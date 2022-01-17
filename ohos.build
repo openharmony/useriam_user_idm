@@ -1,0 +1,22 @@
+{
+  "subsystem": "useriam",
+  "parts": {
+    "useridm": {
+      "variants": [
+        "phone",
+        "wearable"
+      ],
+      "inner_kits": [
+      ],
+      "module_list": [
+        "//base/useriam/useridm/interfaces/innerkits:useridm_framework",
+        "//base/useriam/useridm/services:useridmservice",
+        "//base/useriam/useridm/sa_profiles:useridm_sa_profile",
+        "//base/useriam/useridm/interfaces/kits/napi:useridm"
+      ],
+      "test_list": [
+        "//base/useriam/useridm/unittest:UserIDM_UT_test"
+      ]
+    }
+  }
+}
