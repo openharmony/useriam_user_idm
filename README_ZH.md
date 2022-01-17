@@ -64,7 +64,7 @@
 
 ### 接口说明
 
-**表1** 输入框管理接口
+**表1** 凭据信息管理接口
 
 | 接口名  | 描述                             |
 | ------ | -------------------------------- |
@@ -73,7 +73,7 @@
 | delUser(token : Uint8Array, callback : IIdmCallback) : void; | 口令删除接口，当系统内删除用户口令时，也同时删除该用户的全部认证凭据 |
 | delCred(credentialId : Uint8Array, token : Uint8Array, callback : IIdmCallback) : void; | 凭据删除接口 |
 
-**表2** 数据获取和传输接口
+**表2** 凭据信息查询接口
 
 | 接口名 | 描述                       |
 | ------ | -------------------------------- |
@@ -87,11 +87,11 @@
 
 [useriam_coauth](https://gitee.com/openharmony-sig/useriam_coauth)
 
-[useriam_useridm](https://gitee.com/openharmony-sig/useriam_useridm)
+**[useriam_useridm](https://gitee.com/openharmony-sig/useriam_useridm)**
 
 [useriam_userauth](https://gitee.com/openharmony-sig/useriam_userauth)
 
-**[useriam_pinauth](https://gitee.com/openharmony-sig/useriam_pinauth)**
+[useriam_pinauth](https://gitee.com/openharmony-sig/useriam_pinauth)
 
 [useriam_faceauth](https://gitee.com/openharmony/useriam_faceauth)
 
