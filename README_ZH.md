@@ -19,7 +19,7 @@
 ## 目录
 
 ```undefined
-//base/useriam/user_idm
+//base/user_iam/user_idm
 ├── ohos.build			# 组件描述文件
 ├── useridm.gni			# 构建配置
 ├── frameworks			# 框架代码
