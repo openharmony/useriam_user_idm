@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
-void AuthCommon::StorageCallback(napi_env env, size_t argc, napi_value* argv,
+void AuthCommon::SaveCallback(napi_env env, size_t argc, napi_value* argv,
                                  AsyncCallbackContext* asyncCallbackContext)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
@@ -79,8 +79,7 @@ std::vector<uint8_t> AuthCommon::GetNamedAttribute(napi_env env, napi_value obj)
 {
     std::vector<uint8_t>RetNull = {0};
     napi_value token;
-    napi_status status;
-    status = napi_get_named_property(env, obj, PROPERTY_KEY_EVENT.c_str(), &token);
+    napi_status status = napi_get_named_property(env, obj, PROPERTY_KEY_EVENT.c_str(), &token);
     if (status != napi_ok) {
             HILOG_ERROR("napi_get_named_property faild");
     }
@@ -146,7 +145,7 @@ void AuthCommon::JudgeObjectType (napi_env env, napi_callback_info info, AsyncCa
     if (status != napi_ok) {
         HILOG_ERROR("napi_typeof faild");
     }
-    StorageCallback(env, ONE_PARAMETER, argv, asyncCallbackContext);
+    SaveCallback(env, ONE_PARAMETER, argv, asyncCallbackContext);
 }
 
 void AuthCommon::JudgeDelUserType(napi_env env, napi_callback_info info, AsyncCallbackContext* asyncCallbackContext)
@@ -160,7 +159,7 @@ void AuthCommon::JudgeDelUserType(napi_env env, napi_callback_info info, AsyncCa
         HILOG_ERROR("napi_get_cb_info faild");
     }
     asyncCallbackContext->token = JudgeArryType(env, ZERO_PARAMETER, argv);
-    StorageCallback(env, ONE_PARAMETER, argv, asyncCallbackContext);
+    SaveCallback(env, ONE_PARAMETER, argv, asyncCallbackContext);
 }
 
 void AuthCommon::JudgeDelCredType(napi_env env, napi_callback_info info, AsyncCallbackContext* asyncCallbackContext)
@@ -175,7 +174,7 @@ void AuthCommon::JudgeDelCredType(napi_env env, napi_callback_info info, AsyncCa
     }
     asyncCallbackContext->token = JudgeArryType(env, ZERO_PARAMETER, argv);
     asyncCallbackContext->credentialId = JudgeArryType(env, ONE_PARAMETER, argv);
-    StorageCallback(env, TWO_PARAMETER, argv, asyncCallbackContext);
+    SaveCallback(env, TWO_PARAMETER, argv, asyncCallbackContext);
 }
 
 std::vector<uint8_t> AuthCommon::JudgeArryType(napi_env env, size_t argc, napi_value *argv)
@@ -212,23 +211,21 @@ std::vector<uint8_t> AuthCommon::JudgeArryType(napi_env env, size_t argc, napi_v
 AsyncGetAuthInfo *GCreateAsyncInfo(napi_env env)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
-    AsyncGetAuthInfo *asyncInfo = new (std::nothrow) AsyncGetAuthInfo {
+    return new (std::nothrow) AsyncGetAuthInfo {
         .env = env,
         .asyncWork = nullptr,
         .deferred = nullptr,
     };
-    return asyncInfo;
 }
 
 AsyncOpenSession *OCreateAsyncInfo(napi_env env)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
-    AsyncOpenSession *asyncInfo = new (std::nothrow) AsyncOpenSession {
+    return new (std::nothrow) AsyncOpenSession {
         .env = env,
         .asyncWork = nullptr,
         .deferred = nullptr,
     };
-    return asyncInfo;
 }
 } // UserIDM
 } // USerIAM

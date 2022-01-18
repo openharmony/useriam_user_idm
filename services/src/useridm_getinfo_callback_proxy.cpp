@@ -30,37 +30,33 @@ void UserIDMGetInfoCallbackProxy::OnGetInfo(std::vector<CredentialInfo>& credInf
         USERIDM_HILOGI(MODULE_INNERKIT, "write descriptor failed!");
         return;
     }
-
     // Write container size first
     if (!data.WriteUint32(credInfos.size())) {
         USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteUint32(credInfos.size()).");
         return;
     }
-
-    // write data then
-    for (uint32_t i = 0; i < credInfos.size(); i++) {
-        // credInfos[i].authType
-        if (!data.WriteUint64(credInfos[i].credentialId)) {
-            USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteUint64(info.credentialId).");
-            return;
-        }
-
-        if (!data.WriteUint32(credInfos[i].authType)) {
-            USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteUint32(info.authType).");
-            return;
-        }
-
-        if (!data.WriteUint64(credInfos[i].authSubType)) {
-            USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteUint64(info.authSubType).");
-            return;
-        }
-
-        if (!data.WriteUint64(credInfos[i].templateId)) {
-            USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteUint64(info.templateId).");
-            return;
+    if(credInfos.size() > 0){
+        // write data then
+        for (uint32_t i = 0; i < credInfos.size(); i++) {
+            // credInfos[i].authType
+            if (!data.WriteUint64(credInfos[i].credentialId)) {
+                USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteUint64(info.credentialId).");
+                return;
+            }
+            if (!data.WriteUint32(credInfos[i].authType)) {
+                USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteUint32(info.authType).");
+                return;
+            }
+            if (!data.WriteUint64(credInfos[i].authSubType)) {
+                USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteUint64(info.authSubType).");
+                return;
+            }
+            if (!data.WriteUint64(credInfos[i].templateId)) {
+                USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteUint64(info.templateId).");
+                return;
+            }
         }
     }
-
     bool ret = SendRequest(ON_GET_INFO, data, reply);
     if (ret) {
         int32_t result = reply.ReadInt32();

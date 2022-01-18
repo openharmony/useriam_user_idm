@@ -116,7 +116,7 @@ struct AddCredInfo {
 
 // struct
 struct  RequestResult {
-    int32_t credentialId;   // Credential index value
+    uint64_t credentialId;   // Credential index value
 } ;
 }  // namespace UserIDM
 }  // namespace UserIAM

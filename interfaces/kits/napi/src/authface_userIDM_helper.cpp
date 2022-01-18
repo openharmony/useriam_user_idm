@@ -102,7 +102,7 @@ napi_value UpdateCredential(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_MAX_COUNT] = {nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argcAsync, argv, &thisVar, nullptr));
     UserIdentityManager *userIdentityManager = nullptr;
-    NAPI_CALL(env, napi_unwrap(env, thisVar, (void **)&userIdentityManager)); 
+    NAPI_CALL(env, napi_unwrap(env, thisVar, (void **)&userIdentityManager));
     return userIdentityManager->NAPI_UpdateCredential(env, info);
 }
 

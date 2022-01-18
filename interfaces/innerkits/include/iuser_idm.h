@@ -24,8 +24,6 @@ namespace UserIAM {
 namespace UserIDM {
 class IUserIDM : public IRemoteBroker {
 public:
-    // static const int32_t USERIDM_SERVICE_SA_ID = 1024;
-
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.useridm.IUserIDM");
     
     /**

@@ -11,15 +11,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//base/useriam/useridm/useridm.gni")
+import("//base/user_iam/user_idm/useridm.gni")
 import("//build/ohos.gni")
 
 config("useridm_private_config") {
   include_dirs = [
-    "//base/useriam/coauth/common/interface",
+    "//base/user_iam/auth_executor_mgr/common/interface",
     "${useridm_interfaces_path}/include",
     "${useridm_services_path}/include",
-    ]
+    "//utils/system/safwk/native/include",
+  ]
 }
 
 config("useridm_public_config") {
@@ -30,16 +31,16 @@ config("useridm_public_config") {
 
 ohos_shared_library("useridmservice") {
   sources = [
-        "${useridm_services_path}/src/useridm_callback_proxy.cpp",
-        "${useridm_services_path}/src/useridm_getinfo_callback_proxy.cpp",
-        "${useridm_services_path}/src/useridm_getsecinfo_callback_proxy.cpp",
-        "${useridm_services_path}/src/useridm_service.cpp",
-        "${useridm_services_path}/src/useridm_stub.cpp",
-        "${useridm_services_path}/src/useridm_controller.cpp",
-        "${useridm_services_path}/src/useridm_moudle.cpp",
-        "${useridm_services_path}/src/useridm_coauth_handler.cpp",
-        "${useridm_services_path}/src/useridm_setprop_handler.cpp",
-        "${useridm_services_path}/src/useridm_adapter.cpp",
+    "${useridm_services_path}/src/useridm_callback_proxy.cpp",
+    "${useridm_services_path}/src/useridm_getinfo_callback_proxy.cpp",
+    "${useridm_services_path}/src/useridm_getsecinfo_callback_proxy.cpp",
+    "${useridm_services_path}/src/useridm_service.cpp",
+    "${useridm_services_path}/src/useridm_stub.cpp",
+    "${useridm_services_path}/src/useridm_controller.cpp",
+    "${useridm_services_path}/src/useridm_moudle.cpp",
+    "${useridm_services_path}/src/useridm_coauth_handler.cpp",
+    "${useridm_services_path}/src/useridm_setprop_handler.cpp",
+    "${useridm_services_path}/src/useridm_adapter.cpp",
   ]
 
   configs = [
@@ -49,13 +50,12 @@ ohos_shared_library("useridmservice") {
   public_configs = [ ":useridm_public_config" ]
 
   deps = [
-    #"//base/useriam/useridm/interfaces/innerkits/useridm:useridm_inner",
     "${useridm_innerkits_path}:useridm_framework",
     "//drivers/peripheral/display/hal:hdi_display_device",
     "//utils/native/base:utils",
-    "//base/useriam/coauth/interfaces/innerkits:coauth_framework",
+    "//base/user_iam/auth_executor_mgr/interfaces/innerkits:coauth_framework",
     "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
-    "//base/useriam/coauth/common:useriam_common_lib",
+    "//base/user_iam/auth_executor_mgr/common:useriam_common_lib",
   ]
 
   external_deps = [

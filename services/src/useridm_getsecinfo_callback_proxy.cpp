@@ -33,7 +33,7 @@ void UserIDMGetSecInfoCallbackProxy::OnGetSecInfo(SecInfo &info)
     }
 
     if (!data.WriteUint64(info.secureUid)) {
-        USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteUint64(info.credentialId).");
+        USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteUint64(info.secureUid).");
         return;
     }
 

@@ -19,7 +19,8 @@
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
-UserIDMSetPropHandler::UserIDMSetPropHandler(AuthType type, const uint64_t challenge, const  uint64_t sessionId,
+UserIDMSetPropHandler::UserIDMSetPropHandler(AuthType type, const uint64_t challenge, 
+                                             const  uint64_t sessionId, uint64_t credentialId,
                                              const std::shared_ptr<UserIDMMoudle>& data,
                                              const sptr<IIDMCallback>& callback)
 {
@@ -28,6 +29,7 @@ UserIDMSetPropHandler::UserIDMSetPropHandler(AuthType type, const uint64_t chall
     type_ = type;
     lastChallenge_ = challenge;
     lastSessionId_ = sessionId;
+    lastCredentialId_ = credentialId;
     propDataCallback_ = data;
     propInnerCallback_ = callback;
 }
@@ -38,7 +40,7 @@ void UserIDMSetPropHandler::OnResult(uint32_t result, std::vector<uint8_t> &extr
     if ((type_ == PIN) || (type_ == FACE)) {
         USERIDM_HILOGI(MODULE_INNERKIT, "ready to call callback");
         RequestResult reqResult;
-        reqResult.credentialId = 1;
+        reqResult.credentialId = lastCredentialId_;
         propInnerCallback_->OnResult(result, reqResult);
         propDataCallback_->DeleteSessionId();   // todo no need to check session
     }

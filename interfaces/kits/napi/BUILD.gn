@@ -12,7 +12,7 @@
 # limitations under the License.
 import("//build/ohos.gni")
 import("//build/lite/config/component/lite_component.gni")
-import("//base/useriam/useridm/useridm.gni")
+import("//base/user_iam/user_idm/useridm.gni")
 
 config("useridm_public_config") {
  visibility = [ ":*" ]
@@ -33,13 +33,13 @@ ohos_shared_library("useridm") {
 
   include_dirs = [
     "./include",
-    #"base/useriam/useridm/interfaces/innerkits/include",
+    #"base/user_iam/user_idm/interfaces/innerkits/include",
     "${useridm_innerkits_path}:ohosuseridm",
   ]
 
   deps = [
     "//foundation/ace/napi:ace_napi",
-    "//base/useriam/useridm/interfaces/innerkits:useridm_framework",
+    "//base/user_iam/user_idm/interfaces/innerkits:useridm_framework",
     "//utils/native/base:utils",
   ]
 
@@ -58,8 +58,8 @@ ohos_shared_library("useridm") {
 
   public_deps = []
   relative_install_dir = "module"
-  part_name = "useridm"
-  subsystem_name = "useridm"
+  part_name = "user_idm"
+  subsystem_name = "useriam"
 }
 
 

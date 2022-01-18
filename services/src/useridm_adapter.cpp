@@ -102,7 +102,7 @@ int32_t UserIDMAdapter::InitSchedulation(std::vector<uint8_t> autoToken, int32_t
     USERIDM_HILOGI(MODULE_INNERKIT, "UserIDMAdapter InitSchedulation enter");
 
     // call TA interface InitSchedulation()
-    int32_t ret = OHOS::UserIAM::UserIDM::Hal::GetScheduleId(autoToken, userId, authType, authSubType, sessionId);
+    int32_t ret = OHOS::UserIAM::UserIDM::Hal::InitSchedulation(autoToken, userId, authType, authSubType, sessionId);
     USERIDM_HILOGI(MODULE_INNERKIT, "Call TA info: GetScheduleId: %{public}d", ret);
 
     return ret;
