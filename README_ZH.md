@@ -15,11 +15,11 @@
 
 ## 简介
 
-**用户身份凭据管理（useridm）**是用户IAM子系统的基础部件之一，向上提供系统内统一的用户身份凭据信息管理（设置、修改和删除）接口，向下通过协同认证模块，调用系统内的认证资源，完成用户身份凭据的生命周期管理和安全存储。
+**用户身份凭据管理**是用户IAM子系统的基础部件之一，向上提供系统内统一的用户身份凭据信息管理（设置、修改和删除）接口，向下通过协同认证模块，调用系统内的认证资源，完成用户身份凭据的生命周期管理和安全存储。
 
 **图1** 用户身份凭据管理架构图
 
-<img src="figures/用户身份凭据管理架构图.png" alt="口令认证架构图" style="zoom:80%;" />
+<img src="figures/用户身份凭据管理架构图.png" alt="用户身份凭据管理架构图" style="zoom:80%;" />
 
 ## 目录
 
@@ -64,7 +64,7 @@
 
 ### 接口说明
 
-**表1** 输入框管理接口
+**表1** 凭据信息管理接口
 
 | 接口名  | 描述                             |
 | ------ | -------------------------------- |
@@ -73,7 +73,7 @@
 | delUser(token : Uint8Array, callback : IIdmCallback) : void; | 口令删除接口，当系统内删除用户口令时，也同时删除该用户的全部认证凭据 |
 | delCred(credentialId : Uint8Array, token : Uint8Array, callback : IIdmCallback) : void; | 凭据删除接口 |
 
-**表2** 数据获取和传输接口
+**表2** 凭据信息查询接口
 
 | 接口名 | 描述                       |
 | ------ | -------------------------------- |
@@ -87,11 +87,11 @@
 
 [useriam_coauth](https://gitee.com/openharmony-sig/useriam_coauth)
 
-[useriam_useridm](https://gitee.com/openharmony-sig/useriam_useridm)
+**[useriam_useridm](https://gitee.com/openharmony-sig/useriam_useridm)**
 
 [useriam_userauth](https://gitee.com/openharmony-sig/useriam_userauth)
 
-**[useriam_pinauth](https://gitee.com/openharmony-sig/useriam_pinauth)**
+[useriam_pinauth](https://gitee.com/openharmony-sig/useriam_pinauth)
 
 [useriam_faceauth](https://gitee.com/openharmony/useriam_faceauth)
 
