@@ -20,15 +20,15 @@
 
 ```undefined
 //base/user_iam/user_idm
-├── ohos.build			# 组件描述文件
-├── useridm.gni			# 构建配置
 ├── frameworks			# 框架代码
 ├── interfaces			# 对外接口存放目录
 │   └── innerkits		# 对内部子系统暴露的头文件，供系统服务使用
 ├── sa_profile			# Service Ability 配置文件
 ├── services			# Service Ability 服务实现
 ├── unittest			# 测试代码存放目录
-└── utils				# 测试代码存放目录
+├── utils				# 工具代码存放目录
+├── bundle.json			# 组件描述文件
+└── useridm.gni			# 构建配置
 ```
 
 
