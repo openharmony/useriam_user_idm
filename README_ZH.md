@@ -53,7 +53,7 @@
 
 ### 使用说明
 
-- 需在可信执行环境内实现头文件```common\hal\interface\useridm_interface.h``` 中定义的接口，保证用户身份认证凭据信息与用户id的关联关系不可篡改，可以支持统一用户认证功能。
+- 需在可信执行环境内实现[useriam_auth_executor_mgr](https://gitee.com/openharmony-sig/useriam_coauth)仓内，头文件```common\interface\useridm_interface.h``` 中定义的接口，保证用户身份认证凭据信息与用户id的关联关系不可篡改，可以支持统一用户认证功能。
 - OpenHarmony框架提供了相关功能的软件实现，可供厂商适配时参考实现。
 
 ## 相关仓
