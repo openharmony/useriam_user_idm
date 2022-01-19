@@ -19,7 +19,7 @@ config("useridm_private_config") {
     "${useridm_interfaces_path}/include",
     "${useridm_services_path}/include",
     "${useriam_path}/auth_executor_mgr/interfaces/innerkits/include",
-    "//utils/system/safwk/native/include",
+    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
   ]
 }
 
@@ -29,23 +29,21 @@ config("useridm_public_config") {
 
 ohos_shared_library("useridm_framework") {
   sources = [
-    "${useridm_frameworks_path}/src/useridm_proxy.cpp",
-    "${useridm_frameworks_path}/src/useridm_client.cpp",
     "${useridm_frameworks_path}/src/useridm_callback_stub.cpp",
+    "${useridm_frameworks_path}/src/useridm_client.cpp",
     "${useridm_frameworks_path}/src/useridm_getinfo_callback_stub.cpp",
     "${useridm_frameworks_path}/src/useridm_getsecinfo_callback_stub.cpp",
+    "${useridm_frameworks_path}/src/useridm_proxy.cpp",
   ]
 
   configs = [
     "${useridm_utils_path}:utils_config",
-    ":useridm_private_config"
+    ":useridm_private_config",
   ]
 
   public_configs = [ ":useridm_public_config" ]
 
-  deps = [
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//utils/native/base:utils" ]
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",

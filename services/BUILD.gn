@@ -19,43 +19,39 @@ config("useridm_private_config") {
     "//base/user_iam/auth_executor_mgr/common/interface",
     "${useridm_interfaces_path}/include",
     "${useridm_services_path}/include",
-    "//utils/system/safwk/native/include",
+    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
   ]
 }
 
 config("useridm_public_config") {
-  include_dirs = [
-    "include",
-  ]
+  include_dirs = [ "include" ]
 }
 
 ohos_shared_library("useridmservice") {
   sources = [
+    "${useridm_services_path}/src/useridm_adapter.cpp",
     "${useridm_services_path}/src/useridm_callback_proxy.cpp",
+    "${useridm_services_path}/src/useridm_coauth_handler.cpp",
+    "${useridm_services_path}/src/useridm_controller.cpp",
     "${useridm_services_path}/src/useridm_getinfo_callback_proxy.cpp",
     "${useridm_services_path}/src/useridm_getsecinfo_callback_proxy.cpp",
-    "${useridm_services_path}/src/useridm_service.cpp",
-    "${useridm_services_path}/src/useridm_stub.cpp",
-    "${useridm_services_path}/src/useridm_controller.cpp",
     "${useridm_services_path}/src/useridm_moudle.cpp",
-    "${useridm_services_path}/src/useridm_coauth_handler.cpp",
+    "${useridm_services_path}/src/useridm_service.cpp",
     "${useridm_services_path}/src/useridm_setprop_handler.cpp",
-    "${useridm_services_path}/src/useridm_adapter.cpp",
+    "${useridm_services_path}/src/useridm_stub.cpp",
   ]
 
-  configs = [
-    ":useridm_private_config",
-  ]
+  configs = [ ":useridm_private_config" ]
 
   public_configs = [ ":useridm_public_config" ]
 
   deps = [
     "${useridm_innerkits_path}:useridm_framework",
-    "//drivers/peripheral/display/hal:hdi_display_device",
-    "//utils/native/base:utils",
-    "//base/user_iam/auth_executor_mgr/interfaces/innerkits:coauth_framework",
     "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
     "//base/user_iam/auth_executor_mgr/common:useriam_common_lib",
+    "//base/user_iam/auth_executor_mgr/interfaces/innerkits:coauth_framework",
+    "//drivers/peripheral/display/hal:hdi_display_device",
+    "//utils/native/base:utils",
   ]
 
   external_deps = [

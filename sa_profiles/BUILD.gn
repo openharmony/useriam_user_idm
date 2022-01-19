@@ -12,10 +12,10 @@
 # limitations under the License.
 
 import("//base/user_iam/user_idm/useridm.gni")
-import("//build/ohos/sa_profile/sa_profile.gni")
 import("//build/ohos.gni")
+import("//build/ohos/sa_profile/sa_profile.gni")
 
 ohos_sa_profile("useridm_sa_profile") {
-  sources = [ "921.xml" ]
+  sources = [ "901.xml" ]
   part_name = "${useridm_native_part_name}"
 }
