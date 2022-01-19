@@ -26,7 +26,6 @@ namespace UserIAM {
 namespace UserIDM {
 class AuthCommon {
 public:
-static napi_value TestInterface_1(napi_env env);
 static napi_value CreateObject(napi_env env, const std::string &keyStr, RequestResult requestResult);
 static int32_t GetNamedProperty(napi_env env, napi_value obj, const std::string &keyStr);
 static std::vector<uint8_t> GetNamedAttribute(napi_env env, napi_value obj);
@@ -34,7 +33,7 @@ static void JudgeObjectType (napi_env env, napi_callback_info info, AsyncCallbac
 static std::vector<uint8_t> JudgeArryType(napi_env env, size_t argc, napi_value* argv);
 static void JudgeDelUserType (napi_env env, napi_callback_info info, AsyncCallbackContext* asyncCallbackContext);
 static void JudgeDelCredType(napi_env env, napi_callback_info info, AsyncCallbackContext* asyncCallbackContext);
-static void StorageCallback (napi_env env, size_t argc, napi_value* argv, AsyncCallbackContext* asyncCallbackContext);
+static void SaveCallback (napi_env env, size_t argc, napi_value* argv, AsyncCallbackContext* asyncCallbackContext);
 };
 } // namespace UserIDM
 } // namespace UserIAM

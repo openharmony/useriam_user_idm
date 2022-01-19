@@ -30,15 +30,14 @@ namespace UserIAM {
 namespace UserIDM {
 napi_value GetAuthInfoRet(napi_env env, uint64_t Ret)
 {
-    std::string RetCode = std::to_string(Ret);
-    size_t length = RetCode.size();
+    size_t length = sizeof(Ret);
     void* data = nullptr;
     napi_value arrayBuffer = nullptr;
     size_t bufferSize = length;
-    napi_create_arraybuffer(env, bufferSize, &data, &arrayBuffer);
-    memcpy_s(data, bufferSize, reinterpret_cast<const void*>(RetCode.c_str()), bufferSize);
+    NAPI_CALL(env, napi_create_arraybuffer(env, bufferSize, &data, &arrayBuffer));
+    memcpy_s(data, bufferSize, reinterpret_cast<const void*>(&Ret), bufferSize);
     napi_value result = nullptr;
-    napi_create_typedarray(env, napi_uint8_array, bufferSize, arrayBuffer, 0, &result);
+    NAPI_CALL(env, napi_create_typedarray(env, napi_uint8_array, bufferSize, arrayBuffer, 0, &result));
     return result;
 }
 
@@ -133,8 +132,9 @@ GetInfoCallbackIDM::GetInfoCallbackIDM(AsyncGetAuthInfo *asyncGetAuthInfo)
     asyncGetAuthInfo_ = asyncGetAuthInfo;
 }
 
-napi_value GetInfoCallbackIDM::createCredentialInfo (std::vector<CredentialInfo>& info) 
+napi_value GetInfoCallbackIDM::createCredentialInfo (std::vector<CredentialInfo>& info)
 {
+    HILOG_INFO("authFace : %{public}s, start.", __func__);
     napi_env env;
     napi_value Obj;
     napi_value Ary;
@@ -144,27 +144,28 @@ napi_value GetInfoCallbackIDM::createCredentialInfo (std::vector<CredentialInfo>
     napi_value templateId_;
     if (asyncGetAuthInfo_ != nullptr) {
         env = asyncGetAuthInfo_->env;
-        NAPI_CALL(env, napi_create_array_with_length(env,info.size(),&Ary));
-        for (uint64_t Vect = 0; Vect < info.size(); Vect ++ ) {
-            NAPI_CALL(env, napi_create_object(env,&Obj));
-            credentialId_ = GetAuthInfoRet(env,(info[Vect].credentialId));
-            NAPI_CALL(env, napi_create_int32(env,static_cast<int32_t>(info[Vect].authType),&authType_));
-            NAPI_CALL(env, napi_create_int32(env,static_cast<int32_t>(info[Vect].authSubType),&authSubType_));
-            templateId_ = GetAuthInfoRet(env,(info[Vect].templateId));
-            NAPI_CALL(env, napi_set_named_property(env,Obj,"credentialId",credentialId_));
-            NAPI_CALL(env, napi_set_named_property(env,Obj,"authType",authType_));
-            NAPI_CALL(env, napi_set_named_property(env,Obj,"authSubType",authSubType_));
-            NAPI_CALL(env, napi_set_named_property(env,Obj,"templateId",templateId_));
-            NAPI_CALL(env, napi_set_element(env,Ary,Vect,Obj));
+        NAPI_CALL(env, napi_create_array_with_length(env, info.size(), &Ary));
+        for (uint64_t Vect = 0; Vect < info.size(); Vect ++) {
+            NAPI_CALL(env, napi_create_object(env, &Obj));
+            credentialId_ = GetAuthInfoRet(env, (info[Vect].credentialId));
+            NAPI_CALL(env, napi_create_int32(env, static_cast<int32_t>(info[Vect].authType), &authType_));
+            NAPI_CALL(env, napi_create_int32(env, static_cast<int32_t>(info[Vect].authSubType), &authSubType_));
+            templateId_ = GetAuthInfoRet(env, (info[Vect].templateId));
+            NAPI_CALL(env, napi_set_named_property(env, Obj, "credentialId", credentialId_));
+            NAPI_CALL(env, napi_set_named_property(env, Obj, "authType", authType_));
+            NAPI_CALL(env, napi_set_named_property(env, Obj, "authSubType", authSubType_));
+            NAPI_CALL(env, napi_set_named_property(env, Obj, "templateId", templateId_));
+            NAPI_CALL(env, napi_set_element(env, Ary, Vect, Obj));
         }
         return Ary;
     }
     return nullptr;
-} 
+}
 
 void GetInfoCallbackIDM::OnGetInfo(std::vector<CredentialInfo>& info)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
+    HILOG_INFO("vector size : %{public}d.",info.size());
     if (asyncGetAuthInfo_ != nullptr) {
         napi_env env;
         napi_status status;
@@ -185,15 +186,15 @@ void GetInfoCallbackIDM::OnGetInfo(std::vector<CredentialInfo>& info)
         napi_value global;
         napi_value callbackRet = 0;
         result[ZERO_PARAMETER] = createCredentialInfo(info);
-        status = napi_get_reference_value(env,asyncGetAuthInfo_->callback,&callback);
+        status = napi_get_reference_value(env, asyncGetAuthInfo_->callback, &callback);
         if (status != napi_ok) {
             HILOG_ERROR("napi_get_reference_value faild");
         }
-        status = napi_get_global(env,&global);
+        status = napi_get_global(env, &global);
         if (status != napi_ok) {
             HILOG_ERROR("napi_get_global faild");
         }
-        status = napi_call_function(env,global,callback,1,result,&callbackRet); 
+        status = napi_call_function(env, global, callback, 1, result, &callbackRet);
         if (status != napi_ok) {
             HILOG_ERROR("napi_call_function faild");
         }

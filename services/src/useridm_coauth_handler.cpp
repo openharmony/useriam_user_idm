@@ -33,7 +33,7 @@ UserIDMCoAuthHandler::UserIDMCoAuthHandler(CoAuthType type, const uint64_t chall
     innerCallback_ = callback;
 }
 void UserIDMCoAuthHandler::OnFinishModify(uint32_t resultCode, std::vector<uint8_t> &scheduleToken,
-                                          uint64_t credentialId, int32_t result)
+                                          uint64_t& credentialId, int32_t result)
 {
     // success
     // check sessionId:
@@ -45,12 +45,6 @@ void UserIDMCoAuthHandler::OnFinishModify(uint32_t resultCode, std::vector<uint8
     if (!res) {
         // challenge miss return error, need openSession()
         USERIDM_HILOGE(MODULE_INNERKIT, "check challenge num error: no challenge!");
-
-        RequestResult reqRet;
-        reqRet.credentialId = 0;
-        innerCallback_->OnResult(result, reqRet);
-        // clean session data
-        dataCallback_->DeleteSessionId();
         return;
     }
 
@@ -66,6 +60,7 @@ void UserIDMCoAuthHandler::OnFinishModify(uint32_t resultCode, std::vector<uint8
         std::shared_ptr<UserIDMSetPropHandler> setPropCallback =
                                                 std::make_shared<UserIDMSetPropHandler>(PIN, challenge,
                                                                                         sessionId,
+                                                                                        credentialId,
                                                                                         dataCallback_,
                                                                                         innerCallback_);
             
@@ -79,13 +74,7 @@ void UserIDMCoAuthHandler::OnFinishModify(uint32_t resultCode, std::vector<uint8
         // Call the collaboration interface again to delete the template ID and password
         CoAuth::CoAuth::GetInstance().SetExecutorProp(condition, setPropCallback);
     } else {
-        // if not:  session has been canceled
-        RequestResult reqRet;
-        reqRet.credentialId = 0;
-        innerCallback_->OnResult(result, reqRet);
-        // clean session data
-        dataCallback_->DeleteSessionId();
-        return;
+        USERIDM_HILOGE(MODULE_INNERKIT, "sessionId wrong!");
     }
 }
 void UserIDMCoAuthHandler::OnFinish(uint32_t resultCode, std::vector<uint8_t> &scheduleToken)
@@ -122,9 +111,10 @@ void UserIDMCoAuthHandler::OnFinish(uint32_t resultCode, std::vector<uint8_t> &s
     } else if (MODIFY_CRED == type_) {
         int32_t result = FAIL;
         OnFinishModify(resultCode, scheduleToken, credentialId, result);
+
         // if not:  session has been canceled
         RequestResult reqRet;
-        reqRet.credentialId = 0;
+        reqRet.credentialId = credentialId;
         innerCallback_->OnResult(result, reqRet);
         // clean session data
         dataCallback_->DeleteSessionId();
@@ -141,7 +131,7 @@ void UserIDMCoAuthHandler::OnAcquireInfo(uint32_t acquire)
 
     if (ADD_FACE_CRED == type_) {
         RequestResult reqRet;
-        reqRet.credentialId = 1;
+        reqRet.credentialId = 0;
         innerCallback_->OnResult(acquire, reqRet);   // Prompt information is returned through callback
     }
 }

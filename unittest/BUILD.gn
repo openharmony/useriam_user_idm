@@ -13,8 +13,7 @@
 
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("//base/useriam/useridm/useridm.gni")
-
+import("//base/user_iam/user_idm/useridm.gni")
 
 module_output_path = "useridm/UserIDM_UT_test"
 
@@ -29,22 +28,17 @@ ohos_unittest("UserIDM_UT_test") {
 
   include_dirs = [
     "include",
-    "//base/useriam/useridm/unittest/include",
+    "//base/user_iam/user_idm/unittest/include",
     "//out/hi3516dv300/innerkits/ohos-arm/ipc/ipc_single/include",
-    "//base/useriam/useridm/interfaces/innerkits/include",
-    "//base/useriam/useridm/services/include",
+    "//base/user_iam/user_idm/interfaces/innerkits/include",
+    "//base/user_iam/user_idm/services/include",
   ]
   
   deps = [
-    #"//base/useriam/useridm/interfaces/innerkits/useridm:useridm_inner",
     "${useridm_innerkits_path}:useridm_framework",
     "//drivers/peripheral/display/hal:hdi_display_device",
     "//utils/native/base:utils",
-    #"//base/security/permission/interfaces/innerkits/permission_standard/distributedpermission/:distributed_permission_innerkits",
     "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
-    #"//base/useriam/useridm/interfaces/innerkits/useridm:useridm_inner",
-    #"//base/useriam/useridm/services/useridmservice/adapter:useridm_authdata_adapter",
-  #  "//base/useriam/coauth/interfaces/innerkits:coauth",
   ]
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",

@@ -26,7 +26,7 @@ namespace UserIAM {
 namespace UserIDM {
 class UserIDMSetPropHandler : public CoAuth::SetPropCallback {
 public:
-    UserIDMSetPropHandler(AuthType type, const uint64_t challenge, const  uint64_t sessionId,
+    UserIDMSetPropHandler(AuthType type, const uint64_t challenge, const  uint64_t sessionId, uint64_t credentialId,
         const std::shared_ptr<UserIDMMoudle>& data, const sptr<IIDMCallback>& callback);
     // Param3: function pointer passed in to the caller
     virtual ~UserIDMSetPropHandler() = default;
@@ -36,6 +36,7 @@ public:
 private:
     uint64_t lastChallenge_;
     uint64_t lastSessionId_;
+    uint64_t lastCredentialId_;
     std::shared_ptr<UserIDMMoudle> propDataCallback_;
     sptr<IIDMCallback> propInnerCallback_;
     AuthType type_;   // 0: add cred 1: modify cred

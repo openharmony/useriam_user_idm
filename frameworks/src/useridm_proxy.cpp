@@ -75,7 +75,7 @@ int32_t UserIDMProxy::GetAuthInfo(AuthType authType, const sptr<IGetInfoCallback
     }
 
     int32_t result = FAIL;
-    bool ret = SendRequest(USERIDM_GET_AUTH_INFO, data, reply, false);
+    bool ret = SendRequest(USERIDM_GET_AUTH_INFO, data, reply, true);
     if (ret) {
         result = reply.ReadInt32();
         USERIDM_HILOGI(MODULE_INNERKIT, "result = %{public}d", result);
@@ -99,7 +99,7 @@ int32_t UserIDMProxy::GetSecInfo(const sptr<IGetSecInfoCallback>& callback)
     }
 
     int32_t result = FAIL;
-    bool ret = SendRequest(USERIDM_GET_SEC_INFO, data, reply, false);
+    bool ret = SendRequest(USERIDM_GET_SEC_INFO, data, reply, true);
     if (ret) {
         result = reply.ReadInt32();
         USERIDM_HILOGI(MODULE_INNERKIT, "result = %{public}d", result);

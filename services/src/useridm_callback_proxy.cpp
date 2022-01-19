@@ -36,8 +36,8 @@ void UserIDMCallbackProxy::OnResult(int32_t result, RequestResult reqRet)
         return;
     }
 
-    if (!data.WriteInt32(reqRet.credentialId)) {
-        USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteInt32(reqRet.credentialId).");
+    if (!data.WriteUint64(reqRet.credentialId)) {
+        USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteUint64(reqRet.credentialId).");
         return;
     }
 
@@ -70,8 +70,8 @@ void UserIDMCallbackProxy::OnAcquireInfo(int32_t module, int32_t acquire, Reques
         return;
     }
 
-    if (!data.WriteInt32(reqRet.credentialId)) {
-        USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteInt32(reqRet.credentialId).");
+    if (!data.WriteUint64(reqRet.credentialId)) {
+        USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteUint64(reqRet.credentialId).");
         return;
     }
 

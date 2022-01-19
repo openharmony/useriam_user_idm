@@ -195,7 +195,7 @@ HWTEST_F(UseriamUtTest, UseriamUtTest_009b, TestSize.Level1)
 }
 HWTEST_F(UseriamUtTest, UseriamUtTest_010, TestSize.Level1)
 {
-    uint32_t credentialId=1;
+    uint64_t credentialId=1;
     std::vector<uint8_t> authToken;
     std::shared_ptr<IDMCallback> call=nullptr;
     USERIDM_HILOGI(MODULE_INNERKIT, " UseriamUtTest_010  enter");
@@ -203,7 +203,7 @@ HWTEST_F(UseriamUtTest, UseriamUtTest_010, TestSize.Level1)
 }
 HWTEST_F(UseriamUtTest, UseriamUtTest_010b, TestSize.Level1)
 {
-    uint32_t credentialId=1;
+    uint64_t credentialId=1;
     std::vector<uint8_t> authToken;
     std::shared_ptr<IDMCallback> call = std::make_shared<IDMCallbackUT>();
     USERIDM_HILOGI(MODULE_INNERKIT, " UseriamUtTest_010b  enter");

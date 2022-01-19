@@ -29,8 +29,8 @@ UserIDMGetInfoCallbackStub::UserIDMGetInfoCallbackStub(const std::shared_ptr<Get
 int32_t UserIDMGetInfoCallbackStub::OnRemoteRequest(uint32_t code,
                                                     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, "UserIDMGetInfoCallbackStub::OnRemoteRequest, cmd = %d, flags= %d", code,
-                   option.GetFlags());
+    USERIDM_HILOGI(MODULE_INNERKIT, "UserIDMGetInfoCallbackStub::OnRemoteRequest, cmd = %{public}d, flags= %d", 
+                    code, option.GetFlags());
 
     std::u16string descripter = UserIDMGetInfoCallbackStub::GetDescriptor();
     std::u16string remoteDescripter = data.ReadInterfaceToken();
@@ -56,14 +56,16 @@ int32_t UserIDMGetInfoCallbackStub::OnGetInfoStub(MessageParcel& data, MessagePa
     uint32_t vectorSize = data.ReadUint32();    // vector size
     std::vector<CredentialInfo> credInfos;
 
-    for (uint32_t i = 0; i < vectorSize; i ++) {
-        CredentialInfo info;
-        info.credentialId = data.ReadUint64();          // credentialId
-        info.authType = static_cast<AuthType>(data.ReadUint32());               // authType
-        info.authSubType = static_cast<AuthSubType>(data.ReadUint64());         // authSubType
-        info.templateId = data.ReadUint64();            // templateId
-        // todo
-        credInfos.push_back(info);
+    if (vectorSize > 0) {
+        for (uint32_t i = 0; i < vectorSize; i ++) {
+            CredentialInfo info;
+            info.credentialId = data.ReadUint64();          // credentialId
+            info.authType = static_cast<AuthType>(data.ReadUint32());               // authType
+            info.authSubType = static_cast<AuthSubType>(data.ReadUint64());         // authSubType
+            info.templateId = data.ReadUint64();            // templateId
+            // todo
+            credInfos.push_back(info);
+        }
     }
 
     this->OnGetInfo(credInfos);

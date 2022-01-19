@@ -42,6 +42,8 @@ public:
     int32_t DeleteUserByForceCtrl(int32_t userId, std::vector<CredentialInfo>& credInfo);
     
     int32_t AddCredentialCtrl(AddCredInfo & credInfo, const sptr<IIDMCallback>& innerCallback); // napi callback
+    void    AddCredentialCallCoauth(AddCredInfo& credInfo, const sptr<IIDMCallback>& innerkitsCallback,
+                                    uint64_t& challenge, uint64_t& scheduleId, int32_t& userId);
     int32_t UpdateCredentialCtrl(AddCredInfo & credInfo, const sptr<IIDMCallback>& innerCallback);   // napi callback
     int32_t DelSchedleIdCtrl(uint64_t challenge);
     int32_t DelFaceCredentialCtrl(AuthType authType, AuthSubType authSubType,

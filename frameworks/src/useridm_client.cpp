@@ -44,7 +44,7 @@ sptr<IUserIDM> UserIDMClient::GetUserIDMProxy()
         return nullptr;
     }
 
-    sptr<IRemoteObject> obj = sam->CheckSystemAbility(USERIDM_SERVICE_SA_ID);
+    sptr<IRemoteObject> obj = sam->CheckSystemAbility(SUBSYS_USERIAM_SYS_ABILITY_USERIDM);
     if (!obj) {
         USERIDM_HILOGE(MODULE_INNERKIT, "failed to get remoteObject.");
         return nullptr;

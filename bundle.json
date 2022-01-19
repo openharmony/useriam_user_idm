@@ -1,0 +1,66 @@
+{
+    "name": "@openharmony/user_idm",
+    "version": "3.1.0",
+    "description": "User Identity Management capability",
+    "homePage": "https://gitee.com/openharmony",
+    "author": {},
+    "repository": "",
+    "license": "Apache License 2.0",
+    "publishAs": "code-segment",
+    "segment": {
+      "destPath" : "base/user_iam/user_idm"
+    },
+    "dirs": {},
+    "scripts": {},
+    "component": {
+      "name": "user_idm",
+      "subsystem": "useriam",
+      "adapted_system_type": [ "standard" ],
+      "syscap": ["SystemCapability.UserIAM.UserIDM"],
+      "features": [],
+      "rom": "300KB",
+      "ram": "1000KB",
+      "deps": {
+        "components": [
+            "hiviewdfx_hilog_native",
+            "ipc",
+            "safwk",
+            "samgr_standard",
+            "auth_executor_mgr"
+        ],
+        "third_party": [
+        ]
+      },
+      "build": {
+        "sub_component": [
+            "//base/user_iam/user_idm/services:useridmservice",
+            "//base/user_iam/user_idm/sa_profiles:useridm_sa_profile",
+            "//base/user_iam/user_idm/interfaces/kits/napi:useridm"	  
+        ],
+        "inner_kits": [
+		  {
+            "type": "so",
+            "name": "//base/user_iam/user_idm/interfaces/innerkits:useridm_framework",
+            "header": {
+              "header_files": [
+                "iuser_idm.h",
+                "iuseridm_callback.h",
+                "useridm_callback.h",
+                "useridm_callback_stub.h",
+                "useridm_client.h",
+                "useridm_getinfo_callback_stub.h",
+                "useridm_getsecinfo_callback_stub.h",
+                "useridm_hilog_wrapper.h",
+                "useridm_info.h",
+                "useridm_proxy.h"				
+              ],
+              "header_base": "//base/user_iam/user_idm/interfaces/innerkits/include"
+            }
+          }  
+        ],
+        "test": [
+            "//base/user_iam/user_idm/unittest:UserIDM_UT_test"
+        ]
+      }
+    }
+  }

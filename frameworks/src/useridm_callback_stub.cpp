@@ -56,7 +56,7 @@ int32_t UserIDMCallbackStub::OnResultStub(MessageParcel& data, MessageParcel& re
     RequestResult reqRet;
 
     int32_t result = data.ReadInt32();
-    reqRet.credentialId = data.ReadInt32();
+    reqRet.credentialId = data.ReadUint64();
 
     this->OnResult(result, reqRet);
 
@@ -71,7 +71,7 @@ int32_t UserIDMCallbackStub::OnAcquireInfoStub(MessageParcel& data, MessageParce
     RequestResult reqRet;
     int32_t module = data.ReadInt32();
     int32_t acquire = data.ReadInt32();
-    reqRet.credentialId = data.ReadInt32();
+    reqRet.credentialId = data.ReadUint64();
 
     OnAcquireInfo(module, acquire, reqRet);
     if (!reply.WriteInt32(ret)) {

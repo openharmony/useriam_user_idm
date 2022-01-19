@@ -101,29 +101,58 @@ int32_t UserIDMController::DeleteUserByForceCtrl(int32_t userId, std::vector<Cre
     return UserIDMAdapter::GetInstance().DeleteUserEnforce(userId, credInfo);
 }
 
-int32_t UserIDMController::AddCredentialCtrl(AddCredInfo & credInfo, const sptr<IIDMCallback>& innerkitsCallback)
+void UserIDMController::AddCredentialCallCoauth(AddCredInfo& credInfo, const sptr<IIDMCallback>& innerkitsCallback,
+                                                uint64_t& challenge, uint64_t& scheduleId, int32_t& userId)
+{
+    // success
+    std::string callerName = "callerName";
+    data_->InsertSessionId(scheduleId);
+    // callback: as coauth info param
+    std::shared_ptr<UserIDMCoAuthHandler> coAuthCallback;
+    CoAuth::AuthInfo paramInfo;
+    paramInfo.SetPkgName(callerName);
+    paramInfo.SetCallerUid(userId);
+
+    USERIDM_HILOGE(MODULE_INNERKIT, "credInfo.authType is [%{public}d]!", credInfo.authType);
+
+    if (credInfo.authType == PIN) {
+        coAuthCallback = std::make_shared<UserIDMCoAuthHandler>(ADD_PIN_CRED, challenge, scheduleId, data_,
+                                                                innerkitsCallback);
+    } else if (FACE == credInfo.authType) {
+        coAuthCallback = std::make_shared<UserIDMCoAuthHandler>(ADD_FACE_CRED, challenge, scheduleId, data_,
+                                                                innerkitsCallback);
+    } else {
+        USERIDM_HILOGE(MODULE_INNERKIT, "credInfo.authType error: %{public}d!", credInfo.authType);
+        coAuthCallback = std::make_shared<UserIDMCoAuthHandler>(ADD_PIN_CRED, challenge, scheduleId, data_,
+                                                                innerkitsCallback);
+    }
+    if (coAuthCallback == nullptr) {
+        USERIDM_HILOGE(MODULE_INNERKIT, "coAuthCallback is nullptr!");
+    }
+    // call coauth info
+    CoAuth::CoAuth::GetInstance().coAuth(scheduleId, paramInfo, coAuthCallback);
+}
+
+int32_t UserIDMController::AddCredentialCtrl(AddCredInfo& credInfo, const sptr<IIDMCallback>& innerkitsCallback)
 {
     USERIDM_HILOGI(MODULE_INNERKIT, "AddCredentialCtrl enter ");
-    int32_t userId = 0;
-    std::string callerName = "callerName";
     uint64_t scheduleId = 0;
     uint64_t challenge = 0;
+    int32_t userId = 0;
     // add death recipient start
     sptr<IRemoteObject::DeathRecipient> dr = new AddCredCallbackDeathRecipient(this);
     if (!innerkitsCallback->AsObject()->AddDeathRecipient(dr)) {
         USERIDM_HILOGE(MODULE_INNERKIT, "Failed to add death recipient AddCredCallbackDeathRecipient");
     }
-    addCredCallback_ = innerkitsCallback;  //
+    addCredCallback_ = innerkitsCallback;
     USERIDM_HILOGI(MODULE_SERVICE, "add death recipient success!");
     // add death recipient end
-
     bool res = data_->CheckChallenge(challenge);
     if (!res) {
         // challenge miss return error, need openSession()
         USERIDM_HILOGE(MODULE_INNERKIT, "check challenge num error: no challenge!");
         return FAIL;
     }
-
     res = data_->CheckSessionId(scheduleId);
     if (res) {
         // current session in active
@@ -132,34 +161,8 @@ int32_t UserIDMController::AddCredentialCtrl(AddCredInfo & credInfo, const sptr<
     }
     int32_t ret = UserIDMAdapter::GetInstance().InitSchedulation(credInfo.token, userId, credInfo.authType,
                                                                  credInfo.authSubType, scheduleId);
-    if (SUCCESS == ret) {
-        // success
-        data_->InsertSessionId(scheduleId);
-        // callback: as coauth info param
-        std::shared_ptr<UserIDMCoAuthHandler> coAuthCallback;
-
-        CoAuth::AuthInfo paramInfo;
-        paramInfo.SetPkgName(callerName);
-        paramInfo.SetCallerUid(userId);
-
-        USERIDM_HILOGE(MODULE_INNERKIT, "credInfo.authType is [%{public}d]!", credInfo.authType);
-
-        if (credInfo.authType == PIN) {
-            coAuthCallback = std::make_shared<UserIDMCoAuthHandler>(ADD_PIN_CRED, challenge, scheduleId, data_,
-                                                                    innerkitsCallback);
-        } else if (FACE == credInfo.authType) {
-            coAuthCallback = std::make_shared<UserIDMCoAuthHandler>(ADD_FACE_CRED, challenge, scheduleId, data_,
-                                                                    innerkitsCallback);
-        } else {
-            USERIDM_HILOGE(MODULE_INNERKIT, "credInfo.authType error: %{public}d!", credInfo.authType);
-            coAuthCallback = std::make_shared<UserIDMCoAuthHandler>(ADD_PIN_CRED, challenge, scheduleId, data_,
-                                                                    innerkitsCallback);
-        }
-        if (coAuthCallback == nullptr) {
-            USERIDM_HILOGE(MODULE_INNERKIT, "coAuthCallback is nullptr!");
-        }
-        // call coauth info
-        CoAuth::CoAuth::GetInstance().coAuth(scheduleId, paramInfo, coAuthCallback);
+    if (ret == SUCCESS) {
+        AddCredentialCallCoauth(credInfo, innerkitsCallback, challenge, scheduleId, userId);
     } else {
         // check failed
         // no need insert sessionId
@@ -212,7 +215,7 @@ int32_t UserIDMController::UpdateCredentialCtrl(AddCredInfo & credInfo, const sp
         data_->InsertSessionId(scheduleId);
         // callback: as coauth info param
         std::shared_ptr<UserIDMCoAuthHandler> coAuthCallback =
-                                              std::make_shared<UserIDMCoAuthHandler>(MODIFY_CRED, challenge,
+                                               std::make_shared<UserIDMCoAuthHandler>(MODIFY_CRED, challenge,
                                                                                      scheduleId, data_,
                                                                                      innerkitsCallback);
         
@@ -270,7 +273,7 @@ int32_t UserIDMController::DelFaceCredentialCtrl(AuthType authType, AuthSubType 
 
     if (authType == FACE) { // FACE
         std::shared_ptr<UserIDMSetPropHandler> setPropCallback =
-                                               std::make_shared<UserIDMSetPropHandler>(FACE, 0, 0,
+                                               std::make_shared<UserIDMSetPropHandler>(FACE, 0, 0, credentialId,
                                                                                        data_, innerCallback);
 
         AuthResPool::AuthAttributes condition;
@@ -312,8 +315,8 @@ int32_t UserIDMController::DelExecutorPinInofCtrl(const sptr<IIDMCallback>& inne
         if (PIN == info[i].authType) {
             // PIN
             std::shared_ptr<UserIDMSetPropHandler> setPropCallback =
-                                                   std::make_shared<UserIDMSetPropHandler>(PIN, 0, 0, data_,
-                                                                                           innerCallback);
+                                                   std::make_shared<UserIDMSetPropHandler>(PIN, 0, 0, info[i].credentialId,
+                                                                                            data_, innerCallback);
 
             AuthResPool::AuthAttributes condition;
             condition.SetUint32Value(AuthAttributeType::AUTH_PROPERTY_MODE, 0);
@@ -327,8 +330,8 @@ int32_t UserIDMController::DelExecutorPinInofCtrl(const sptr<IIDMCallback>& inne
         } else if (info[i].authType == FACE) {     // to be delete
             // FACE
             std::shared_ptr<UserIDMSetPropHandler> setPropCallback =
-                                                   std::make_shared<UserIDMSetPropHandler>(FACE, 0, 0, data_,
-                                                                                           innerCallback);
+                                                   std::make_shared<UserIDMSetPropHandler>(FACE, 0, 0, info[i].credentialId,
+                                                                                            data_, innerCallback);
             AuthResPool::AuthAttributes condition;
             condition.SetUint32Value(AuthAttributeType::AUTH_PROPERTY_MODE, 0);
             condition.SetUint64Value(AuthAttributeType::AUTH_CALLER_UID, 0);

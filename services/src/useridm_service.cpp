@@ -23,7 +23,7 @@ namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
 // define System Ability
-REGISTER_SYSTEM_ABILITY_BY_ID(UserIDMService, USERIDM_SERVICE_SA_ID, true);
+REGISTER_SYSTEM_ABILITY_BY_ID(UserIDMService, SUBSYS_USERIAM_SYS_ABILITY_USERIDM, true);
 
 UserIDMService::UserIDMService(int32_t systemAbilityId, bool runOnCreate)
     : SystemAbility(systemAbilityId, runOnCreate)
@@ -41,7 +41,6 @@ void UserIDMService::OnStart()
     if (!ret) {
         OHOS::UserIAM::Common::Init();
     }
-    //service_ = new UserIDMService();
     if (!Publish(this)) {
         USERIDM_HILOGE(MODULE_INNERKIT, "Failed to publish service");
     }
@@ -144,10 +143,10 @@ int32_t UserIDMService::EnforceDelUser(int32_t userId, const sptr<IIDMCallback>&
     int32_t ret = 0;
 
     // get accountmgr info
-    bool isAccountMgr = true;
+    // bool isAccountMgr = true;
     std::vector<CredentialInfo> credInfos;
 
-    if (isAccountMgr) {
+    //if (isAccountMgr) {
         ret = idmController_.DeleteUserByForceCtrl(userId, credInfos);
         if (SUCCESS != ret) {
             USERIDM_HILOGE(MODULE_INNERKIT, "DeleteUserByForceCtrl return fail");
@@ -157,7 +156,7 @@ int32_t UserIDMService::EnforceDelUser(int32_t userId, const sptr<IIDMCallback>&
         } else {
             ret = idmController_.DelExecutorPinInofCtrl(callback, credInfos);
         }
-    }
+    //}
 
     return ret;
 }

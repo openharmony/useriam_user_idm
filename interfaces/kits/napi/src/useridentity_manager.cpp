@@ -92,15 +92,14 @@ napi_value UserIdentityManager::OpenSessionWrap(napi_env env, napi_callback_info
 
 napi_value OpenSessionRet (napi_env env, AsyncOpenSession* asyncOpenSession)
 {
-    std::string RetCode = std::to_string(asyncOpenSession->OpenSession);
-    size_t length = RetCode.size();
+    size_t length = sizeof(asyncOpenSession->OpenSession);
     void* data = nullptr;
     napi_value arrayBuffer = nullptr;
     size_t bufferSize = length;
-    napi_create_arraybuffer(env, bufferSize, &data, &arrayBuffer);
-    memcpy_s(data, bufferSize, reinterpret_cast<const void*>(RetCode.c_str()), bufferSize);
+    NAPI_CALL(env, napi_create_arraybuffer(env, bufferSize, &data, &arrayBuffer));
+    memcpy_s(data, bufferSize, reinterpret_cast<const void*>(&asyncOpenSession->OpenSession), bufferSize);
     napi_value result = nullptr;
-    napi_create_typedarray(env, napi_uint8_array, bufferSize, arrayBuffer, 0, &result);
+    NAPI_CALL(env, napi_create_typedarray(env, napi_uint8_array, bufferSize, arrayBuffer, 0, &result));
     return result;
 }
 
@@ -349,7 +348,7 @@ napi_value UserIdentityManager::NAPI_DelUser(napi_env env, napi_callback_info in
     AuthCommon::JudgeDelUserType(env, info, asyncCallbackContext);
     napi_value resourceName = nullptr;
     NAPI_CALL(env, napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName));
-    NAPI_CALL(env, napi_create_async_work(env, nullptr, resourceName,DelUserExecute, DelUserComplete,
+    NAPI_CALL(env, napi_create_async_work(env, nullptr, resourceName, DelUserExecute, DelUserComplete,
                                           (void *)asyncCallbackContext, &asyncCallbackContext->asyncWork));
     NAPI_CALL(env, napi_queue_async_work(env, asyncCallbackContext->asyncWork));
     napi_value result = RESULT;
@@ -395,8 +394,8 @@ napi_value UserIdentityManager::NAPI_DelCred(napi_env env, napi_callback_info in
     AuthCommon::JudgeDelCredType(env, info, asyncCallbackContext);
     napi_value resourceName = nullptr;
     NAPI_CALL(env, napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName));
-    NAPI_CALL(env, napi_create_async_work(env, nullptr, resourceName,DelCredExecute, DelCredComplete,
-                                         (void *)asyncCallbackContext, &asyncCallbackContext->asyncWork));
+    NAPI_CALL(env, napi_create_async_work(env, nullptr, resourceName, DelCredExecute, DelCredComplete,
+                                          (void *)asyncCallbackContext, &asyncCallbackContext->asyncWork));
     NAPI_CALL(env, napi_queue_async_work(env, asyncCallbackContext->asyncWork));
     napi_value result = RESULT;
     NAPI_CALL(env, napi_get_null(env, &result));
