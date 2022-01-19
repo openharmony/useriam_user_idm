@@ -10,36 +10,35 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import("//build/ohos.gni")
-import("//build/lite/config/component/lite_component.gni")
 import("//base/user_iam/user_idm/useridm.gni")
+import("//build/lite/config/component/lite_component.gni")
+import("//build/ohos.gni")
 
 config("useridm_public_config") {
- visibility = [ ":*" ]
-  include_dirs = [
-    "include"
-  ]
-  cflags = [ ]
+  visibility = [ ":*" ]
+  include_dirs = [ "include" ]
+  cflags = []
 }
- 
+
 ohos_shared_library("useridm") {
   sources = [
-    "src/callback.cpp",
-    "src/useridentity_manager.cpp",
-    "src/authface_userIDM_helper.cpp",
     "src/auth_common.cpp",
+    "src/authface_userIDM_helper.cpp",
+    "src/callback.cpp",
     "src/native_moudle_init.cpp",
+    "src/useridentity_manager.cpp",
   ]
 
   include_dirs = [
     "./include",
+
     #"base/user_iam/user_idm/interfaces/innerkits/include",
     "${useridm_innerkits_path}:ohosuseridm",
   ]
 
   deps = [
-    "//foundation/ace/napi:ace_napi",
     "//base/user_iam/user_idm/interfaces/innerkits:useridm_framework",
+    "//foundation/ace/napi:ace_napi",
     "//utils/native/base:utils",
   ]
 
@@ -61,5 +60,3 @@ ohos_shared_library("useridm") {
   part_name = "user_idm"
   subsystem_name = "useriam"
 }
-
-
