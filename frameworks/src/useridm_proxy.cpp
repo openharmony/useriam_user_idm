@@ -14,6 +14,7 @@
  */
 
 #include "useridm_proxy.h"
+#include <cinttypes>
 #include "useridm_hilog_wrapper.h"
 
 namespace OHOS {
@@ -33,7 +34,7 @@ uint64_t UserIDMProxy::OpenSession()
     bool ret = SendRequest(USERIDM_OPEN_SESSION, data, reply);
     if (ret) {
         result = reply.ReadUint64();
-        USERIDM_HILOGI(MODULE_INNERKIT, "result = %{public}llu", result);
+        USERIDM_HILOGI(MODULE_INNERKIT, "result = %{public}" PRIu64, result);
     }
     return result;
 }
