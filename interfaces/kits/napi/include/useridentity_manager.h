@@ -23,7 +23,7 @@
 #include "useridm_client.h"
 #include "useridm_callback.h"
 #include "napi/native_api.h"
-#include "napi/native_node_api.h"
+#include "napi/native_common.h"
 
 namespace OHOS {
 namespace UserIAM {

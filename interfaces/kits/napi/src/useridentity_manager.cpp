@@ -22,7 +22,7 @@
 #include "auth_common.h"
 #include "hilog_wrapper.h"
 #include "napi/native_api.h"
-#include "napi/native_node_api.h"
+#include "napi/native_common.h"
 #include "useridentity_manager.h"
 
 const size_t ARGC = 2;
