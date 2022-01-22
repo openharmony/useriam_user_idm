@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 #include <iremote_broker.h>
-#include "useridentity_manager.h"
+
 #include "hilog_wrapper.h"
+#include "useridentity_manager.h"
 #include "authface_userIDM_helper.h"
 
 namespace OHOS {

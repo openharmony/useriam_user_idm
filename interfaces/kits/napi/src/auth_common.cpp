@@ -17,10 +17,11 @@
 #include <sstream>
 #include <string>
 #include <iremote_broker.h>
+
+#include "hilog_wrapper.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "useridentity_manager.h"
-#include "hilog_wrapper.h"
 #include "auth_common.h"
 
 namespace OHOS {
@@ -31,27 +32,30 @@ void AuthCommon::SaveCallback(napi_env env, size_t argc, napi_value* argv,
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
     napi_valuetype valueType;
-    napi_typeof(env, argv[argc], &valueType);
+    napi_status status = napi_typeof(env, argv[argc], &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR("napi_typeof faild");
+    }
     if (valueType == napi_object) {
         asyncCallbackContext->callbackInfo.env = env;
-        napi_status status = napi_get_named_property(env, argv[argc], "onResult",
-                                                     &asyncCallbackContext->IdmCallOnResult);
+        status = napi_get_named_property(env, argv[argc], "onResult",
+            &asyncCallbackContext->IdmCallOnResult);
         if (status != napi_ok) {
             HILOG_ERROR("napi_get_named_property faild");
         }
         status = napi_create_reference(
             env, asyncCallbackContext->IdmCallOnResult, 1, &asyncCallbackContext->callbackInfo.onResult);
-            if (status != napi_ok) {
+        if (status != napi_ok) {
             HILOG_ERROR("napi_create_reference faild");
         }
         status = napi_get_named_property(
             env, argv[argc], "onAcquireInfo", &asyncCallbackContext->IdmCallonAcquireInfo);
-            if (status != napi_ok) {
+        if (status != napi_ok) {
             HILOG_ERROR("napi_get_named_property faild");
         }
         status = napi_create_reference(
             env, asyncCallbackContext->IdmCallonAcquireInfo, 1, &asyncCallbackContext->callbackInfo.onAcquireInfo);
-            if (status != napi_ok) {
+        if (status != napi_ok) {
             HILOG_ERROR("napi_create_reference faild");
         }
     } else {
@@ -65,23 +69,24 @@ int32_t AuthCommon::GetNamedProperty(napi_env env, napi_value obj, const std::st
     napi_value value = nullptr;
     napi_status status = napi_get_named_property(env, obj, keyStr.c_str(), &value);
     if (status != napi_ok) {
-            HILOG_ERROR("napi_get_named_property faild");
+        HILOG_ERROR("napi_get_named_property faild");
     }
     uint32_t propLen;
     status = napi_get_value_uint32(env, value, &propLen);
     if (status != napi_ok) {
-            HILOG_ERROR("napi_get_value_uint32 faild");
+        HILOG_ERROR("napi_get_value_uint32 faild");
     }
     return propLen;
 }
 
 std::vector<uint8_t> AuthCommon::GetNamedAttribute(napi_env env, napi_value obj)
 {
+    HILOG_INFO("authFace : %{public}s, start.", __func__);
     std::vector<uint8_t>RetNull = {0};
     napi_value token;
     napi_status status = napi_get_named_property(env, obj, PROPERTY_KEY_EVENT.c_str(), &token);
     if (status != napi_ok) {
-            HILOG_ERROR("napi_get_named_property faild");
+        HILOG_ERROR("napi_get_named_property faild");
     }
     napi_typedarray_type arraytype;
     size_t length = 0;
@@ -91,20 +96,20 @@ std::vector<uint8_t> AuthCommon::GetNamedAttribute(napi_env env, napi_value obj)
     bool isTypedArray = false;
     napi_is_typedarray(env, token, &isTypedArray);
     if (isTypedArray) {
-        HILOG_INFO("args[PIN_PARAMS_ONE]  is a array");
+        HILOG_INFO("token is a array");
     } else {
-        HILOG_INFO("args[PIN_PARAMS_ONE]  is not a uint8array");
+        HILOG_INFO("token is not a array");
         return RetNull;
     }
     napi_get_typedarray_info(env, token, &arraytype, &length, reinterpret_cast<void **>(&data), &buffer, &offset);
     if (arraytype == napi_uint8_array) {
-        HILOG_INFO("InputerImpl, OnSetData get uint8 array ");
+        HILOG_INFO("token is uint8 array ");
     } else {
-        HILOG_ERROR("InputerImpl, OnSetData get uint8 array error");
+        HILOG_ERROR("token is not a uint8 array ");
         return RetNull;
     }
     if (offset != 0) {
-        HILOG_INFO(" offset is =============>%{public}d", offset);
+        HILOG_INFO("offset is %{public}d", offset);
         return RetNull;
     }
     std::vector<uint8_t> result(data, data + length);
@@ -118,10 +123,15 @@ napi_value AuthCommon::CreateObject(napi_env env, const std::string &keyStr, Req
     napi_value credentialId = nullptr;
     NAPI_CALL(env, napi_create_object(env, &obj));
     if (keyStr.c_str() == FUNC_ONRESULT || keyStr.c_str() == FUNC_ONACQUIREINFO) {
-        NAPI_CALL(env, napi_create_int32(env, requestResult.credentialId, &credentialId));
+        void* data = nullptr;
+        napi_value arrayBuffer = nullptr;
+        size_t length = sizeof(requestResult.credentialId);
+        size_t bufferSize = length;
+        NAPI_CALL(env, napi_create_arraybuffer(env, bufferSize, &data, &arrayBuffer));
+        memcpy_s(data, bufferSize, reinterpret_cast<const void*>(&requestResult.credentialId), bufferSize);
+        NAPI_CALL(env, napi_create_typedarray(env, napi_uint8_array, bufferSize, arrayBuffer, 0, &credentialId));
     }
     NAPI_CALL(env, napi_set_named_property(env, obj, "credentialId", credentialId));
-    HILOG_INFO("authFace : %{public}s, end.", __func__);
     return obj;
 }
 
@@ -179,6 +189,7 @@ void AuthCommon::JudgeDelCredType(napi_env env, napi_callback_info info, AsyncCa
 
 std::vector<uint8_t> AuthCommon::JudgeArryType(napi_env env, size_t argc, napi_value *argv)
 {
+    HILOG_INFO("authFace : %{public}s, start.", __func__);
     std::vector<uint8_t>RetNull = {0};
     napi_typedarray_type arraytype;
     size_t length = 0;
@@ -188,20 +199,20 @@ std::vector<uint8_t> AuthCommon::JudgeArryType(napi_env env, size_t argc, napi_v
     bool isTypedArray = false;
     napi_is_typedarray(env, argv[argc], &isTypedArray);
     if (isTypedArray) {
-        HILOG_INFO("args[PIN_PARAMS_ONE]  is a array");
+        HILOG_INFO("this is a array");
     } else {
-        HILOG_INFO("args[PIN_PARAMS_ONE]  is not a uint8array");
+        HILOG_INFO("this is not a array");
         return RetNull;
     }
     napi_get_typedarray_info(env, argv[argc], &arraytype, &length, reinterpret_cast<void **>(&data), &buffer, &offset);
     if (arraytype == napi_uint8_array) {
-        HILOG_INFO("InputerImpl, OnSetData get uint8 array ");
+        HILOG_INFO("this is a uint8 array ");
     } else {
-        HILOG_ERROR("InputerImpl, OnSetData get uint8 array error");
+        HILOG_ERROR("this is not a uint8 array ");
         return RetNull;
     }
     if (offset != 0) {
-        HILOG_INFO(" offset is =============>%{public}d", offset);
+        HILOG_INFO(" offset is %{public}d", offset);
         return RetNull;
     }
     std::vector<uint8_t>result(data, data + length);
