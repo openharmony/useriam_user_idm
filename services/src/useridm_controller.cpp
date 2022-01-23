@@ -101,17 +101,16 @@ int32_t UserIDMController::DeleteUserByForceCtrl(int32_t userId, std::vector<Cre
     return UserIDMAdapter::GetInstance().DeleteUserEnforce(userId, credInfo);
 }
 
-void UserIDMController::AddCredentialCallCoauth(AddCredInfo& credInfo, const sptr<IIDMCallback>& innerkitsCallback,
-                                                uint64_t& challenge, uint64_t& scheduleId, int32_t& userId)
+void UserIDMController::AddCredentialCallCoauth(uint64_t callerID, std::string callerName,
+    AddCredInfo& credInfo, const sptr<IIDMCallback>& innerkitsCallback, uint64_t& challenge,
+    uint64_t& scheduleId, int32_t& userId)
 {
-    // success
-    std::string callerName = "callerName";
     data_->InsertSessionId(scheduleId);
     // callback: as coauth info param
     std::shared_ptr<UserIDMCoAuthHandler> coAuthCallback;
     CoAuth::AuthInfo paramInfo;
     paramInfo.SetPkgName(callerName);
-    paramInfo.SetCallerUid(userId);
+    paramInfo.SetCallerUid(callerID);
 
     USERIDM_HILOGE(MODULE_INNERKIT, "credInfo.authType is [%{public}d]!", credInfo.authType);
 
@@ -133,7 +132,8 @@ void UserIDMController::AddCredentialCallCoauth(AddCredInfo& credInfo, const spt
     CoAuth::CoAuth::GetInstance().coAuth(scheduleId, paramInfo, coAuthCallback);
 }
 
-int32_t UserIDMController::AddCredentialCtrl(AddCredInfo& credInfo, const sptr<IIDMCallback>& innerkitsCallback)
+int32_t UserIDMController::AddCredentialCtrl(uint64_t callerID, std::string callerName,
+    AddCredInfo& credInfo, const sptr<IIDMCallback>& innerkitsCallback)
 {
     USERIDM_HILOGI(MODULE_INNERKIT, "AddCredentialCtrl enter ");
     uint64_t scheduleId = 0;
@@ -151,59 +151,64 @@ int32_t UserIDMController::AddCredentialCtrl(AddCredInfo& credInfo, const sptr<I
     if (!res) {
         // challenge miss return error, need openSession()
         USERIDM_HILOGE(MODULE_INNERKIT, "check challenge num error: no challenge!");
+        RequestResult reqRet;
+        innerkitsCallback->OnResult(FAIL, reqRet);
         return FAIL;
     }
     res = data_->CheckSessionId(scheduleId);
     if (res) {
         // current session in active
         USERIDM_HILOGE(MODULE_INNERKIT, "current session in active: busy!");
+        RequestResult reqRet;
+        innerkitsCallback->OnResult(BUSY, reqRet);
         return BUSY;  // todo siqi busy
     }
     int32_t ret = UserIDMAdapter::GetInstance().InitSchedulation(credInfo.token, userId, credInfo.authType,
                                                                  credInfo.authSubType, scheduleId);
     if (ret == SUCCESS) {
-        AddCredentialCallCoauth(credInfo, innerkitsCallback, challenge, scheduleId, userId);
+        AddCredentialCallCoauth(callerID, callerName, credInfo, innerkitsCallback, challenge, scheduleId, userId);
     } else {
         // check failed
         // no need insert sessionId
         // direct return failed
         USERIDM_HILOGE(MODULE_INNERKIT, "call TA info: InitSchedulation failed!");
+        RequestResult reqRet;
+        innerkitsCallback->OnResult(FAIL, reqRet);
         ret = FAIL;
     }
     USERIDM_HILOGE(MODULE_INNERKIT, "AddCredentialCtrl end");
     return ret;
 }
 
-int32_t UserIDMController::UpdateCredentialCtrl(AddCredInfo & credInfo, const sptr<IIDMCallback>& innerkitsCallback)
+int32_t UserIDMController::UpdateCredentialCtrl(uint64_t callerID, std::string callerName,
+    AddCredInfo & credInfo, const sptr<IIDMCallback>& innerkitsCallback)
 {
     USERIDM_HILOGI(MODULE_INNERKIT, "UpdateCredentialCtrl enter ");
-
-    // userid and caller name
     int32_t userId = 0;
-    std::string callerName = "callerName";
     uint64_t scheduleId = 0;
     uint64_t challenge = 0;
 
-    // update death recipient start
     sptr<IRemoteObject::DeathRecipient> dr = new UpdateCredCallbackDeathRecipient(this);
     if (!innerkitsCallback->AsObject()->AddDeathRecipient(dr)) {
         USERIDM_HILOGE(MODULE_INNERKIT, "Failed to add death recipient UpdateCredCallbackDeathRecipient");
     }
     updateCredCallback_ = innerkitsCallback;
     USERIDM_HILOGI(MODULE_SERVICE, "update death recipient success!");
-    // update death recipient end
 
     bool res = data_->CheckChallenge(challenge);
     if (!res) {
         // challenge miss return error, need openSession()
         USERIDM_HILOGE(MODULE_INNERKIT, "check challenge num error: no challenge!");
+        RequestResult reqRet;
+        innerkitsCallback->OnResult(FAIL, reqRet);
         return FAIL;
     }
-
     res = data_->CheckSessionId(scheduleId);
     if (res) {
         // current session in active
         USERIDM_HILOGE(MODULE_INNERKIT, "current session in active: busy!");
+        RequestResult reqRet;
+        innerkitsCallback->OnResult(BUSY, reqRet);
         return BUSY;  // todo busy
     }
 
@@ -218,20 +223,17 @@ int32_t UserIDMController::UpdateCredentialCtrl(AddCredInfo & credInfo, const sp
                                                std::make_shared<UserIDMCoAuthHandler>(MODIFY_CRED, challenge,
                                                                                      scheduleId, data_,
                                                                                      innerkitsCallback);
-        
         CoAuth::AuthInfo paramInfo;
         paramInfo.SetPkgName(callerName);
-        paramInfo.SetCallerUid(userId);
-
+        paramInfo.SetCallerUid(callerID);
         CoAuth::CoAuth::GetInstance().coAuth(scheduleId, paramInfo, coAuthCallback);
     } else {
         // InitSchedulation failed
-        // no need add pair data
-        // direct return failed
         USERIDM_HILOGE(MODULE_INNERKIT, "call TA info: InitSchedulation failed!");
+        RequestResult reqRet;
+        innerkitsCallback->OnResult(FAIL, reqRet);
         ret = FAIL;
     }
-
     return ret;
 }
 
@@ -297,17 +299,17 @@ int32_t UserIDMController::DelExecutorPinInofCtrl(const sptr<IIDMCallback>& inne
 {
     USERIDM_HILOGI(MODULE_INNERKIT, "DelExecutorPinInofCtrl enter: info.size(): %{public}d.", info.size());
 
-    // delete user recipient start
     sptr<IRemoteObject::DeathRecipient> dr = new DelUserCallbackDeathRecipient(this);
     if (!innerCallback->AsObject()->AddDeathRecipient(dr)) {
         USERIDM_HILOGE(MODULE_INNERKIT, "Failed to add death recipient DelUserCallbackDeathRecipient");
     }
     delUserCallback_ = innerCallback;
     USERIDM_HILOGI(MODULE_SERVICE, "delete user recipient success!");
-    // delete user recipient end
 
     if (info.size() < MIN_VECTOR_SIZE) {
         USERIDM_HILOGI(MODULE_INNERKIT, "info size error!: %{public}d.", info.size());
+        RequestResult reqRet;
+        innerCallback->OnResult(FAIL, reqRet);
         return FAIL;
     }
 
@@ -317,7 +319,6 @@ int32_t UserIDMController::DelExecutorPinInofCtrl(const sptr<IIDMCallback>& inne
             std::shared_ptr<UserIDMSetPropHandler> setPropCallback =
                                                    std::make_shared<UserIDMSetPropHandler>(PIN, 0, 0, info[i].credentialId,
                                                                                             data_, innerCallback);
-
             AuthResPool::AuthAttributes condition;
             condition.SetUint32Value(AuthAttributeType::AUTH_PROPERTY_MODE, 0);
             condition.SetUint64Value(AuthAttributeType::AUTH_CALLER_UID, 0);
@@ -325,7 +326,6 @@ int32_t UserIDMController::DelExecutorPinInofCtrl(const sptr<IIDMCallback>& inne
             condition.SetUint64Value(AuthAttributeType::AUTH_SUBTYPE, info[i].authSubType);
             condition.SetUint64Value(AuthAttributeType::AUTH_CREDENTIAL_ID, info[i].credentialId);
             condition.SetUint64Value(AuthAttributeType::AUTH_TEMPLATE_ID, info[i].templateId);
-
             CoAuth::CoAuth::GetInstance().SetExecutorProp(condition, setPropCallback);
         } else if (info[i].authType == FACE) {     // to be delete
             // FACE
@@ -339,7 +339,6 @@ int32_t UserIDMController::DelExecutorPinInofCtrl(const sptr<IIDMCallback>& inne
             condition.SetUint64Value(AuthAttributeType::AUTH_SUBTYPE, info[i].authSubType);
             condition.SetUint64Value(AuthAttributeType::AUTH_CREDENTIAL_ID, info[i].credentialId);
             condition.SetUint64Value(AuthAttributeType::AUTH_TEMPLATE_ID, info[i].templateId);
-
             CoAuth::CoAuth::GetInstance().SetExecutorProp(condition, setPropCallback);
         }   // endif
     }   // end for

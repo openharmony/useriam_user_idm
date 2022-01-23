@@ -13,16 +13,16 @@
  * limitations under the License.
  */
 #include <cstdio>
-#include <iostream>
-#include <sstream>
 #include <string>
+#include <sstream>
+#include <iostream>
 #include <securec.h>
 #include <iremote_broker.h>
 #include "callback.h"
-#include "napi/native_api.h"
-#include "napi/native_node_api.h"
 #include "auth_common.h"
 #include "hilog_wrapper.h"
+#include "napi/native_api.h"
+#include "napi/native_node_api.h"
 #include "useridentity_manager.h"
 
 const size_t ARGC = 2;
@@ -92,6 +92,7 @@ napi_value UserIdentityManager::OpenSessionWrap(napi_env env, napi_callback_info
 
 napi_value OpenSessionRet (napi_env env, AsyncOpenSession* asyncOpenSession)
 {
+    HILOG_INFO("authFace : %{public}s, start.", __func__);
     size_t length = sizeof(asyncOpenSession->OpenSession);
     void* data = nullptr;
     napi_value arrayBuffer = nullptr;
@@ -112,8 +113,8 @@ napi_value UserIdentityManager::OpenSessionCallback(napi_env env, napi_value *ar
         return nullptr;
     }
     napi_value resourceName = nullptr;
-    napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName);
-    napi_create_async_work(
+    NAPI_CALL(env, napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName));
+    NAPI_CALL(env, napi_create_async_work(
         env, nullptr, resourceName,
         [](napi_env env, void *data) {
             AsyncOpenSession *asyncInfo = (AsyncOpenSession*)data;
@@ -126,16 +127,17 @@ napi_value UserIdentityManager::OpenSessionCallback(napi_env env, napi_value *ar
             napi_value undefined;
             napi_value callResult = ZERO_PARAMETER;
             result[0] = OpenSessionRet(env, asyncInfo);
+            if (result[0] == nullptr) {
+                HILOG_ERROR("translate uint64 to uint8Array faild");
+            }
             napi_get_undefined(env, &undefined);
             napi_get_reference_value(env, asyncInfo->callback, &callback_);
-            napi_valuetype valuetype;
-            napi_typeof(env, result[0], &valuetype);
             napi_call_function(env, undefined, callback_, 1, result, &callResult);
             napi_delete_async_work(env, asyncInfo->asyncWork);
             delete asyncInfo;
             asyncInfo = nullptr;
         },
-        (void *)asyncInfo, &asyncInfo->asyncWork);
+        (void *)asyncInfo, &asyncInfo->asyncWork));
     NAPI_CALL(env, napi_queue_async_work(env, asyncInfo->asyncWork));
     napi_value result = RESULT;
     NAPI_CALL(env, napi_get_null(env, &result));
@@ -151,7 +153,7 @@ napi_value UserIdentityManager::OpenSessionPromise(napi_env env, napi_value *arg
     }
     napi_value resourceName = nullptr;
     NAPI_CALL(env, napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName));
-    napi_create_async_work(
+    NAPI_CALL(env, napi_create_async_work(
         env, nullptr, resourceName,
         [](napi_env env, void *data) {
             AsyncOpenSession *asyncInfo = (AsyncOpenSession*)data;
@@ -161,12 +163,15 @@ napi_value UserIdentityManager::OpenSessionPromise(napi_env env, napi_value *arg
            AsyncOpenSession *asyncInfo = (AsyncOpenSession*)data;
             napi_value RetPromise = nullptr;
             RetPromise = OpenSessionRet(env, asyncInfo);
+            if (RetPromise == nullptr) {
+                HILOG_ERROR("translate uint64 to uint8Array faild");
+            }
             napi_resolve_deferred(asyncInfo->env, asyncInfo->deferred, RetPromise);
             napi_delete_async_work(env, asyncInfo->asyncWork);
             delete asyncInfo;
             asyncInfo = nullptr;
         },
-        (void *)asyncInfo, &asyncInfo->asyncWork);
+        (void *)asyncInfo, &asyncInfo->asyncWork));
     NAPI_CALL(env,  napi_queue_async_work(env, asyncInfo->asyncWork));
     return asyncInfo->promise;
 }
@@ -298,15 +303,17 @@ napi_value UserIdentityManager::NAPI_Cancel(napi_env env, napi_callback_info inf
     int32_t ret = 0;
     napi_value result = nullptr;
     size_t argc = ONE_PARAMETER;
-    std::string translate;
     napi_value argv[ONE_PARAMETER] = {0};
     SyncCancelContext *syncCancelContext = new (std::nothrow) SyncCancelContext();
     syncCancelContext->env = env;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
     syncCancelContext->challenge = AuthCommon::JudgeArryType(env, ZERO_PARAMETER, argv);
-    translate.assign(syncCancelContext->challenge.begin(), syncCancelContext->challenge.end());
-    uint64_t tempChanlenge = atol(translate.c_str());
-    ret = UserIDMClient::GetInstance().Cancel(tempChanlenge);
+    uint8_t tmp[sizeof(uint64_t)];
+    for (uint32_t i = 0; i < sizeof(uint64_t); i++) {
+        tmp[i] = syncCancelContext->challenge[i];
+    }
+    uint64_t *re = static_cast<uint64_t *>(static_cast<void *>(tmp));
+    ret = UserIDMClient::GetInstance().Cancel(*re);
     NAPI_CALL(env, napi_create_int32(env, ret, &result));
     delete syncCancelContext;
     syncCancelContext = nullptr;
@@ -361,11 +368,13 @@ void UserIdentityManager::DelCredExecute(napi_env env, void *data)
     HILOG_INFO("authFace : %{public}s, start.", __func__);
     AsyncCallbackContext* asyncCallbackContext = (AsyncCallbackContext*)data;
     if (asyncCallbackContext != nullptr) {
-        std::string translate;
-        translate.assign(asyncCallbackContext->credentialId.begin(), asyncCallbackContext->credentialId.end());
-        uint64_t tempCredentialId = atol(translate.c_str());
+        uint8_t tmp[sizeof(uint64_t)];
+        for (uint32_t i = 0; i < sizeof(uint64_t); i++) {
+        tmp[i] = asyncCallbackContext->credentialId[i];
+        }
+        uint64_t *tempCredentialId = static_cast<uint64_t *>(static_cast<void *>(tmp));
         std::shared_ptr<IDMCallback> iidmCallback = std::make_shared<IIdmCallback>(asyncCallbackContext);
-        UserIDMClient::GetInstance().DelCred(tempCredentialId, asyncCallbackContext->token, iidmCallback);
+        UserIDMClient::GetInstance().DelCred(*tempCredentialId, asyncCallbackContext->token, iidmCallback);
     } else {
         HILOG_ERROR("syncDelCredContext is nullptr");
     }
@@ -444,7 +453,7 @@ napi_value UserIdentityManager::GetAuthInfoWrap(napi_env env, napi_callback_info
         ret = GetAuthInfoPromise(env, argv, argc, asyncInfo);
     } else {
         callbackIndex = argc - 1;
-        napi_typeof(env, argv[callbackIndex], &valuetype);
+        NAPI_CALL(env, napi_typeof(env, argv[callbackIndex], &valuetype));
         if (valuetype == napi_function) {
             NAPI_CALL(env, napi_create_reference(env, argv[callbackIndex], 1, &asyncInfo->callback));
             ret = GetAuthInfoCallback(env, argv, argc, asyncInfo);
@@ -499,7 +508,7 @@ napi_value UserIdentityManager::GetAuthInfoPromise(napi_env env, napi_value *arg
         return nullptr;
     }
     napi_valuetype valuetype = napi_undefined;
-    napi_typeof(env, argv[0], &valuetype);
+    NAPI_CALL(env, napi_typeof(env, argv[0], &valuetype));
     if (argv[0] != nullptr && valuetype == napi_number) {
         int32_t jsAuthType = 0;
         NAPI_CALL(env, napi_get_value_int32(env, argv[0], &jsAuthType));
@@ -508,8 +517,8 @@ napi_value UserIdentityManager::GetAuthInfoPromise(napi_env env, napi_value *arg
         asyncInfo->authType = static_cast<AuthType>(0);
     }
     napi_value resourceName = nullptr;
-    napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName);
-    napi_create_async_work(
+    NAPI_CALL(env, napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName));
+    NAPI_CALL(env, napi_create_async_work(
         env, nullptr, resourceName,
         [](napi_env env, void *data) {
             AsyncGetAuthInfo *asyncInfo = (AsyncGetAuthInfo *)data;
@@ -522,8 +531,8 @@ napi_value UserIdentityManager::GetAuthInfoPromise(napi_env env, napi_value *arg
             delete asyncInfo;
             asyncInfo = nullptr;
         },
-        (void *)asyncInfo, &asyncInfo->asyncWork);
-    napi_queue_async_work(env, asyncInfo->asyncWork);
+        (void *)asyncInfo, &asyncInfo->asyncWork));
+    NAPI_CALL(env, napi_queue_async_work(env, asyncInfo->asyncWork));
     return asyncInfo->promise;
 }
 } // namespace UserIDM

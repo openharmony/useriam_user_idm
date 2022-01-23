@@ -113,17 +113,19 @@ int32_t UserIDMService::GetSecInfo(const sptr<IGetSecInfoCallback>& callback)
 void UserIDMService::AddCredential(AddCredInfo& credInfo, const sptr<IIDMCallback>& callback)
 {
     USERIDM_HILOGI(MODULE_INNERKIT, "service AddCredential enter");
+    uint64_t callerID = this->GetCallingUid();
+    std::string callerName = std::to_string(callerID);
 
-    // done into controller
-    idmController_.AddCredentialCtrl(credInfo, callback);
+    idmController_.AddCredentialCtrl(callerID, callerName, credInfo, callback);
 }
 
 void UserIDMService::UpdateCredential(AddCredInfo& credInfo, const sptr<IIDMCallback>& innerkitsCallback)
 {
     USERIDM_HILOGI(MODULE_INNERKIT, "service UpdateCredential enter");
+    uint64_t callerID = this->GetCallingUid();
+    std::string callerName = std::to_string(callerID);
 
-    // done into controller
-    idmController_.UpdateCredentialCtrl(credInfo, innerkitsCallback);
+    idmController_.UpdateCredentialCtrl(callerID, callerName, credInfo, innerkitsCallback);
 }
 
 int32_t UserIDMService::Cancel(uint64_t challenge)
@@ -175,6 +177,8 @@ void UserIDMService::DelUser(std::vector<uint8_t> authToken, const sptr<IIDMCall
         idmController_.DelExecutorPinInofCtrl(callback, credInfos);
     } else {
         USERIDM_HILOGE(MODULE_INNERKIT, "DeleteUserCtrl failed");
+        RequestResult reqRet;
+        callback->OnResult(ret, reqRet);
     }
 }
 
@@ -196,6 +200,8 @@ void UserIDMService::DelCred(uint64_t credentialId, std::vector<uint8_t> authTok
                                              innerkitsCallback);
     } else {
         USERIDM_HILOGE(MODULE_INNERKIT, "DeleteCredentialCtrl failed ");
+        RequestResult reqRet;
+        innerkitsCallback->OnResult(ret, reqRet);
     }
 }
 }  // namespace UserIDM

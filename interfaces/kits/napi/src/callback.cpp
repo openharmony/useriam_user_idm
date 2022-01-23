@@ -17,11 +17,12 @@
 #include <sstream>
 #include <string>
 #include <iremote_broker.h>
+
+#include "auth_common.h"
+#include "hilog_wrapper.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "useridentity_manager.h"
-#include "auth_common.h"
-#include "hilog_wrapper.h"
 #include "callback.h"
 const int paramTwo = 2;
 const int paramThree = 3;
@@ -30,6 +31,7 @@ namespace UserIAM {
 namespace UserIDM {
 napi_value GetAuthInfoRet(napi_env env, uint64_t Ret)
 {
+    HILOG_INFO("authFace : %{public}s, start.", __func__);
     size_t length = sizeof(Ret);
     void* data = nullptr;
     napi_value arrayBuffer = nullptr;
@@ -43,10 +45,11 @@ napi_value GetAuthInfoRet(napi_env env, uint64_t Ret)
 
 IIdmCallback::IIdmCallback(AsyncCallbackContext* asyncCallbackContext)
 {
+    HILOG_INFO("authFace : %{public}s, start.", __func__);
     std::lock_guard<std::mutex> idmMutexGuard(mutex_);
     asyncCallbackContext_ = asyncCallbackContext;
 }
- 
+
 void IIdmCallback::OnResult(int32_t result, RequestResult extraInfo)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
@@ -64,6 +67,9 @@ void IIdmCallback::OnResult(int32_t result, RequestResult extraInfo)
             HILOG_ERROR("napi_create_int32 faild");
         }
         param[ONE_PARAMETER] = AuthCommon::CreateObject(env, FUNC_ONRESULT, extraInfo);
+        if (param[ONE_PARAMETER] == nullptr) {
+            HILOG_ERROR("create object faild");
+        }
         status =napi_get_reference_value(env, asyncCallbackContext_->callbackInfo.onResult, &callbackRef);
         if (status != napi_ok) {
             HILOG_ERROR("napi_get_reference_value faild");
@@ -104,6 +110,9 @@ void IIdmCallback::OnAcquireInfo(int32_t module, int32_t acquire, RequestResult 
             HILOG_ERROR("napi_create_int32 faild");
         }
         Sparam[TWO_PARAMETER] = AuthCommon::CreateObject(env, FUNC_ONACQUIREINFO, extraInfo);
+        if (Sparam[TWO_PARAMETER] == nullptr) {
+            HILOG_ERROR("create object faild");
+        }
         status = napi_get_reference_value(env, asyncCallbackContext_->callbackInfo.onAcquireInfo, &callbackRef);
         if (status != napi_ok) {
             HILOG_ERROR("napi_get_reference_value faild");
@@ -148,9 +157,15 @@ napi_value GetInfoCallbackIDM::createCredentialInfo (std::vector<CredentialInfo>
         for (uint64_t Vect = 0; Vect < info.size(); Vect ++) {
             NAPI_CALL(env, napi_create_object(env, &Obj));
             credentialId_ = GetAuthInfoRet(env, (info[Vect].credentialId));
+            if (credentialId_ == nullptr) {
+                HILOG_ERROR("GetAuthInfo faild");
+            }
             NAPI_CALL(env, napi_create_int32(env, static_cast<int32_t>(info[Vect].authType), &authType_));
             NAPI_CALL(env, napi_create_int32(env, static_cast<int32_t>(info[Vect].authSubType), &authSubType_));
             templateId_ = GetAuthInfoRet(env, (info[Vect].templateId));
+            if (templateId_ == nullptr) {
+                HILOG_ERROR("GetAuthInfo faild");
+            }
             NAPI_CALL(env, napi_set_named_property(env, Obj, "credentialId", credentialId_));
             NAPI_CALL(env, napi_set_named_property(env, Obj, "authType", authType_));
             NAPI_CALL(env, napi_set_named_property(env, Obj, "authSubType", authSubType_));
@@ -165,7 +180,6 @@ napi_value GetInfoCallbackIDM::createCredentialInfo (std::vector<CredentialInfo>
 void GetInfoCallbackIDM::OnGetInfo(std::vector<CredentialInfo>& info)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
-    HILOG_INFO("vector size : %{public}d.",info.size());
     if (asyncGetAuthInfo_ != nullptr) {
         napi_env env;
         napi_status status;
@@ -174,6 +188,9 @@ void GetInfoCallbackIDM::OnGetInfo(std::vector<CredentialInfo>& info)
         if (asyncGetAuthInfo_->callback == nullptr) {
             napi_value ResPromise;
             result[ZERO_PARAMETER] = createCredentialInfo(info);
+            if (result[ZERO_PARAMETER] == nullptr) {
+                HILOG_ERROR("createCredentialInfo faild");
+            }
             ResPromise = result[ZERO_PARAMETER];
             status = napi_resolve_deferred(asyncGetAuthInfo_->env, asyncGetAuthInfo_->deferred, ResPromise);
             if (status != napi_ok) {
@@ -186,6 +203,9 @@ void GetInfoCallbackIDM::OnGetInfo(std::vector<CredentialInfo>& info)
         napi_value global;
         napi_value callbackRet = 0;
         result[ZERO_PARAMETER] = createCredentialInfo(info);
+        if (result[ZERO_PARAMETER] == nullptr) {
+            HILOG_ERROR("createCredentialInfo faild");
+        }
         status = napi_get_reference_value(env, asyncGetAuthInfo_->callback, &callback);
         if (status != napi_ok) {
             HILOG_ERROR("napi_get_reference_value faild");

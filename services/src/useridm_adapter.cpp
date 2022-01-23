@@ -70,7 +70,7 @@ int32_t UserIDMAdapter::QueryCredential(int32_t userId, AuthType authType,
     return ret;
 }
 
-int32_t UserIDMAdapter::GetSecureUid(int32_t userId, uint64_t secureUid,
+int32_t UserIDMAdapter::GetSecureUid(int32_t userId, uint64_t& secureUid,
                                      std::vector<OHOS::UserIAM::UserIDM::EnrolledInfo>& enroInfos)
 {
     USERIDM_HILOGI(MODULE_INNERKIT, "UserIDMAdapter GetSecureUid enter");
