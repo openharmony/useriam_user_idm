@@ -49,7 +49,6 @@ public:
     AsyncGetAuthInfo *asyncGetAuthInfo_;
     void OnGetInfo(std::vector<CredentialInfo>& info) override;
     void OnGetInfolog(std::vector<CredentialInfo>& info);
-    napi_value createCredentialInfo (std::vector<CredentialInfo>& info);
 };
 napi_value GetAuthInfoRet(napi_env env, AsyncGetAuthInfo* asyncGetAuthInfo);
 } // namespace UserIDM

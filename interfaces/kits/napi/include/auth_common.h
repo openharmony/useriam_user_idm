@@ -26,7 +26,7 @@ namespace UserIAM {
 namespace UserIDM {
 class AuthCommon {
 public:
-static napi_value CreateObject(napi_env env, const std::string &keyStr, RequestResult requestResult);
+static napi_value CreateObject(napi_env env, const std::string &keyStr, uint64_t credentialId);
 static int32_t GetNamedProperty(napi_env env, napi_value obj, const std::string &keyStr);
 static std::vector<uint8_t> GetNamedAttribute(napi_env env, napi_value obj);
 static void JudgeObjectType (napi_env env, napi_callback_info info, AsyncCallbackContext* asyncCallbackContext);

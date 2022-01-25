@@ -116,22 +116,22 @@ std::vector<uint8_t> AuthCommon::GetNamedAttribute(napi_env env, napi_value obj)
     return result;
 }
 
-napi_value AuthCommon::CreateObject(napi_env env, const std::string &keyStr, RequestResult requestResult)
+napi_value AuthCommon::CreateObject(napi_env env, const std::string &keyStr, uint64_t credentialId)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
     napi_value obj;
-    napi_value credentialId = nullptr;
+    napi_value napiCredentialId = nullptr;
     NAPI_CALL(env, napi_create_object(env, &obj));
     if (keyStr.c_str() == FUNC_ONRESULT || keyStr.c_str() == FUNC_ONACQUIREINFO) {
         void* data = nullptr;
         napi_value arrayBuffer = nullptr;
-        size_t length = sizeof(requestResult.credentialId);
+        size_t length = sizeof(credentialId);
         size_t bufferSize = length;
         NAPI_CALL(env, napi_create_arraybuffer(env, bufferSize, &data, &arrayBuffer));
-        memcpy_s(data, bufferSize, reinterpret_cast<const void*>(&requestResult.credentialId), bufferSize);
-        NAPI_CALL(env, napi_create_typedarray(env, napi_uint8_array, bufferSize, arrayBuffer, 0, &credentialId));
+        memcpy_s(data, bufferSize, reinterpret_cast<const void*>(&credentialId), bufferSize);
+        NAPI_CALL(env, napi_create_typedarray(env, napi_uint8_array, bufferSize, arrayBuffer, 0, &napiCredentialId));
     }
-    NAPI_CALL(env, napi_set_named_property(env, obj, "credentialId", credentialId));
+    NAPI_CALL(env, napi_set_named_property(env, obj, "credentialId", napiCredentialId));
     return obj;
 }
 

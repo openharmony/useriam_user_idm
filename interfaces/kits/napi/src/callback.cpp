@@ -17,6 +17,7 @@
 #include <sstream>
 #include <string>
 #include <iremote_broker.h>
+#include <uv.h>
 
 #include "auth_common.h"
 #include "hilog_wrapper.h"
@@ -43,6 +44,29 @@ napi_value GetAuthInfoRet(napi_env env, uint64_t Ret)
     return result;
 }
 
+static AsyncCallbackContext *CopyAsyncCallbackContext(AsyncCallbackContext *asyncCallbackContext)
+{
+    AsyncCallbackContext *copy = new (std::nothrow) AsyncCallbackContext();
+    if (copy == nullptr) {
+        HILOG_ERROR("new copy faild");
+        return copy;
+    }
+    copy->env = asyncCallbackContext->env;
+    copy->callbackInfo = asyncCallbackContext->callbackInfo;
+    copy->asyncWork = asyncCallbackContext->asyncWork;
+    copy->authType = asyncCallbackContext->authType;
+    copy->authSubType = asyncCallbackContext->authSubType;
+    copy->credentialId = asyncCallbackContext->credentialId;
+    copy->token = asyncCallbackContext->token;
+    copy->IdmCallOnResult = asyncCallbackContext->IdmCallOnResult;
+    copy->IdmCallonAcquireInfo = asyncCallbackContext->IdmCallonAcquireInfo;
+    copy->result = asyncCallbackContext->result;
+    copy->retCredentialId = asyncCallbackContext->retCredentialId;
+    copy->module = asyncCallbackContext->module;
+    copy->acquire = asyncCallbackContext->acquire;
+    return copy;
+}
+
 IIdmCallback::IIdmCallback(AsyncCallbackContext* asyncCallbackContext)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
@@ -50,89 +74,166 @@ IIdmCallback::IIdmCallback(AsyncCallbackContext* asyncCallbackContext)
     asyncCallbackContext_ = asyncCallbackContext;
 }
 
+static void OnResultWork(uv_work_t* work, int status)
+{
+    HILOG_INFO("Do OnResultWork start");
+    AsyncCallbackContext *asyncCallbackContext = reinterpret_cast<AsyncCallbackContext *>(work->data);
+    if (asyncCallbackContext == nullptr) {
+        HILOG_ERROR("asyncCallbackContext is null");
+        delete work;
+        return;
+    }
+    napi_value global;
+    napi_env env = asyncCallbackContext->callbackInfo.env;
+    napi_value callbackRef;
+    napi_value callResult = 0;
+    napi_value param[TWO_PARAMETER] = {0};
+    napi_status napiStatus = napi_create_int32(env, asyncCallbackContext->result, &param[0]);
+    if (napiStatus != napi_ok) {
+        HILOG_ERROR("napi_create_int32 faild");
+        goto EXIT;
+    }
+    param[ONE_PARAMETER] = AuthCommon::CreateObject(env, FUNC_ONRESULT, asyncCallbackContext->retCredentialId);
+    if (param[ONE_PARAMETER] == nullptr) {
+        HILOG_ERROR("create object faild");
+        goto EXIT;
+    }
+    napiStatus =napi_get_reference_value(env, asyncCallbackContext->callbackInfo.onResult, &callbackRef);
+    if (napiStatus != napi_ok) {
+        HILOG_ERROR("napi_get_reference_value faild");
+        goto EXIT;
+    }
+    napiStatus =napi_get_global(env, &global);
+    if (napiStatus != napi_ok) {
+        HILOG_ERROR("napi_get_global faild");
+        goto EXIT;
+    }
+    napiStatus = napi_call_function(env, global, callbackRef, paramTwo, param, &callResult);
+    if (napiStatus != napi_ok) {
+        HILOG_ERROR("napi_call_function faild");
+        goto EXIT;
+    }
+EXIT:
+    delete asyncCallbackContext;
+    delete work;
+}
+
 void IIdmCallback::OnResult(int32_t result, RequestResult extraInfo)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
     std::lock_guard<std::mutex> idmMutexGuard(mutex_);
-    if (asyncCallbackContext_ != nullptr) {
-        napi_env env;
-        napi_value global;
-        napi_status status;
-        env = asyncCallbackContext_->callbackInfo.env;
-        napi_value callbackRef;
-        napi_value callResult = 0;
-        napi_value param[TWO_PARAMETER] = {0};
-        status = napi_create_int32(env, result, &param[0]);
-        if (status != napi_ok) {
-            HILOG_ERROR("napi_create_int32 faild");
-        }
-        param[ONE_PARAMETER] = AuthCommon::CreateObject(env, FUNC_ONRESULT, extraInfo);
-        if (param[ONE_PARAMETER] == nullptr) {
-            HILOG_ERROR("create object faild");
-        }
-        status =napi_get_reference_value(env, asyncCallbackContext_->callbackInfo.onResult, &callbackRef);
-        if (status != napi_ok) {
-            HILOG_ERROR("napi_get_reference_value faild");
-        }
-        status =napi_get_global(env, &global);
-        if (status != napi_ok) {
-            HILOG_ERROR("napi_get_global faild");
-        }
-        status = napi_call_function(env, global, callbackRef, paramTwo, param, &callResult);
-        if (status != napi_ok) {
-            HILOG_ERROR("napi_call_function faild");
-        }
+    if (asyncCallbackContext_ == nullptr) {
+        HILOG_ERROR("asyncCallbackContext_ is nullptr");
+        return;
+    }
+    uv_loop_s *loop(nullptr);
+    napi_get_uv_event_loop(asyncCallbackContext_->callbackInfo.env, &loop);
+    if (loop == nullptr) {
+        HILOG_ERROR("loop is null");
         delete asyncCallbackContext_;
         asyncCallbackContext_ = nullptr;
-    } else {
-        HILOG_ERROR("asyncCallbackContext_ is nullptr");
+        return;
     }
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    if (work == nullptr) {
+        HILOG_ERROR("work is null");
+        delete asyncCallbackContext_;
+        asyncCallbackContext_ = nullptr;
+        return;
+    }
+    asyncCallbackContext_->result = result;
+    asyncCallbackContext_->retCredentialId = extraInfo.credentialId;
+    AsyncCallbackContext *copy = CopyAsyncCallbackContext(asyncCallbackContext_);
+    delete asyncCallbackContext_;
+    asyncCallbackContext_ = nullptr;
+    if (copy == nullptr) {
+        HILOG_ERROR("copy is null");
+        delete work;
+        return;
+    }
+    work->data = reinterpret_cast<void *>(copy);
+    uv_queue_work(loop, work, [] (uv_work_t *work) { }, OnResultWork);
+}
+
+static void OnAcquireInfoWork(uv_work_t* work, int status)
+{
+    HILOG_INFO("Do OnAcquireInfoWork start");
+    AsyncCallbackContext *asyncCallbackContext = reinterpret_cast<AsyncCallbackContext *>(work->data);
+    if (asyncCallbackContext == nullptr) {
+        HILOG_ERROR("asyncCallbackContext is null");
+        delete work;
+        return;
+    }
+    napi_env env = asyncCallbackContext->callbackInfo.env;
+    napi_value global;
+    napi_value callbackRef;
+    napi_value callResult;
+    napi_value params[THREE_PARAMETER] = {0};
+    napi_status napiStatus = napi_create_int32(env, asyncCallbackContext->module, &params[ZERO_PARAMETER]);
+    if (napiStatus != napi_ok) {
+        HILOG_ERROR("napi_create_int32 faild");
+        goto EXIT;
+    }
+    napiStatus = napi_create_int32(env, asyncCallbackContext->acquire, &params[ONE_PARAMETER]);
+    if (napiStatus != napi_ok) {
+        HILOG_ERROR("napi_create_int32 faild");
+        goto EXIT;
+    }
+    params[TWO_PARAMETER] = AuthCommon::CreateObject(env, FUNC_ONACQUIREINFO, asyncCallbackContext->retCredentialId);
+    if (params[TWO_PARAMETER] == nullptr) {
+        HILOG_ERROR("create object faild");
+        goto EXIT;
+    }
+    napiStatus = napi_get_reference_value(env, asyncCallbackContext->callbackInfo.onAcquireInfo, &callbackRef);
+    if (napiStatus != napi_ok) {
+        HILOG_ERROR("napi_get_reference_value faild");
+        goto EXIT;
+    }
+    napiStatus = napi_get_global(env, &global);
+    if (napiStatus != napi_ok) {
+        HILOG_ERROR("napi_get_global faild");
+        goto EXIT;
+    }
+    napiStatus = napi_call_function(env, global, callbackRef, paramThree, params, &callResult);
+    if (napiStatus != napi_ok) {
+        HILOG_ERROR("napi_call_function faild");
+        goto EXIT;
+    }
+EXIT:
+    delete asyncCallbackContext;
+    delete work;
 }
 
 void IIdmCallback::OnAcquireInfo(int32_t module, int32_t acquire, RequestResult extraInfo)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
     std::lock_guard<std::mutex> idmMutexGuard(mutex_);
-    if (asyncCallbackContext_ != nullptr) {
-        napi_env env;
-        napi_status status;
-        env = asyncCallbackContext_->callbackInfo.env;
-        napi_value global;
-        napi_value callbackRef;
-        napi_value callResult;
-        napi_value Sparam[THREE_PARAMETER] = {0};
-        status = napi_create_int32(env, module, &Sparam[ZERO_PARAMETER]);
-        if (status != napi_ok) {
-            HILOG_ERROR("napi_create_int32 faild");
-        }
-        status = napi_create_int32(env, acquire, &Sparam[ONE_PARAMETER]);
-        if (status != napi_ok) {
-            HILOG_ERROR("napi_create_int32 faild");
-        }
-        Sparam[TWO_PARAMETER] = AuthCommon::CreateObject(env, FUNC_ONACQUIREINFO, extraInfo);
-        if (Sparam[TWO_PARAMETER] == nullptr) {
-            HILOG_ERROR("create object faild");
-        }
-        status = napi_get_reference_value(env, asyncCallbackContext_->callbackInfo.onAcquireInfo, &callbackRef);
-        if (status != napi_ok) {
-            HILOG_ERROR("napi_get_reference_value faild");
-        }
-        napi_valuetype valuetype;
-        status = napi_typeof(env, callbackRef, &valuetype);
-        if (status != napi_ok) {
-            HILOG_ERROR("napi_typeof faild");
-        }
-        status = napi_get_global(env, &global);
-        if (status != napi_ok) {
-            HILOG_ERROR("napi_get_global faild");
-        }
-        status = napi_call_function(env, global, callbackRef, paramThree, Sparam, &callResult);
-        if (status != napi_ok) {
-            HILOG_ERROR("napi_call_function faild");
-        }
-    } else {
+    if (asyncCallbackContext_ == nullptr) {
         HILOG_ERROR("napi_call_function is nullptr");
+        return;
     }
+    uv_loop_s *loop(nullptr);
+    napi_get_uv_event_loop(asyncCallbackContext_->callbackInfo.env, &loop);
+    if (loop == nullptr) {
+        HILOG_ERROR("loop is null");
+        return;
+    }
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    if (work == nullptr) {
+        HILOG_ERROR("work is null");
+        return;
+    }
+    asyncCallbackContext_->module = module;
+    asyncCallbackContext_->acquire = acquire;
+    asyncCallbackContext_->retCredentialId = extraInfo.credentialId;
+    AsyncCallbackContext *copy = CopyAsyncCallbackContext(asyncCallbackContext_);
+    if (copy == nullptr) {
+        HILOG_ERROR("copy is null");
+        delete work;
+        return;
+    }
+    work->data = reinterpret_cast<void *>(copy);
+    uv_queue_work(loop, work, [] (uv_work_t *work) { }, OnAcquireInfoWork);
 }
 
 GetInfoCallbackIDM::GetInfoCallbackIDM(AsyncGetAuthInfo *asyncGetAuthInfo)
@@ -141,87 +242,146 @@ GetInfoCallbackIDM::GetInfoCallbackIDM(AsyncGetAuthInfo *asyncGetAuthInfo)
     asyncGetAuthInfo_ = asyncGetAuthInfo;
 }
 
-napi_value GetInfoCallbackIDM::createCredentialInfo (std::vector<CredentialInfo>& info)
+static napi_value CreateCredentialInfo(AsyncGetAuthInfo *asyncGetAuthInfo)
 {
-    HILOG_INFO("authFace : %{public}s, start.", __func__);
-    napi_env env;
-    napi_value Obj;
-    napi_value Ary;
-    napi_value credentialId_;
-    napi_value authType_;
-    napi_value authSubType_;
-    napi_value templateId_;
-    if (asyncGetAuthInfo_ != nullptr) {
-        env = asyncGetAuthInfo_->env;
-        NAPI_CALL(env, napi_create_array_with_length(env, info.size(), &Ary));
-        for (uint64_t Vect = 0; Vect < info.size(); Vect ++) {
-            NAPI_CALL(env, napi_create_object(env, &Obj));
-            credentialId_ = GetAuthInfoRet(env, (info[Vect].credentialId));
-            if (credentialId_ == nullptr) {
-                HILOG_ERROR("GetAuthInfo faild");
-            }
-            NAPI_CALL(env, napi_create_int32(env, static_cast<int32_t>(info[Vect].authType), &authType_));
-            NAPI_CALL(env, napi_create_int32(env, static_cast<int32_t>(info[Vect].authSubType), &authSubType_));
-            templateId_ = GetAuthInfoRet(env, (info[Vect].templateId));
-            if (templateId_ == nullptr) {
-                HILOG_ERROR("GetAuthInfo faild");
-            }
-            NAPI_CALL(env, napi_set_named_property(env, Obj, "credentialId", credentialId_));
-            NAPI_CALL(env, napi_set_named_property(env, Obj, "authType", authType_));
-            NAPI_CALL(env, napi_set_named_property(env, Obj, "authSubType", authSubType_));
-            NAPI_CALL(env, napi_set_named_property(env, Obj, "templateId", templateId_));
-            NAPI_CALL(env, napi_set_element(env, Ary, Vect, Obj));
+    HILOG_INFO("%{public}s, start.", __func__);
+    napi_value array;
+    napi_env env = asyncGetAuthInfo->env;
+    NAPI_CALL(env, napi_create_array_with_length(env, asyncGetAuthInfo->info.size(), &array));
+    for (uint64_t Vect = 0; Vect < asyncGetAuthInfo->info.size(); Vect ++) {
+        napi_value obj;
+        NAPI_CALL(env, napi_create_object(env, &obj));
+        napi_value credentialId = GetAuthInfoRet(env, (asyncGetAuthInfo->info[Vect].credentialId));
+        if (credentialId == nullptr) {
+            HILOG_ERROR("GetAuthInfo faild");
+            return nullptr;
         }
-        return Ary;
+        napi_value authType;
+        NAPI_CALL(env, napi_create_int32(env,
+            static_cast<int32_t>(asyncGetAuthInfo->info[Vect].authType), &authType));
+        napi_value authSubType;
+        NAPI_CALL(env, napi_create_int32(env,
+            static_cast<int32_t>(asyncGetAuthInfo->info[Vect].authSubType), &authSubType));
+        napi_value templateId = GetAuthInfoRet(env, (asyncGetAuthInfo->info[Vect].templateId));
+        if (templateId == nullptr) {
+            HILOG_ERROR("GetAuthInfo faild");
+        }
+        NAPI_CALL(env, napi_set_named_property(env, obj, "credentialId", credentialId));
+        NAPI_CALL(env, napi_set_named_property(env, obj, "authType", authType));
+        NAPI_CALL(env, napi_set_named_property(env, obj, "authSubType", authSubType));
+        NAPI_CALL(env, napi_set_named_property(env, obj, "templateId", templateId));
+        NAPI_CALL(env, napi_set_element(env, array, Vect, obj));
     }
-    return nullptr;
+    return array;
+}
+
+static AsyncGetAuthInfo *CopyAsyncGetAuthInfo(AsyncGetAuthInfo *asyncGetAuthInfo)
+{
+    AsyncGetAuthInfo *copy = new (std::nothrow) AsyncGetAuthInfo();
+    if (copy == nullptr) {
+        HILOG_ERROR("new copy faild");
+        return copy;
+    }
+    copy->env = asyncGetAuthInfo->env;
+    copy->openSession = asyncGetAuthInfo->openSession;
+    copy->asyncWork = asyncGetAuthInfo->asyncWork;
+    copy->callback = asyncGetAuthInfo->callback;
+    copy->authType = asyncGetAuthInfo->authType;
+    copy->deferred = asyncGetAuthInfo->deferred;
+    copy->promise = asyncGetAuthInfo->promise;
+    copy->info = asyncGetAuthInfo->info;
+    return copy;
+}
+
+static void OnGetInfoPromiseWork(AsyncGetAuthInfo *asyncGetAuthInfo)
+{
+    napi_value result[ONE_PARAMETER] = {0};
+    result[ZERO_PARAMETER] = CreateCredentialInfo(asyncGetAuthInfo);
+    if (result[ZERO_PARAMETER] == nullptr) {
+        HILOG_ERROR("createCredentialInfo faild");
+        return;
+    }
+    napi_value retPromise = result[ZERO_PARAMETER];
+    napi_status napiStatus = napi_resolve_deferred(asyncGetAuthInfo->env, asyncGetAuthInfo->deferred, retPromise);
+    if (napiStatus != napi_ok) {
+        HILOG_ERROR("napi_resolve_deferred faild");
+        return;
+    }
+}
+
+static void OnGetInfoCallbackWork(AsyncGetAuthInfo *asyncGetAuthInfo)
+{
+    napi_value result[ONE_PARAMETER] = {0};
+    napi_value callback;
+    napi_value global;
+    napi_value callbackRet = 0;
+    result[ZERO_PARAMETER] = CreateCredentialInfo(asyncGetAuthInfo);
+    if (result[ZERO_PARAMETER] == nullptr) {
+        HILOG_ERROR("createCredentialInfo faild");
+        return;
+    }
+    napi_status napiStatus = napi_get_reference_value(asyncGetAuthInfo->env, asyncGetAuthInfo->callback, &callback);
+    if (napiStatus != napi_ok) {
+        HILOG_ERROR("napi_get_reference_value faild");
+        return;
+    }
+    napiStatus = napi_get_global(asyncGetAuthInfo->env, &global);
+    if (napiStatus != napi_ok) {
+        HILOG_ERROR("napi_get_global faild");
+        return;
+    }
+    napiStatus = napi_call_function(asyncGetAuthInfo->env, global, callback, 1, result, &callbackRet);
+    if (napiStatus != napi_ok) {
+        HILOG_ERROR("napi_call_function faild");
+        return;
+    }
+}
+
+static void OnGetInfoWork(uv_work_t* work, int status)
+{
+    HILOG_INFO("Do OnGetInfoWork start");
+    AsyncGetAuthInfo *asyncGetAuthInfo = reinterpret_cast<AsyncGetAuthInfo *>(work->data);
+    if (asyncGetAuthInfo == nullptr) {
+        HILOG_ERROR("asyncGetAuthInfo is null");
+        delete work;
+        return;
+    }
+    if (asyncGetAuthInfo->callback == nullptr) {
+        OnGetInfoPromiseWork(asyncGetAuthInfo);
+    } else {
+        OnGetInfoCallbackWork(asyncGetAuthInfo);
+    }
+    delete asyncGetAuthInfo;
+    delete work;
 }
 
 void GetInfoCallbackIDM::OnGetInfo(std::vector<CredentialInfo>& info)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
-    if (asyncGetAuthInfo_ != nullptr) {
-        napi_env env;
-        napi_status status;
-        env = asyncGetAuthInfo_->env;
-        napi_value result[ONE_PARAMETER] = {0};
-        if (asyncGetAuthInfo_->callback == nullptr) {
-            napi_value ResPromise;
-            result[ZERO_PARAMETER] = createCredentialInfo(info);
-            if (result[ZERO_PARAMETER] == nullptr) {
-                HILOG_ERROR("createCredentialInfo faild");
-            }
-            ResPromise = result[ZERO_PARAMETER];
-            status = napi_resolve_deferred(asyncGetAuthInfo_->env, asyncGetAuthInfo_->deferred, ResPromise);
-            if (status != napi_ok) {
-            HILOG_ERROR("napi_resolve_deferred faild");
-        }
-            delete asyncGetAuthInfo_;
-            asyncGetAuthInfo_ = nullptr;
-        } else {
-        napi_value callback;
-        napi_value global;
-        napi_value callbackRet = 0;
-        result[ZERO_PARAMETER] = createCredentialInfo(info);
-        if (result[ZERO_PARAMETER] == nullptr) {
-            HILOG_ERROR("createCredentialInfo faild");
-        }
-        status = napi_get_reference_value(env, asyncGetAuthInfo_->callback, &callback);
-        if (status != napi_ok) {
-            HILOG_ERROR("napi_get_reference_value faild");
-        }
-        status = napi_get_global(env, &global);
-        if (status != napi_ok) {
-            HILOG_ERROR("napi_get_global faild");
-        }
-        status = napi_call_function(env, global, callback, 1, result, &callbackRet);
-        if (status != napi_ok) {
-            HILOG_ERROR("napi_call_function faild");
-        }
-        }
-    } else {
+    if (asyncGetAuthInfo_ == nullptr) {
         HILOG_ERROR("asyncGetAuthInfo_ is nullptr");
+        return;
     }
+    uv_loop_s *loop(nullptr);
+    napi_get_uv_event_loop(asyncGetAuthInfo_->env, &loop);
+    if (loop == nullptr) {
+        HILOG_ERROR("loop is null");
+        return;
+    }
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    if (work == nullptr) {
+        HILOG_ERROR("work is null");
+        return;
+    }
+    asyncGetAuthInfo_->info = info;
+    AsyncGetAuthInfo *copy = CopyAsyncGetAuthInfo(asyncGetAuthInfo_);
+    if (copy == nullptr) {
+        HILOG_ERROR("copy is null");
+        delete work;
+        return;
+    }
+    work->data = reinterpret_cast<void *>(copy);
+    uv_queue_work(loop, work, [] (uv_work_t *work) { }, OnGetInfoWork);
 }
 } // namespace UserIDM
 } // namespace UserIAM

@@ -16,7 +16,10 @@ import("//build/ohos.gni")
 
 config("useridm_public_config") {
   visibility = [ ":*" ]
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "//third_party/libuv/include",
+  ]
   cflags = []
 }
 
@@ -31,8 +34,7 @@ ohos_shared_library("useridm") {
 
   include_dirs = [
     "./include",
-
-    #"base/user_iam/user_idm/interfaces/innerkits/include",
+    "//third_party/libuv/include",
     "${useridm_innerkits_path}:ohosuseridm",
   ]
 

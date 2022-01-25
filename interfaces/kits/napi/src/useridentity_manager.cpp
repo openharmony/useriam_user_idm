@@ -426,14 +426,7 @@ napi_value UserIdentityManager::NAPI_GetAuthInfo(napi_env env, napi_callback_inf
     if (asyncInfo == nullptr) {
         return nullptr;
     }
-    napi_value ret = GetAuthInfoWrap(env, info, asyncInfo);
-    if (ret == nullptr) {
-        if (asyncInfo != nullptr) {
-            delete asyncInfo;
-            asyncInfo = nullptr;
-        }
-    }
-    return ret;
+    return GetAuthInfoWrap(env, info, asyncInfo);
 }
 
 napi_value UserIdentityManager::GetAuthInfoWrap(napi_env env, napi_callback_info info, AsyncGetAuthInfo *asyncInfo)
