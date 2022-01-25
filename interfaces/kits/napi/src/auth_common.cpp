@@ -135,27 +135,30 @@ napi_value AuthCommon::CreateObject(napi_env env, const std::string &keyStr, uin
     return obj;
 }
 
-void AuthCommon::JudgeObjectType (napi_env env, napi_callback_info info, AsyncCallbackContext* asyncCallbackContext)
+napi_status AuthCommon::JudgeObjectType (
+    napi_env env, napi_callback_info info, AsyncCallbackContext* asyncCallbackContext)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
-    napi_status status;
     size_t argc = TWO_PARAMETER;
     napi_value argv[TWO_PARAMETER] = {0};
-    status = napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+    napi_status status = napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     if (status != napi_ok) {
         HILOG_ERROR("napi_get_cb_info faild");
+        return status;
     }
     napi_valuetype valueType = napi_undefined;
     status = napi_typeof(env, argv[ZERO_PARAMETER], &valueType);
+    if (status != napi_ok) {
+        HILOG_ERROR("napi_typeof faild");
+        return status;
+    }
     if (valueType == napi_object) {
         asyncCallbackContext->authType = static_cast<AuthType>(GetNamedProperty(env, argv[0], PROPERTY_KEY_NAME));
         asyncCallbackContext->authSubType = static_cast<AuthSubType>(GetNamedProperty(env, argv[0], PROPERTY_KEY_ID));
         asyncCallbackContext->token = GetNamedAttribute(env, argv[0]);
     }
-    if (status != napi_ok) {
-        HILOG_ERROR("napi_typeof faild");
-    }
     SaveCallback(env, ONE_PARAMETER, argv, asyncCallbackContext);
+    return status;
 }
 
 void AuthCommon::JudgeDelUserType(napi_env env, napi_callback_info info, AsyncCallbackContext* asyncCallbackContext)
@@ -224,7 +227,6 @@ AsyncGetAuthInfo *GCreateAsyncInfo(napi_env env)
     HILOG_INFO("authFace : %{public}s, start.", __func__);
     return new (std::nothrow) AsyncGetAuthInfo {
         .env = env,
-        .asyncWork = nullptr,
         .deferred = nullptr,
     };
 }
