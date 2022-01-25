@@ -51,7 +51,6 @@ typedef struct AsyncOpenSession {
 typedef struct AsyncGetAuthInfo {
     napi_env env;
     uint64_t openSession;
-    napi_async_work asyncWork;
     napi_ref callback;
     AuthType authType;
     napi_deferred deferred;
@@ -66,7 +65,6 @@ typedef struct CallbackInfo {
 typedef struct AsyncCallbackContext {
     napi_env env;
     CallbackInfo callbackInfo;
-    napi_async_work asyncWork;
     AuthType authType;
     AuthSubType authSubType;
     std::vector<uint8_t> credentialId;
@@ -82,6 +80,11 @@ typedef struct SyncCancelContext {
     napi_env env;
     std::vector<uint8_t> challenge;
 } SyncCancelContext;
+typedef struct AsyncHolder {
+    AsyncHolder() : data(nullptr), asyncWork(nullptr) {};
+    void *data;
+    napi_async_work asyncWork;
+} AsyncHolder;
 class UserIdentityManager {
 public:
     UserIdentityManager() ;
@@ -99,10 +102,17 @@ private:
     napi_value OpenSessionCallback(napi_env env, napi_value *args, size_t argcAsync, AsyncOpenSession *asyncInfo);
     napi_value OpenSessionPromise(napi_env env, napi_value *args, size_t argcAsync, AsyncOpenSession *asyncInfo);
 
-    napi_value GetAuthInfoWrap(napi_env env, napi_callback_info info, AsyncGetAuthInfo *asyncInfo);
-    napi_value GetAuthInfoCallback(napi_env env, napi_value *args, size_t argcAsync, AsyncGetAuthInfo *asyncInfo);
-    napi_value GetAuthInfoPromise(napi_env env, napi_value *args, size_t argcAsync, AsyncGetAuthInfo *asyncInfo);
+    napi_value GetAuthInfoWrap(napi_env env, napi_callback_info info, AsyncHolder *asyncHolder);
+    napi_value GetAuthInfoCallback(napi_env env, napi_value *args, size_t argcAsync, AsyncHolder *asyncHolder);
+    napi_value GetAuthInfoPromise(napi_env env, napi_value *args, size_t argcAsync, AsyncHolder *asyncHolder);
 
+    napi_value BuildAddCredentialInfo(napi_env env, napi_callback_info info, AsyncHolder *asyncHolder);
+    napi_value BuildUpdateCredentialInfo(napi_env env, napi_callback_info info, AsyncHolder *asyncHolder);
+    napi_value DoDelUser(napi_env env, napi_callback_info info, AsyncHolder *asyncHolder);
+    napi_value DoDelCred(napi_env env, napi_callback_info info, AsyncHolder *asyncHolder);
+
+    static void GetAuthInfoExecute(napi_env env, void *data);
+    static void GetAuthInfoComplete(napi_env env, napi_status status, void *data);
     static void AddCredentialExecute(napi_env env, void *data);
     static void AddCredentialComplete(napi_env env, napi_status status, void *data);
     static void UpdateCredentialExecute(napi_env env, void *data);

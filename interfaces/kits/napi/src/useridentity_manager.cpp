@@ -90,7 +90,7 @@ napi_value UserIdentityManager::OpenSessionWrap(napi_env env, napi_callback_info
     return ret;
 }
 
-napi_value OpenSessionRet (napi_env env, AsyncOpenSession* asyncOpenSession)
+napi_value OpenSessionRet(napi_env env, AsyncOpenSession* asyncOpenSession)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
     size_t length = sizeof(asyncOpenSession->OpenSession);
@@ -179,24 +179,51 @@ napi_value UserIdentityManager::OpenSessionPromise(napi_env env, napi_value *arg
 void UserIdentityManager::AddCredentialExecute(napi_env env, void *data)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
-    AsyncCallbackContext* asyncCallbackContext = (AsyncCallbackContext*)data;
-    if (asyncCallbackContext != nullptr) {
-        AddCredInfo addCredInfo;
-        addCredInfo.authType = asyncCallbackContext->authType;
-        addCredInfo.authSubType = asyncCallbackContext->authSubType;
-        addCredInfo.token.assign(asyncCallbackContext->token.begin(), asyncCallbackContext->token.end());
-        std::shared_ptr<IDMCallback> iidmCallback = std::make_shared<IIdmCallback>(asyncCallbackContext);
-        UserIDMClient::GetInstance().AddCredential(addCredInfo, iidmCallback);
-    } else {
-        HILOG_ERROR("syncCredentialContext is nullptr");
+    AsyncHolder *asyncHolder = reinterpret_cast<AsyncHolder *>(data);
+    if (asyncHolder == nullptr) {
+        HILOG_ERROR("%{public}s asyncHolder nullptr", __func__);
+        return;
     }
+    AsyncCallbackContext *asyncCallbackContext = reinterpret_cast<AsyncCallbackContext *>(asyncHolder->data);
+    if (asyncCallbackContext == nullptr) {
+        HILOG_ERROR("%{public}s asyncCallbackContext nullptr", __func__);
+        return;
+    }
+    AddCredInfo addCredInfo;
+    addCredInfo.authType = asyncCallbackContext->authType;
+    addCredInfo.authSubType = asyncCallbackContext->authSubType;
+    addCredInfo.token.assign(asyncCallbackContext->token.begin(), asyncCallbackContext->token.end());
+    std::shared_ptr<IDMCallback> iidmCallback = std::make_shared<IIdmCallback>(asyncCallbackContext);
+    UserIDMClient::GetInstance().AddCredential(addCredInfo, iidmCallback);
 }
 
 void UserIdentityManager::AddCredentialComplete(napi_env env, napi_status status, void *data)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
-    AsyncCallbackContext* asyncCallbackContext = (AsyncCallbackContext*)data;
-    napi_delete_async_work(env, asyncCallbackContext->asyncWork);
+    AsyncHolder *asyncHolder = reinterpret_cast<AsyncHolder *>(data);
+    if (asyncHolder == nullptr) {
+        HILOG_ERROR("%{public}s asyncHolder nullptr", __func__);
+        return;
+    }
+    napi_delete_async_work(env, asyncHolder->asyncWork);
+    delete asyncHolder;
+}
+
+napi_value UserIdentityManager::BuildAddCredentialInfo(napi_env env, napi_callback_info info, AsyncHolder *asyncHolder)
+{
+    AsyncCallbackContext *asyncCallbackContext = reinterpret_cast<AsyncCallbackContext *>(asyncHolder->data);
+    if (AuthCommon::JudgeObjectType(env, info, asyncCallbackContext) != napi_ok) {
+        HILOG_ERROR("NAPI_AddCredential JudgeObjectType fail");
+        return nullptr;
+    }
+    napi_value result = nullptr;
+    NAPI_CALL(env, napi_get_null(env, &result));
+    napi_value resourceName = nullptr;
+    NAPI_CALL(env, napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName));
+    NAPI_CALL(env, napi_create_async_work(env, nullptr, resourceName, AddCredentialExecute, AddCredentialComplete,
+        (void *)asyncHolder, &asyncHolder->asyncWork));
+    NAPI_CALL(env, napi_queue_async_work(env, asyncHolder->asyncWork));
+    return result;
 }
 
 /**
@@ -210,41 +237,81 @@ void UserIdentityManager::AddCredentialComplete(napi_env env, napi_status status
 napi_value UserIdentityManager::NAPI_AddCredential(napi_env env, napi_callback_info info)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
+    AsyncHolder *asyncHolder = new (std::nothrow) AsyncHolder();
+    if (asyncHolder == nullptr) {
+        HILOG_ERROR("NAPI_AddCredential asyncHolder nullptr");
+        return nullptr;
+    }
     AsyncCallbackContext *asyncCallbackContext = new (std::nothrow) AsyncCallbackContext();
+    if (asyncCallbackContext == nullptr) {
+        HILOG_ERROR("NAPI_AddCredential asyncCallbackContext nullptr");
+        delete asyncHolder;
+        return nullptr;
+    }
+    asyncHolder->data = asyncCallbackContext;
     asyncCallbackContext->env = env;
-    AuthCommon::JudgeObjectType(env, info, asyncCallbackContext);
-    napi_value resourceName = nullptr;
-    NAPI_CALL(env, napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName));
-    NAPI_CALL(env, napi_create_async_work(env, nullptr, resourceName, AddCredentialExecute, AddCredentialComplete,
-                                          (void *)asyncCallbackContext, &asyncCallbackContext->asyncWork));
-
-    NAPI_CALL(env, napi_queue_async_work(env, asyncCallbackContext->asyncWork));
-    napi_value result = RESULT;
-    NAPI_CALL(env, napi_get_null(env, &result));
-    return result;
+    napi_value ret = BuildAddCredentialInfo(env, info, asyncHolder);
+    if (ret == nullptr) {
+        HILOG_ERROR("NAPI_AddCredential BuildAddCredentialInfo fail");
+        delete asyncCallbackContext;
+        delete asyncHolder;
+        if (asyncHolder->asyncWork != nullptr) {
+            napi_delete_async_work(env, asyncHolder->asyncWork);
+        }
+    }
+    return ret;
 }
 
 void UserIdentityManager::UpdateCredentialExecute(napi_env env, void *data)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
-    AsyncCallbackContext* asyncCallbackContext = (AsyncCallbackContext*)data;
-    if (asyncCallbackContext != nullptr) {
-        AddCredInfo addCredInfo;
-        addCredInfo.authType = asyncCallbackContext->authType;
-        addCredInfo.authSubType = asyncCallbackContext->authSubType;
-        addCredInfo.token.assign(asyncCallbackContext->token.begin(), asyncCallbackContext->token.end());
-        std::shared_ptr<IDMCallback> iidmCallback = std::make_shared<IIdmCallback>(asyncCallbackContext);
-        UserIDMClient::GetInstance().UpdateCredential(addCredInfo, iidmCallback);
-    } else {
-        HILOG_ERROR("AsyncCallbackContextis nullptr");
+    AsyncHolder *asyncHolder = reinterpret_cast<AsyncHolder *>(data);
+    if (asyncHolder == nullptr) {
+        HILOG_ERROR("%{public}s asyncHolder nullptr", __func__);
+        return;
     }
+    AsyncCallbackContext *asyncCallbackContext = reinterpret_cast<AsyncCallbackContext *>(asyncHolder->data);
+    if (asyncCallbackContext == nullptr) {
+        HILOG_ERROR("%{public}s asyncCallbackContext nullptr", __func__);
+        return;
+    }
+    AddCredInfo addCredInfo;
+    addCredInfo.authType = asyncCallbackContext->authType;
+    addCredInfo.authSubType = asyncCallbackContext->authSubType;
+    addCredInfo.token.assign(asyncCallbackContext->token.begin(), asyncCallbackContext->token.end());
+    std::shared_ptr<IDMCallback> iidmCallback = std::make_shared<IIdmCallback>(asyncCallbackContext);
+    UserIDMClient::GetInstance().UpdateCredential(addCredInfo, iidmCallback);
 }
 
 void UserIdentityManager::UpdateCredentialComplete(napi_env env, napi_status status, void *data)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
-    AsyncCallbackContext* asyncCallbackContext = (AsyncCallbackContext*)data;
-    napi_delete_async_work(env, asyncCallbackContext->asyncWork);
+    AsyncHolder *asyncHolder = reinterpret_cast<AsyncHolder *>(data);
+    if (asyncHolder == nullptr) {
+        HILOG_ERROR("%{public}s asyncHolder nullptr", __func__);
+        return;
+    }
+    napi_delete_async_work(env, asyncHolder->asyncWork);
+    delete asyncHolder;
+}
+
+napi_value UserIdentityManager::BuildUpdateCredentialInfo(
+    napi_env env, napi_callback_info info, AsyncHolder *asyncHolder)
+{
+    AsyncCallbackContext *asyncCallbackContext = reinterpret_cast<AsyncCallbackContext *>(asyncHolder->data);
+    if (AuthCommon::JudgeObjectType(env, info, asyncCallbackContext) != napi_ok) {
+        HILOG_ERROR("BuildUpdateCredentialInfo JudgeObjectType fail");
+        return nullptr;
+    }
+    napi_value result = nullptr;
+    NAPI_CALL(env, napi_get_null(env, &result));
+    napi_value resourceName = nullptr;
+    NAPI_CALL(env, napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName));
+    NAPI_CALL(env, napi_create_async_work(
+        env, nullptr, resourceName, UpdateCredentialExecute, UpdateCredentialComplete,
+        (void *)asyncHolder, &asyncHolder->asyncWork));
+    NAPI_CALL(env, napi_queue_async_work(env, asyncHolder->asyncWork));
+    return result;
 }
 
 /**
@@ -258,17 +325,29 @@ void UserIdentityManager::UpdateCredentialComplete(napi_env env, napi_status sta
 napi_value UserIdentityManager::NAPI_UpdateCredential(napi_env env, napi_callback_info info)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
-    AsyncCallbackContext *asyncCallbackContext = new (std::nothrow) AsyncCallbackContext;
+    AsyncHolder *asyncHolder = new (std::nothrow) AsyncHolder();
+    if (asyncHolder == nullptr) {
+        HILOG_ERROR("NAPI_AddCredential asyncHolder nullptr");
+        return nullptr;
+    }
+    AsyncCallbackContext *asyncCallbackContext = new (std::nothrow) AsyncCallbackContext();
+    if (asyncCallbackContext == nullptr) {
+        HILOG_ERROR("NAPI_AddCredential asyncCallbackContext nullptr");
+        delete asyncHolder;
+        return nullptr;
+    }
+    asyncHolder->data = asyncCallbackContext;
     asyncCallbackContext->env = env;
-    AuthCommon::JudgeObjectType(env, info, asyncCallbackContext);
-    napi_value resourceName = nullptr;
-    NAPI_CALL(env, napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName));
-    NAPI_CALL(env, napi_create_async_work(env, nullptr, resourceName, UpdateCredentialExecute, UpdateCredentialComplete,
-                          (void *)asyncCallbackContext, &asyncCallbackContext->asyncWork));
-    NAPI_CALL(env, napi_queue_async_work(env, asyncCallbackContext->asyncWork));
-    napi_value result = RESULT;
-    NAPI_CALL(env, napi_get_null(env, &result));
-    return result;
+    napi_value ret = BuildUpdateCredentialInfo(env, info, asyncHolder);
+    if (ret == nullptr) {
+        HILOG_ERROR("NAPI_AddCredential BuildAddCredentialInfo fail");
+        delete asyncCallbackContext;
+        delete asyncHolder;
+        if (asyncHolder->asyncWork != nullptr) {
+            napi_delete_async_work(env, asyncHolder->asyncWork);
+        }
+    }
+    return ret;
 }
 
 /**
@@ -323,20 +402,44 @@ napi_value UserIdentityManager::NAPI_Cancel(napi_env env, napi_callback_info inf
 void UserIdentityManager::DelUserExecute(napi_env env, void *data)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
-    AsyncCallbackContext* asyncCallbackContext = (AsyncCallbackContext*)data;
-    if (asyncCallbackContext != nullptr) {
-        std::shared_ptr<IDMCallback> iidmCallback = std::make_shared<IIdmCallback>(asyncCallbackContext);
-        UserIDMClient::GetInstance().DelUser(asyncCallbackContext->token, iidmCallback);
-    } else {
-        HILOG_ERROR("syncCallbackContext is nullptr");
+    AsyncHolder *asyncHolder = reinterpret_cast<AsyncHolder *>(data);
+    if (asyncHolder == nullptr) {
+        HILOG_ERROR("%{public}s asyncHolder nullptr", __func__);
+        return;
     }
+    AsyncCallbackContext *asyncCallbackContext = reinterpret_cast<AsyncCallbackContext *>(asyncHolder->data);
+    if (asyncCallbackContext == nullptr) {
+        HILOG_ERROR("%{public}s asyncCallbackContext nullptr", __func__);
+        return;
+    }
+    std::shared_ptr<IDMCallback> iidmCallback = std::make_shared<IIdmCallback>(asyncCallbackContext);
+    UserIDMClient::GetInstance().DelUser(asyncCallbackContext->token, iidmCallback);
 }
 
 void UserIdentityManager::DelUserComplete(napi_env env, napi_status status, void *data)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
-    AsyncCallbackContext *asyncCallbackContext = (AsyncCallbackContext*)data;
-    napi_delete_async_work(env, asyncCallbackContext->asyncWork);
+    AsyncHolder *asyncHolder = reinterpret_cast<AsyncHolder *>(data);
+    if (asyncHolder == nullptr) {
+        HILOG_ERROR("%{public}s asyncHolder nullptr", __func__);
+        return;
+    }
+    napi_delete_async_work(env, asyncHolder->asyncWork);
+    delete asyncHolder;
+}
+
+napi_value UserIdentityManager::DoDelUser(napi_env env, napi_callback_info info, AsyncHolder *asyncHolder)
+{
+    AsyncCallbackContext *asyncCallbackContext = reinterpret_cast<AsyncCallbackContext *>(asyncHolder->data);
+    napi_value result = nullptr;
+    NAPI_CALL(env, napi_get_null(env, &result));
+    AuthCommon::JudgeDelUserType(env, info, asyncCallbackContext);
+    napi_value resourceName = nullptr;
+    NAPI_CALL(env, napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName));
+    NAPI_CALL(env, napi_create_async_work(env, nullptr, resourceName, DelUserExecute, DelUserComplete,
+                                          (void *)asyncHolder, &asyncHolder->asyncWork));
+    NAPI_CALL(env, napi_queue_async_work(env, asyncHolder->asyncWork));
+    return result;
 }
 
 /**
@@ -350,41 +453,77 @@ void UserIdentityManager::DelUserComplete(napi_env env, napi_status status, void
 napi_value UserIdentityManager::NAPI_DelUser(napi_env env, napi_callback_info info)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
+    AsyncHolder *asyncHolder = new (std::nothrow) AsyncHolder();
+    if (asyncHolder == nullptr) {
+        HILOG_ERROR("NAPI_DelUser asyncHolder nullptr");
+        return nullptr;
+    }
     AsyncCallbackContext *asyncCallbackContext = new (std::nothrow) AsyncCallbackContext();
+    if (asyncCallbackContext == nullptr) {
+        HILOG_ERROR("NAPI_DelUser asyncCallbackContext nullptr");
+        delete asyncHolder;
+        return nullptr;
+    }
+    asyncHolder->data = asyncCallbackContext;
     asyncCallbackContext->env = env;
-    AuthCommon::JudgeDelUserType(env, info, asyncCallbackContext);
-    napi_value resourceName = nullptr;
-    NAPI_CALL(env, napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName));
-    NAPI_CALL(env, napi_create_async_work(env, nullptr, resourceName, DelUserExecute, DelUserComplete,
-                                          (void *)asyncCallbackContext, &asyncCallbackContext->asyncWork));
-    NAPI_CALL(env, napi_queue_async_work(env, asyncCallbackContext->asyncWork));
-    napi_value result = RESULT;
-    NAPI_CALL(env, napi_get_null(env, &result));
-    return result;
+    napi_value ret = DoDelUser(env, info, asyncHolder);
+    if (ret == nullptr) {
+        HILOG_ERROR("NAPI_DelUser DoDelUser fail");
+        delete asyncCallbackContext;
+        delete asyncHolder;
+        if (asyncHolder->asyncWork != nullptr) {
+            napi_delete_async_work(env, asyncHolder->asyncWork);
+        }
+    }
+    return ret;
 }
 
 void UserIdentityManager::DelCredExecute(napi_env env, void *data)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
-    AsyncCallbackContext* asyncCallbackContext = (AsyncCallbackContext*)data;
-    if (asyncCallbackContext != nullptr) {
-        uint8_t tmp[sizeof(uint64_t)];
-        for (uint32_t i = 0; i < sizeof(uint64_t); i++) {
-        tmp[i] = asyncCallbackContext->credentialId[i];
-        }
-        uint64_t *tempCredentialId = static_cast<uint64_t *>(static_cast<void *>(tmp));
-        std::shared_ptr<IDMCallback> iidmCallback = std::make_shared<IIdmCallback>(asyncCallbackContext);
-        UserIDMClient::GetInstance().DelCred(*tempCredentialId, asyncCallbackContext->token, iidmCallback);
-    } else {
-        HILOG_ERROR("syncDelCredContext is nullptr");
+    AsyncHolder *asyncHolder = reinterpret_cast<AsyncHolder *>(data);
+    if (asyncHolder == nullptr) {
+        HILOG_ERROR("%{public}s asyncHolder nullptr", __func__);
+        return;
     }
+    AsyncCallbackContext *asyncCallbackContext = reinterpret_cast<AsyncCallbackContext *>(asyncHolder->data);
+    if (asyncCallbackContext == nullptr) {
+        HILOG_ERROR("%{public}s asyncCallbackContext nullptr", __func__);
+        return;
+    }
+    uint8_t tmp[sizeof(uint64_t)];
+    for (uint32_t i = 0; i < sizeof(uint64_t); i++) {
+    tmp[i] = asyncCallbackContext->credentialId[i];
+    }
+    uint64_t *tempCredentialId = static_cast<uint64_t *>(static_cast<void *>(tmp));
+    std::shared_ptr<IDMCallback> iidmCallback = std::make_shared<IIdmCallback>(asyncCallbackContext);
+    UserIDMClient::GetInstance().DelCred(*tempCredentialId, asyncCallbackContext->token, iidmCallback);
 }
 
 void UserIdentityManager::DelCredComplete(napi_env env, napi_status status, void *data)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
-    AsyncCallbackContext* asyncCallbackContext = (AsyncCallbackContext*)data;
-    napi_delete_async_work(env, asyncCallbackContext->asyncWork);
+    AsyncHolder *asyncHolder = reinterpret_cast<AsyncHolder *>(data);
+    if (asyncHolder == nullptr) {
+        HILOG_ERROR("%{public}s asyncHolder nullptr", __func__);
+        return;
+    }
+    napi_delete_async_work(env, asyncHolder->asyncWork);
+    delete asyncHolder;
+}
+
+napi_value UserIdentityManager::DoDelCred(napi_env env, napi_callback_info info, AsyncHolder *asyncHolder)
+{
+    AsyncCallbackContext *asyncCallbackContext = reinterpret_cast<AsyncCallbackContext *>(asyncHolder->data);
+    AuthCommon::JudgeDelCredType(env, info, asyncCallbackContext);
+    napi_value result = nullptr;
+    NAPI_CALL(env, napi_get_null(env, &result));
+    napi_value resourceName = nullptr;
+    NAPI_CALL(env, napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName));
+    NAPI_CALL(env, napi_create_async_work(env, nullptr, resourceName, DelCredExecute, DelCredComplete,
+                                          (void *)asyncHolder, &asyncHolder->asyncWork));
+    NAPI_CALL(env, napi_queue_async_work(env, asyncHolder->asyncWork));
+    return result;
 }
 
 /**
@@ -398,17 +537,29 @@ void UserIdentityManager::DelCredComplete(napi_env env, napi_status status, void
 napi_value UserIdentityManager::NAPI_DelCred(napi_env env, napi_callback_info info)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
+    AsyncHolder *asyncHolder = new (std::nothrow) AsyncHolder();
+    if (asyncHolder == nullptr) {
+        HILOG_ERROR("NAPI_DelCred asyncHolder nullptr");
+        return nullptr;
+    }
     AsyncCallbackContext *asyncCallbackContext = new (std::nothrow) AsyncCallbackContext();
+    if (asyncCallbackContext == nullptr) {
+        HILOG_ERROR("NAPI_DelCred asyncCallbackContext nullptr");
+        delete asyncHolder;
+        return nullptr;
+    }
+    asyncHolder->data = asyncCallbackContext;
     asyncCallbackContext->env = env;
-    AuthCommon::JudgeDelCredType(env, info, asyncCallbackContext);
-    napi_value resourceName = nullptr;
-    NAPI_CALL(env, napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName));
-    NAPI_CALL(env, napi_create_async_work(env, nullptr, resourceName, DelCredExecute, DelCredComplete,
-                                          (void *)asyncCallbackContext, &asyncCallbackContext->asyncWork));
-    NAPI_CALL(env, napi_queue_async_work(env, asyncCallbackContext->asyncWork));
-    napi_value result = RESULT;
-    NAPI_CALL(env, napi_get_null(env, &result));
-    return result;
+    napi_value ret = DoDelCred(env, info, asyncHolder);
+    if (ret == nullptr) {
+        HILOG_ERROR("NAPI_DelCred DoDelUser fail");
+        delete asyncCallbackContext;
+        delete asyncHolder;
+        if (asyncHolder->asyncWork != nullptr) {
+            napi_delete_async_work(env, asyncHolder->asyncWork);
+        }
+    }
+    return ret;
 }
 
 /**
@@ -422,19 +573,34 @@ napi_value UserIdentityManager::NAPI_DelCred(napi_env env, napi_callback_info in
 napi_value UserIdentityManager::NAPI_GetAuthInfo(napi_env env, napi_callback_info info)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
-    AsyncGetAuthInfo *asyncInfo = GCreateAsyncInfo(env);
-    if (asyncInfo == nullptr) {
+    AsyncHolder *asyncHolder = new (std::nothrow) AsyncHolder();
+    if (asyncHolder == nullptr) {
+        HILOG_ERROR("NAPI_DelCred asyncHolder nullptr");
         return nullptr;
     }
-    return GetAuthInfoWrap(env, info, asyncInfo);
+    AsyncGetAuthInfo *asyncGetAuthInfo = GCreateAsyncInfo(env);
+    if (asyncGetAuthInfo == nullptr) {
+        HILOG_ERROR("NAPI_DelCred asyncGetAuthInfo nullptr");
+        delete asyncHolder;
+        return nullptr;
+    }
+    asyncHolder->data = asyncGetAuthInfo;
+    napi_value ret = GetAuthInfoWrap(env, info, asyncHolder);
+    if (ret == nullptr) {
+        HILOG_ERROR("NAPI_DelCred DoDelUser fail");
+        delete asyncGetAuthInfo;
+        delete asyncHolder;
+        if (asyncHolder->asyncWork != nullptr) {
+            napi_delete_async_work(env, asyncHolder->asyncWork);
+        }
+    }
+    return ret;
 }
 
-napi_value UserIdentityManager::GetAuthInfoWrap(napi_env env, napi_callback_info info, AsyncGetAuthInfo *asyncInfo)
+napi_value UserIdentityManager::GetAuthInfoWrap(napi_env env, napi_callback_info info, AsyncHolder *asyncHolder)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
-    if (asyncInfo == nullptr) {
-        return nullptr;
-    }
+    AsyncGetAuthInfo *asyncGetAuthInfo = reinterpret_cast<AsyncGetAuthInfo *>(asyncHolder->data);
     size_t argc = ARGS_MAX_COUNT;
     size_t callbackIndex = ZERO_PARAMETER;
     napi_value argv[ARGS_MAX_COUNT] = {nullptr};
@@ -442,91 +608,94 @@ napi_value UserIdentityManager::GetAuthInfoWrap(napi_env env, napi_callback_info
     napi_valuetype valuetype = napi_undefined;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
     if (argc == 0) {
-        NAPI_CALL(env, napi_create_promise(env, &asyncInfo->deferred, &asyncInfo->promise));
-        ret = GetAuthInfoPromise(env, argv, argc, asyncInfo);
+        NAPI_CALL(env, napi_create_promise(env, &asyncGetAuthInfo->deferred, &asyncGetAuthInfo->promise));
+        ret = GetAuthInfoPromise(env, argv, argc, asyncHolder);
     } else {
         callbackIndex = argc - 1;
         NAPI_CALL(env, napi_typeof(env, argv[callbackIndex], &valuetype));
         if (valuetype == napi_function) {
-            NAPI_CALL(env, napi_create_reference(env, argv[callbackIndex], 1, &asyncInfo->callback));
-            ret = GetAuthInfoCallback(env, argv, argc, asyncInfo);
+            NAPI_CALL(env, napi_create_reference(env, argv[callbackIndex], 1, &asyncGetAuthInfo->callback));
+            ret = GetAuthInfoCallback(env, argv, argc, asyncHolder);
         } else {
-            NAPI_CALL(env, napi_create_promise(env, &asyncInfo->deferred, &asyncInfo->promise));
-            ret = GetAuthInfoPromise(env, argv, argc, asyncInfo);
+            NAPI_CALL(env, napi_create_promise(env, &asyncGetAuthInfo->deferred, &asyncGetAuthInfo->promise));
+            ret = GetAuthInfoPromise(env, argv, argc, asyncHolder);
         }
     }
     return ret;
 }
 
+void UserIdentityManager::GetAuthInfoExecute(napi_env env, void *data)
+{
+    HILOG_INFO("authFace : %{public}s, start.", __func__);
+    AsyncHolder *asyncHolder = reinterpret_cast<AsyncHolder *>(data);
+    if (asyncHolder == nullptr) {
+        HILOG_ERROR("%{public}s asyncHolder nullptr", __func__);
+        return;
+    }
+    AsyncGetAuthInfo *asyncGetAuthInfo = reinterpret_cast<AsyncGetAuthInfo *>(asyncHolder->data);
+    if (asyncGetAuthInfo == nullptr) {
+        HILOG_ERROR("%{public}s asyncCallbackContext nullptr", __func__);
+        return;
+    }
+    std::shared_ptr<GetInfoCallback> getInfoCallbackIDM = std::make_shared<GetInfoCallbackIDM>(asyncGetAuthInfo);
+    UserIDMClient::GetInstance().GetAuthInfo(asyncGetAuthInfo->authType, getInfoCallbackIDM);
+}
+
+void UserIdentityManager::GetAuthInfoComplete(napi_env env, napi_status status, void *data)
+{
+    HILOG_INFO("authFace : %{public}s, start.", __func__);
+    AsyncHolder *asyncHolder = reinterpret_cast<AsyncHolder *>(data);
+    if (asyncHolder == nullptr) {
+        HILOG_ERROR("%{public}s asyncHolder nullptr", __func__);
+        return;
+    }
+    napi_delete_async_work(env, asyncHolder->asyncWork);
+    delete asyncHolder;
+}
+
 napi_value UserIdentityManager::GetAuthInfoCallback(napi_env env, napi_value *argv, size_t argc,
-                                                    AsyncGetAuthInfo *asyncInfo)
+                                                    AsyncHolder *asyncHolder)
 {
     HILOG_INFO("authFace : %{public}s, start  .", __func__);
-    if (argv == nullptr || asyncInfo == nullptr) {
-        HILOG_INFO("argv is null");
-        return nullptr;
-    }
+    AsyncGetAuthInfo *asyncGetAuthInfo = reinterpret_cast<AsyncGetAuthInfo *>(asyncHolder->data);
     if (argc == ARGC) {
         int32_t authType_ = 0;
         NAPI_CALL(env, napi_get_value_int32(env, argv[0], &authType_));
-        asyncInfo->authType = static_cast<AuthType>(authType_);
+        asyncGetAuthInfo->authType = static_cast<AuthType>(authType_);
     }
+    napi_value result = nullptr;
+    NAPI_CALL(env, napi_get_null(env, &result));
     napi_value resourceName = nullptr;
     NAPI_CALL(env, napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName));
     NAPI_CALL(env, napi_create_async_work(
-        env, nullptr, resourceName,
-        [](napi_env env, void *data) {
-            AsyncGetAuthInfo *asyncInfo = (AsyncGetAuthInfo *)data;
-            std::shared_ptr<GetInfoCallback> getInfoCallbackIDM = std::make_shared<GetInfoCallbackIDM>(asyncInfo);
-            UserIDMClient::GetInstance().GetAuthInfo(asyncInfo->authType, getInfoCallbackIDM);
-        },
-        [](napi_env env, napi_status status, void *data) {
-            AsyncGetAuthInfo *asyncInfo = (AsyncGetAuthInfo *)data;
-            napi_delete_async_work(env, asyncInfo->asyncWork);
-            delete asyncInfo;
-            asyncInfo = nullptr;
-        },
-        (void *)asyncInfo, &asyncInfo->asyncWork));
-    NAPI_CALL(env, napi_queue_async_work(env, asyncInfo->asyncWork));
-    napi_value result = RESULT;
-    NAPI_CALL(env, napi_get_null(env, &result));
+        env, nullptr, resourceName, GetAuthInfoExecute, GetAuthInfoComplete,
+        (void *)asyncHolder, &asyncHolder->asyncWork));
+    NAPI_CALL(env, napi_queue_async_work(env, asyncHolder->asyncWork));
     return result;
 }
 
 napi_value UserIdentityManager::GetAuthInfoPromise(napi_env env, napi_value *argv, size_t argc,
-                                                   AsyncGetAuthInfo *asyncInfo)
+                                                   AsyncHolder *asyncHolder)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
-    if (asyncInfo == nullptr) {
-        return nullptr;
-    }
+    AsyncGetAuthInfo *asyncGetAuthInfo = reinterpret_cast<AsyncGetAuthInfo *>(asyncHolder->data);
     napi_valuetype valuetype = napi_undefined;
     NAPI_CALL(env, napi_typeof(env, argv[0], &valuetype));
     if (argv[0] != nullptr && valuetype == napi_number) {
         int32_t jsAuthType = 0;
         NAPI_CALL(env, napi_get_value_int32(env, argv[0], &jsAuthType));
-        asyncInfo->authType = static_cast<AuthType>(jsAuthType);
+        asyncGetAuthInfo->authType = static_cast<AuthType>(jsAuthType);
     } else {
-        asyncInfo->authType = static_cast<AuthType>(0);
+        asyncGetAuthInfo->authType = static_cast<AuthType>(0);
     }
     napi_value resourceName = nullptr;
     NAPI_CALL(env, napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName));
     NAPI_CALL(env, napi_create_async_work(
         env, nullptr, resourceName,
-        [](napi_env env, void *data) {
-            AsyncGetAuthInfo *asyncInfo = (AsyncGetAuthInfo *)data;
-            std::shared_ptr<GetInfoCallback> getInfoCallbackIDM = std::make_shared<GetInfoCallbackIDM>(asyncInfo);
-            UserIDMClient::GetInstance().GetAuthInfo(asyncInfo->authType, getInfoCallbackIDM);
-        },
-        [](napi_env env, napi_status status, void *data) {
-            AsyncGetAuthInfo* asyncInfo = (AsyncGetAuthInfo*)data;
-            napi_delete_async_work(env, asyncInfo->asyncWork);
-            delete asyncInfo;
-            asyncInfo = nullptr;
-        },
-        (void *)asyncInfo, &asyncInfo->asyncWork));
-    NAPI_CALL(env, napi_queue_async_work(env, asyncInfo->asyncWork));
-    return asyncInfo->promise;
+        GetAuthInfoExecute, GetAuthInfoComplete,
+        (void *)asyncHolder, &asyncHolder->asyncWork));
+    NAPI_CALL(env, napi_queue_async_work(env, asyncHolder->asyncWork));
+    return asyncGetAuthInfo->promise;
 }
 } // namespace UserIDM
 } // namespace UserIAM

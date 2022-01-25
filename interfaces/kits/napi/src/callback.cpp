@@ -53,7 +53,6 @@ static AsyncCallbackContext *CopyAsyncCallbackContext(AsyncCallbackContext *asyn
     }
     copy->env = asyncCallbackContext->env;
     copy->callbackInfo = asyncCallbackContext->callbackInfo;
-    copy->asyncWork = asyncCallbackContext->asyncWork;
     copy->authType = asyncCallbackContext->authType;
     copy->authSubType = asyncCallbackContext->authSubType;
     copy->credentialId = asyncCallbackContext->credentialId;
@@ -257,10 +256,10 @@ static napi_value CreateCredentialInfo(AsyncGetAuthInfo *asyncGetAuthInfo)
             return nullptr;
         }
         napi_value authType;
-        NAPI_CALL(env, napi_create_int32(env,
+        NAPI_CALL(env, napi_create_uint32(env,
             static_cast<int32_t>(asyncGetAuthInfo->info[Vect].authType), &authType));
         napi_value authSubType;
-        NAPI_CALL(env, napi_create_int32(env,
+        NAPI_CALL(env, napi_create_uint32(env,
             static_cast<int32_t>(asyncGetAuthInfo->info[Vect].authSubType), &authSubType));
         napi_value templateId = GetAuthInfoRet(env, (asyncGetAuthInfo->info[Vect].templateId));
         if (templateId == nullptr) {
@@ -284,7 +283,6 @@ static AsyncGetAuthInfo *CopyAsyncGetAuthInfo(AsyncGetAuthInfo *asyncGetAuthInfo
     }
     copy->env = asyncGetAuthInfo->env;
     copy->openSession = asyncGetAuthInfo->openSession;
-    copy->asyncWork = asyncGetAuthInfo->asyncWork;
     copy->callback = asyncGetAuthInfo->callback;
     copy->authType = asyncGetAuthInfo->authType;
     copy->deferred = asyncGetAuthInfo->deferred;
@@ -380,6 +378,8 @@ void GetInfoCallbackIDM::OnGetInfo(std::vector<CredentialInfo>& info)
         delete work;
         return;
     }
+    delete asyncGetAuthInfo_;
+    asyncGetAuthInfo_ = nullptr;
     work->data = reinterpret_cast<void *>(copy);
     uv_queue_work(loop, work, [] (uv_work_t *work) { }, OnGetInfoWork);
 }
