@@ -56,6 +56,7 @@ typedef struct AsyncGetAuthInfo {
     AuthType authType;
     napi_deferred deferred;
     napi_value promise;
+    std::vector<CredentialInfo> info;
 } AsyncGetAuthInfo;
 typedef struct CallbackInfo {
     napi_env env;
@@ -72,6 +73,10 @@ typedef struct AsyncCallbackContext {
     std::vector<uint8_t> token;
     napi_value IdmCallOnResult;
     napi_value IdmCallonAcquireInfo;
+    int32_t result;
+    uint64_t retCredentialId;
+    int32_t module;
+    int32_t acquire;
 } AsyncCallbackContext;
 typedef struct SyncCancelContext {
     napi_env env;
