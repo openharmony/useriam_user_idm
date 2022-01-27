@@ -21,7 +21,7 @@ namespace UserIAM {
 namespace UserIDM {
 void UserIDMGetInfoCallbackProxy::OnGetInfo(std::vector<CredentialInfo>& credInfos)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, "UserIDMCallbackProxy OnResult enter");
+    USERIDM_HILOGI(MODULE_INNERKIT, "UserIDMGetInfoCallbackProxy OnResult enter");
 
     MessageParcel data;
     MessageParcel reply;
@@ -35,7 +35,7 @@ void UserIDMGetInfoCallbackProxy::OnGetInfo(std::vector<CredentialInfo>& credInf
         USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteUint32(credInfos.size()).");
         return;
     }
-    if(credInfos.size() > 0){
+    if (credInfos.size() > 0) {
         // write data then
         for (uint32_t i = 0; i < credInfos.size(); i++) {
             // credInfos[i].authType

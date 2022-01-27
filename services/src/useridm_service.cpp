@@ -145,20 +145,17 @@ int32_t UserIDMService::EnforceDelUser(int32_t userId, const sptr<IIDMCallback>&
     int32_t ret = 0;
 
     // get accountmgr info
-    // bool isAccountMgr = true;
     std::vector<CredentialInfo> credInfos;
 
-    //if (isAccountMgr) {
-        ret = idmController_.DeleteUserByForceCtrl(userId, credInfos);
-        if (SUCCESS != ret) {
-            USERIDM_HILOGE(MODULE_INNERKIT, "DeleteUserByForceCtrl return fail");
-            RequestResult reqRet;
-            reqRet.credentialId = 0;
-            callback->OnResult(ret, reqRet);
-        } else {
-            ret = idmController_.DelExecutorPinInofCtrl(callback, credInfos);
-        }
-    //}
+    ret = idmController_.DeleteUserByForceCtrl(userId, credInfos);
+    if (SUCCESS != ret) {
+        USERIDM_HILOGE(MODULE_INNERKIT, "DeleteUserByForceCtrl return fail");
+        RequestResult reqRet;
+        reqRet.credentialId = 0;
+        callback->OnResult(ret, reqRet);
+    } else {
+        ret = idmController_.DelExecutorPinInofCtrl(callback, credInfos);
+    }
 
     return ret;
 }

@@ -28,7 +28,7 @@ namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
 void AuthCommon::SaveCallback(napi_env env, size_t argc, napi_value* argv,
-                                 AsyncCallbackContext* asyncCallbackContext)
+                              AsyncCallbackContext* asyncCallbackContext)
 {
     HILOG_INFO("authFace : %{public}s, start.", __func__);
     napi_valuetype valueType;
@@ -154,8 +154,20 @@ napi_status AuthCommon::JudgeObjectType (
     }
     if (valueType == napi_object) {
         asyncCallbackContext->authType = static_cast<AuthType>(GetNamedProperty(env, argv[0], PROPERTY_KEY_NAME));
+        if (asyncCallbackContext->authType == NULL) {
+            HILOG_ERROR("GetNamedProperty authType faild");
+            return napi_generic_failure;
+        }
         asyncCallbackContext->authSubType = static_cast<AuthSubType>(GetNamedProperty(env, argv[0], PROPERTY_KEY_ID));
+        if (asyncCallbackContext->authSubType == NULL) {
+            HILOG_ERROR("GetNamedProperty authSubType faild");
+            return napi_generic_failure;
+        }
         asyncCallbackContext->token = GetNamedAttribute(env, argv[0]);
+        if (asyncCallbackContext->token.empty()) {
+            HILOG_ERROR("GetNamedAttribute token faild");
+            return napi_generic_failure;
+        }
     }
     SaveCallback(env, ONE_PARAMETER, argv, asyncCallbackContext);
     return status;
@@ -172,6 +184,9 @@ void AuthCommon::JudgeDelUserType(napi_env env, napi_callback_info info, AsyncCa
         HILOG_ERROR("napi_get_cb_info faild");
     }
     asyncCallbackContext->token = JudgeArryType(env, ZERO_PARAMETER, argv);
+    if (asyncCallbackContext->token.empty()) {
+        HILOG_ERROR("JudgeArryType token faild");
+    }
     SaveCallback(env, ONE_PARAMETER, argv, asyncCallbackContext);
 }
 
@@ -186,7 +201,13 @@ void AuthCommon::JudgeDelCredType(napi_env env, napi_callback_info info, AsyncCa
         HILOG_ERROR("napi_get_cb_info faild");
     }
     asyncCallbackContext->token = JudgeArryType(env, ZERO_PARAMETER, argv);
+    if (asyncCallbackContext->token.empty()) {
+        HILOG_ERROR("JudgeArryType token faild");
+    }
     asyncCallbackContext->credentialId = JudgeArryType(env, ONE_PARAMETER, argv);
+    if (asyncCallbackContext->credentialId.empty()) {
+        HILOG_ERROR("JudgeArryType credentialId faild");
+    }
     SaveCallback(env, TWO_PARAMETER, argv, asyncCallbackContext);
 }
 

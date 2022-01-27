@@ -244,7 +244,6 @@ napi_value GetCtor(napi_env env)
         DECLARE_NAPI_FUNCTION("delCred", DelCred),
         DECLARE_NAPI_FUNCTION("getAuthInfo", GetAuthInfo),
     };
-    
     NAPI_CALL(env, napi_define_class(env, "UserIdentityManager", NAPI_AUTO_LENGTH, UserIdentityManagerConstructor,
               nullptr, sizeof(clzDes) / sizeof(napi_property_descriptor), clzDes, &cons));
         NAPI_CALL(env, napi_create_reference(env, cons, 1, &g_ctor));
