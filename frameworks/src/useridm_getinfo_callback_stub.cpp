@@ -29,8 +29,8 @@ UserIDMGetInfoCallbackStub::UserIDMGetInfoCallbackStub(const std::shared_ptr<Get
 int32_t UserIDMGetInfoCallbackStub::OnRemoteRequest(uint32_t code,
                                                     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, "UserIDMGetInfoCallbackStub::OnRemoteRequest, cmd = %{public}d, flags= %d", 
-                    code, option.GetFlags());
+    USERIDM_HILOGI(MODULE_INNERKIT, "UserIDMGetInfoCallbackStub::OnRemoteRequest, cmd = %{public}d, flags= %d",
+                   code, option.GetFlags());
 
     std::u16string descripter = UserIDMGetInfoCallbackStub::GetDescriptor();
     std::u16string remoteDescripter = data.ReadInterfaceToken();

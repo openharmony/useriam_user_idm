@@ -387,6 +387,9 @@ napi_value UserIdentityManager::NAPI_Cancel(napi_env env, napi_callback_info inf
     syncCancelContext->env = env;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
     syncCancelContext->challenge = AuthCommon::JudgeArryType(env, ZERO_PARAMETER, argv);
+    if (syncCancelContext->challenge.empty()) {
+        HILOG_ERROR("syncCancelContext->challenge is null!");
+    }
     uint8_t tmp[sizeof(uint64_t)];
     for (uint32_t i = 0; i < sizeof(uint64_t); i++) {
         tmp[i] = syncCancelContext->challenge[i];

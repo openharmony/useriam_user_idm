@@ -19,7 +19,7 @@
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
-UserIDMSetPropHandler::UserIDMSetPropHandler(AuthType type, const uint64_t challenge, 
+UserIDMSetPropHandler::UserIDMSetPropHandler(AuthType type, const uint64_t challenge,
                                              const  uint64_t sessionId, uint64_t credentialId,
                                              const std::shared_ptr<UserIDMMoudle>& data,
                                              const sptr<IIDMCallback>& callback)
