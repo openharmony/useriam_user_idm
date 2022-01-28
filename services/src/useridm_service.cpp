@@ -90,6 +90,21 @@ int32_t UserIDMService::GetAuthInfo(AuthType authType, const sptr<IGetInfoCallba
     return ret;
 }
 
+int32_t UserIDMService::GetAuthInfo(int32_t userId, AuthType authType, const sptr<IGetInfoCallback>& callback)
+{
+    USERIDM_HILOGI(MODULE_INNERKIT, "service GetAuthInfo enter");
+
+    // has no info userId
+    userId = 0;
+    std::vector<CredentialInfo> credInfos;
+    int32_t ret =  idmController_.GetAuthInfoCtrl(userId, authType, credInfos);
+
+    // return data
+    callback->OnGetInfo(credInfos);
+
+    return ret;
+}
+
 int32_t UserIDMService::GetSecInfo(const sptr<IGetSecInfoCallback>& callback)
 {
     USERIDM_HILOGI(MODULE_INNERKIT, "service GetSecInfo enter");

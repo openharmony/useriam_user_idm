@@ -120,6 +120,22 @@ void UserIDMClient::CloseSession()
     proxy->CloseSession();
 }
 
+int32_t UserIDMClient::GetAuthInfo(int32_t userId, AuthType authType, const std::shared_ptr<GetInfoCallback>& callback)
+{
+    USERIDM_HILOGI(MODULE_INNERKIT, " GetAuthInfoById  enter");
+
+    auto proxy = GetUserIDMProxy();
+    if (proxy == nullptr) {
+        return FAIL;
+    }
+
+    sptr<IGetInfoCallback> callbackStub = new UserIDMGetInfoCallbackStub(callback);
+
+    int32_t res = proxy->GetAuthInfo(userId, authType, callbackStub);
+
+    return res;
+}
+
 int32_t UserIDMClient::GetAuthInfo(AuthType authType, const std::shared_ptr<GetInfoCallback>& napiCallback)
 {
     USERIDM_HILOGI(MODULE_INNERKIT, " GetAuthInfo  enter");

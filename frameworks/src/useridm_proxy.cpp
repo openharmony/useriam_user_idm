@@ -84,6 +84,40 @@ int32_t UserIDMProxy::GetAuthInfo(AuthType authType, const sptr<IGetInfoCallback
     return result;
 }
 
+int32_t UserIDMProxy::GetAuthInfo(int32_t userId, AuthType authType, const sptr<IGetInfoCallback>& callback)
+{
+    MessageParcel data;
+    MessageParcel reply;
+
+    if (!data.WriteInterfaceToken(UserIDMProxy::GetDescriptor())) {
+        USERIDM_HILOGI(MODULE_INNERKIT, "write descriptor failed!");
+        return FAIL;
+    }
+
+    if (!data.WriteInt32(userId)) {
+        USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteInt32(userId).");
+        return FAIL;
+    }
+
+    if (!data.WriteUint32(authType)) {
+        USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteUint32(authType).");
+        return FAIL;
+    }
+
+    if (!data.WriteRemoteObject(callback->AsObject())) {
+        USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteRemoteObject(callback).");
+        return FAIL;
+    }
+
+    int32_t result = FAIL;
+    bool ret = SendRequest(USERIDM_GET_AUTH_INFO_BY_ID, data, reply, true);
+    if (ret) {
+        result = reply.ReadInt32();
+        USERIDM_HILOGI(MODULE_INNERKIT, "result = %{public}d", result);
+    }
+    return result;
+}
+
 int32_t UserIDMProxy::GetSecInfo(const sptr<IGetSecInfoCallback>& callback)
 {
     MessageParcel data;

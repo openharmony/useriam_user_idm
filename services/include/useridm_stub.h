@@ -33,6 +33,7 @@ private:
     uint64_t OpenSessionStub(MessageParcel& data, MessageParcel& reply);
     void CloseSessionStub(MessageParcel& data, MessageParcel& reply);
     int32_t GetAuthInfoStub(MessageParcel& data, MessageParcel& reply);
+    int32_t GetAuthInfoByIdStub(MessageParcel& data, MessageParcel& reply);
     int32_t GetSecInfoStub(MessageParcel& data, MessageParcel& reply);
     void AddCredentialStub(MessageParcel& data, MessageParcel& reply);
     void UpdateCredentialStub(MessageParcel& data, MessageParcel& reply);
