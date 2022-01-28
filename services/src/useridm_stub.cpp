@@ -39,6 +39,8 @@ int32_t UserIDMStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Message
             return SUCCESS;
         case static_cast<int32_t>(IUserIDM::USERIDM_GET_AUTH_INFO):
             return GetAuthInfoStub(data, reply);
+        case static_cast<int32_t>(IUserIDM::USERIDM_GET_AUTH_INFO_BY_ID):
+            return GetAuthInfoByIdStub(data, reply);
         case static_cast<int32_t>(IUserIDM::USERIDM_GET_SEC_INFO):
             return GetSecInfoStub(data, reply);
         case static_cast<int32_t>(IUserIDM::USERIDM_ADD_CREDENTIAL):
@@ -97,6 +99,27 @@ int32_t UserIDMStub::GetAuthInfoStub(MessageParcel& data, MessageParcel& reply)
     }
 
     int32_t ret = GetAuthInfo(authType, callback);
+    if (!reply.WriteInt32(ret)) {
+        USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteInt32(ret)");
+        return FAIL;
+    }
+
+    return SUCCESS;
+}
+
+int32_t UserIDMStub::GetAuthInfoByIdStub(MessageParcel& data, MessageParcel& reply)
+{
+    USERIDM_HILOGI(MODULE_INNERKIT, "GetAuthInfoStub enter ");
+
+    int32_t userId = data.ReadInt32();
+    AuthType authType = static_cast<AuthType>(data.ReadUint32());
+    sptr<IGetInfoCallback> callback = iface_cast<IGetInfoCallback>(data.ReadRemoteObject());
+    if (callback == nullptr) {
+        USERIDM_HILOGE(MODULE_INNERKIT, "callback is nullptr");
+        return ERR_INVALID_VALUE;
+    }
+
+    int32_t ret = GetAuthInfo(userId, authType, callback);
     if (!reply.WriteInt32(ret)) {
         USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteInt32(ret)");
         return FAIL;

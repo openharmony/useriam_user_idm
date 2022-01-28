@@ -40,6 +40,7 @@ public:
     uint64_t OpenSession() override;
     void CloseSession() override;
     int32_t GetAuthInfo(AuthType authType, const sptr<IGetInfoCallback>& callback) override;
+    int32_t GetAuthInfo(int32_t userId, AuthType authType, const sptr<IGetInfoCallback>& callback) override;
     int32_t GetSecInfo(const sptr<IGetSecInfoCallback>& callback) override;
     void AddCredential(AddCredInfo & credInfo, const sptr<IIDMCallback>& callback) override;
     void UpdateCredential(AddCredInfo & credInfo, const sptr<IIDMCallback>& callback) override;

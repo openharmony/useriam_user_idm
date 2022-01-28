@@ -49,6 +49,15 @@ public:
     virtual int32_t GetAuthInfo(AuthType authType, const sptr<IGetInfoCallback>& callback) = 0;
 
     /**
+     * @brief get auth info by user id
+     * @param userId user id.
+     * @param authType credential type.
+     * @param callback The callback function provided for caller to handle response data.
+     * @return void.
+     */
+    virtual int32_t GetAuthInfo(int32_t userId, AuthType authType, const sptr<IGetInfoCallback>& callback) = 0;
+
+    /**
      * @brief get sec info
      * @param callback The callback function provided for caller to handle response data.
      * @return void.
@@ -108,6 +117,7 @@ public:
         USERIDM_OPEN_SESSION = 0,        // open the IDM editing session
         USERIDM_CLOSE_SESSION,          // close the IDM editing session
         USERIDM_GET_AUTH_INFO,          // query credential information
+        USERIDM_GET_AUTH_INFO_BY_ID,    // query credential information by user id
         USERIDM_GET_SEC_INFO,           // get user security ID
         USERIDM_ADD_CREDENTIAL,         // add user credential information
         USERIDM_UPDATE_CREDENTIAL,      // update user credential information
