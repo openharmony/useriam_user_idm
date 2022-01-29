@@ -16,7 +16,7 @@
       "name": "user_idm",
       "subsystem": "useriam",
       "adapted_system_type": [ "standard" ],
-      "syscap": ["SystemCapability.UserIAM.UserIDM"],
+      "syscap": ["SystemCapability.UserIAM.UserIdm"],
       "features": [],
       "rom": "500KB",
       "ram": "1000KB",
