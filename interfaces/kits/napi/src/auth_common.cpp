@@ -154,15 +154,7 @@ napi_status AuthCommon::JudgeObjectType (
     }
     if (valueType == napi_object) {
         asyncCallbackContext->authType = static_cast<AuthType>(GetNamedProperty(env, argv[0], PROPERTY_KEY_NAME));
-        if (asyncCallbackContext->authType == NULL) {
-            HILOG_ERROR("GetNamedProperty authType faild");
-            return napi_generic_failure;
-        }
         asyncCallbackContext->authSubType = static_cast<AuthSubType>(GetNamedProperty(env, argv[0], PROPERTY_KEY_ID));
-        if (asyncCallbackContext->authSubType == NULL) {
-            HILOG_ERROR("GetNamedProperty authSubType faild");
-            return napi_generic_failure;
-        }
         asyncCallbackContext->token = GetNamedAttribute(env, argv[0]);
         if (asyncCallbackContext->token.empty()) {
             HILOG_ERROR("GetNamedAttribute token faild");
