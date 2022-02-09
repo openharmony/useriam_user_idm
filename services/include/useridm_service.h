@@ -51,6 +51,7 @@ public:
     // del face
 
 private:
+    int32_t GetCallingUserID(int32_t &userID);
     // add controller point
     UserIDMController idmController_;
 };
