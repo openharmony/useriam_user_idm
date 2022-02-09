@@ -18,6 +18,7 @@
 
 #include "useridm_service.h"
 #include "useriam_common.h"
+#include "accesstoken_kit.h"
 
 namespace OHOS {
 namespace UserIAM {
@@ -55,13 +56,38 @@ void UserIDMService::OnStop()
     }
 }
 
+int32_t UserIDMService::GetCallingUserID(int32_t &userID)
+{
+    uint32_t tokenID = this->GetFirstTokenID();
+    if (tokenID == 0) {
+        tokenID = this->GetCallingTokenID();
+    }
+    Security::AccessToken::ATokenTypeEnum callingType = Security::AccessToken::AccessTokenKit::GetTokenType(tokenID);
+    if (callingType != Security::AccessToken::TOKEN_HAP) {
+        USERIDM_HILOGI(MODULE_INNERKIT, "CallingType is not hap.");
+        return TYPE_NOT_SUPPORT;
+    }
+    Security::AccessToken::HapTokenInfo hapTokenInfo;
+    int result = Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenID, hapTokenInfo);
+    if (result != SUCCESS) {
+        USERIDM_HILOGI(MODULE_INNERKIT, "Get hap token info failed.");
+        return TYPE_NOT_SUPPORT;
+    }
+    userID = (int32_t)hapTokenInfo.userID;
+    USERIDM_HILOGI(MODULE_INNERKIT, "GetCallingUserID is %{public}d", userID);
+    return SUCCESS;
+}
+
 uint64_t UserIDMService::OpenSession()
 {
     USERIDM_HILOGI(MODULE_INNERKIT, "service OpenSession enter");
 
-    // getUserId
     int32_t userId = 0;
     uint64_t challenge = 0;
+    int32_t ret = this->GetCallingUserID(userId);
+    if (ret != SUCCESS) {
+        return 0;
+    }
 
     idmController_.OpenEditSessionCtrl(userId, challenge);
 
@@ -79,10 +105,13 @@ int32_t UserIDMService::GetAuthInfo(AuthType authType, const sptr<IGetInfoCallba
 {
     USERIDM_HILOGI(MODULE_INNERKIT, "service GetAuthInfo enter");
 
-    // has no info userId
     int32_t userId = 0;
+    int32_t ret = this->GetCallingUserID(userId);
+    if (ret != SUCCESS) {
+        return ret;
+    }
     std::vector<CredentialInfo> credInfos;
-    int32_t ret =  idmController_.GetAuthInfoCtrl(userId, authType, credInfos);
+    ret =  idmController_.GetAuthInfoCtrl(userId, authType, credInfos);
 
     // return data
     callback->OnGetInfo(credInfos);
@@ -94,8 +123,6 @@ int32_t UserIDMService::GetAuthInfo(int32_t userId, AuthType authType, const spt
 {
     USERIDM_HILOGI(MODULE_INNERKIT, "service GetAuthInfo enter");
 
-    // has no info userId
-    userId = 0;
     std::vector<CredentialInfo> credInfos;
     int32_t ret =  idmController_.GetAuthInfoCtrl(userId, authType, credInfos);
 
@@ -109,10 +136,13 @@ int32_t UserIDMService::GetSecInfo(const sptr<IGetSecInfoCallback>& callback)
 {
     USERIDM_HILOGI(MODULE_INNERKIT, "service GetSecInfo enter");
 
-    // getUserId
     int32_t userId = 0;
+    int32_t ret = this->GetCallingUserID(userId);
+    if (ret != SUCCESS) {
+        return ret;
+    }
     SecInfo secInfos;
-    int32_t ret =  idmController_.GetSecureInfoCtrl(userId, secInfos.secureUid, secInfos.enrolledInfo);
+    ret =  idmController_.GetSecureInfoCtrl(userId, secInfos.secureUid, secInfos.enrolledInfo);
     if (SUCCESS != ret) {
         USERIDM_HILOGE(MODULE_INNERKIT, "GetSecureInfoCtrl failed");
     }
@@ -130,8 +160,15 @@ void UserIDMService::AddCredential(AddCredInfo& credInfo, const sptr<IIDMCallbac
     USERIDM_HILOGI(MODULE_INNERKIT, "service AddCredential enter");
     uint64_t callerID = this->GetCallingUid();
     std::string callerName = std::to_string(callerID);
-
-    idmController_.AddCredentialCtrl(callerID, callerName, credInfo, callback);
+    int32_t userId = 0;
+    int32_t ret = this->GetCallingUserID(userId);
+    if (ret != SUCCESS) {
+        USERIDM_HILOGE(MODULE_INNERKIT, "GetCallingUserID failed!");
+        RequestResult reqRet;
+        callback->OnResult(ret, reqRet);
+        return;
+    }
+    idmController_.AddCredentialCtrl(userId, callerID, callerName, credInfo, callback);
 }
 
 void UserIDMService::UpdateCredential(AddCredInfo& credInfo, const sptr<IIDMCallback>& innerkitsCallback)
@@ -139,8 +176,15 @@ void UserIDMService::UpdateCredential(AddCredInfo& credInfo, const sptr<IIDMCall
     USERIDM_HILOGI(MODULE_INNERKIT, "service UpdateCredential enter");
     uint64_t callerID = this->GetCallingUid();
     std::string callerName = std::to_string(callerID);
-
-    idmController_.UpdateCredentialCtrl(callerID, callerName, credInfo, innerkitsCallback);
+    int32_t userId = 0;
+    int32_t ret = this->GetCallingUserID(userId);
+    if (ret != SUCCESS) {
+        USERIDM_HILOGE(MODULE_INNERKIT, "GetCallingUserID failed!");
+        RequestResult reqRet;
+        innerkitsCallback->OnResult(ret, reqRet);
+        return;
+    }
+    idmController_.UpdateCredentialCtrl(userId, callerID, callerName, credInfo, innerkitsCallback);
 }
 
 int32_t UserIDMService::Cancel(uint64_t challenge)
@@ -179,11 +223,17 @@ void UserIDMService::DelUser(std::vector<uint8_t> authToken, const sptr<IIDMCall
 {
     USERIDM_HILOGI(MODULE_INNERKIT, "service DelUser enter");
 
-    // getUserId
     int32_t userId = 0;
+    int32_t ret =  this->GetCallingUserID(userId);
+    if (ret != SUCCESS) {
+        USERIDM_HILOGE(MODULE_INNERKIT, "GetCallingUserID failed");
+        RequestResult reqRet;
+        callback->OnResult(ret, reqRet);
+        return;
+    }
     std::vector<CredentialInfo> credInfos;
 
-    int32_t ret =  idmController_.DeleteUserCtrl(userId, authToken, credInfos);
+    ret =  idmController_.DeleteUserCtrl(userId, authToken, credInfos);
     if (ret == SUCCESS) {
         USERIDM_HILOGE(MODULE_INNERKIT, "DeleteUserCtrl success");
         idmController_.DelExecutorPinInofCtrl(callback, credInfos);
@@ -199,11 +249,16 @@ void UserIDMService::DelCred(uint64_t credentialId, std::vector<uint8_t> authTok
 {
     USERIDM_HILOGI(MODULE_INNERKIT, "service DelCred enter");
 
-    // get userId info
     int32_t userId = 0;
+    int32_t ret = this->GetCallingUserID(userId);
+    if (ret != SUCCESS) {
+        USERIDM_HILOGE(MODULE_INNERKIT, "GetCallingUserID failed ");
+        RequestResult reqRet;
+        innerkitsCallback->OnResult(ret, reqRet);
+    }
     CredentialInfo credentialInfo;
 
-    int32_t ret =  idmController_.DeleteCredentialCtrl(userId, credentialId, authToken, credentialInfo);
+    ret =  idmController_.DeleteCredentialCtrl(userId, credentialId, authToken, credentialInfo);
     if (ret == SUCCESS) {
         USERIDM_HILOGI(MODULE_INNERKIT, "DeleteCredentialCtrl success ");
 

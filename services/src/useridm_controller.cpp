@@ -132,13 +132,12 @@ void UserIDMController::AddCredentialCallCoauth(uint64_t callerID, std::string c
     CoAuth::CoAuth::GetInstance().coAuth(scheduleId, paramInfo, coAuthCallback);
 }
 
-int32_t UserIDMController::AddCredentialCtrl(uint64_t callerID, std::string callerName,
+int32_t UserIDMController::AddCredentialCtrl(int32_t userId, uint64_t callerID, std::string callerName,
     AddCredInfo& credInfo, const sptr<IIDMCallback>& innerkitsCallback)
 {
     USERIDM_HILOGI(MODULE_INNERKIT, "AddCredentialCtrl enter ");
     uint64_t scheduleId = 0;
     uint64_t challenge = 0;
-    int32_t userId = 0;
     // add death recipient start
     sptr<IRemoteObject::DeathRecipient> dr = new AddCredCallbackDeathRecipient(this);
     if (!innerkitsCallback->AsObject()->AddDeathRecipient(dr)) {
@@ -180,11 +179,10 @@ int32_t UserIDMController::AddCredentialCtrl(uint64_t callerID, std::string call
     return ret;
 }
 
-int32_t UserIDMController::UpdateCredentialCtrl(uint64_t callerID, std::string callerName,
+int32_t UserIDMController::UpdateCredentialCtrl(int32_t userId, uint64_t callerID, std::string callerName,
     AddCredInfo & credInfo, const sptr<IIDMCallback>& innerkitsCallback)
 {
     USERIDM_HILOGI(MODULE_INNERKIT, "UpdateCredentialCtrl enter ");
-    int32_t userId = 0;
     uint64_t scheduleId = 0;
     uint64_t challenge = 0;
 
