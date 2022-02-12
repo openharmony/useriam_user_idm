@@ -315,8 +315,7 @@ int32_t UserIDMController::DelExecutorPinInofCtrl(const sptr<IIDMCallback>& inne
         if (PIN == info[i].authType) {
             // PIN
             std::shared_ptr<UserIDMSetPropHandler> setPropCallback =
-                                                   std::make_shared<UserIDMSetPropHandler>(PIN, 0, 0, info[i].credentialId,
-                                                                                            data_, innerCallback);
+                std::make_shared<UserIDMSetPropHandler>(PIN, 0, 0, info[i].credentialId, data_, innerCallback);
             AuthResPool::AuthAttributes condition;
             condition.SetUint32Value(AuthAttributeType::AUTH_PROPERTY_MODE, 0);
             condition.SetUint64Value(AuthAttributeType::AUTH_CALLER_UID, 0);
@@ -328,8 +327,7 @@ int32_t UserIDMController::DelExecutorPinInofCtrl(const sptr<IIDMCallback>& inne
         } else if (info[i].authType == FACE) {     // to be delete
             // FACE
             std::shared_ptr<UserIDMSetPropHandler> setPropCallback =
-                                                   std::make_shared<UserIDMSetPropHandler>(FACE, 0, 0, info[i].credentialId,
-                                                                                            data_, innerCallback);
+                std::make_shared<UserIDMSetPropHandler>(FACE, 0, 0, info[i].credentialId, data_, innerCallback);
             AuthResPool::AuthAttributes condition;
             condition.SetUint32Value(AuthAttributeType::AUTH_PROPERTY_MODE, 0);
             condition.SetUint64Value(AuthAttributeType::AUTH_CALLER_UID, 0);
