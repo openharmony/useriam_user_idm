@@ -157,8 +157,8 @@ napi_status AuthCommon::JudgeObjectType (
         asyncCallbackContext->authSubType = static_cast<AuthSubType>(GetNamedProperty(env, argv[0], PROPERTY_KEY_ID));
         asyncCallbackContext->token = GetNamedAttribute(env, argv[0]);
         if (asyncCallbackContext->token.empty()) {
-            HILOG_ERROR("GetNamedAttribute token faild");
-            return napi_generic_failure;
+            HILOG_INFO("input invalid token");
+            asyncCallbackContext->token.push_back(0);
         }
     }
     SaveCallback(env, ONE_PARAMETER, argv, asyncCallbackContext);
@@ -192,11 +192,11 @@ void AuthCommon::JudgeDelCredType(napi_env env, napi_callback_info info, AsyncCa
     if (status != napi_ok) {
         HILOG_ERROR("napi_get_cb_info faild");
     }
-    asyncCallbackContext->token = JudgeArryType(env, ZERO_PARAMETER, argv);
+    asyncCallbackContext->token = JudgeArryType(env, ONE_PARAMETER, argv);
     if (asyncCallbackContext->token.empty()) {
         HILOG_ERROR("JudgeArryType token faild");
     }
-    asyncCallbackContext->credentialId = JudgeArryType(env, ONE_PARAMETER, argv);
+    asyncCallbackContext->credentialId = JudgeArryType(env, ZERO_PARAMETER, argv);
     if (asyncCallbackContext->credentialId.empty()) {
         HILOG_ERROR("JudgeArryType credentialId faild");
     }
