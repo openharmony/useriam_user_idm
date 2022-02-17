@@ -31,7 +31,7 @@ UserIDMClient::~UserIDMClient() = default;
 
 sptr<IUserIDM> UserIDMClient::GetUserIDMProxy()
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, " GetUserIDMProxy  enter");
+    USERIDM_HILOGD(MODULE_CLIENT, " GetUserIDMProxy enter");
 
     std::lock_guard<std::mutex> lock(mutex_);
     if (proxy_ != nullptr) {
@@ -40,32 +40,32 @@ sptr<IUserIDM> UserIDMClient::GetUserIDMProxy()
 
     sptr<ISystemAbilityManager> sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (!sam) {
-        USERIDM_HILOGE(MODULE_INNERKIT, "failed to get systemAbilityManager.");
+        USERIDM_HILOGE(MODULE_CLIENT, "failed to get systemAbilityManager.");
         return nullptr;
     }
 
     sptr<IRemoteObject> obj = sam->CheckSystemAbility(SUBSYS_USERIAM_SYS_ABILITY_USERIDM);
     if (!obj) {
-        USERIDM_HILOGE(MODULE_INNERKIT, "failed to get remoteObject.");
+        USERIDM_HILOGE(MODULE_CLIENT, "failed to get remoteObject.");
         return nullptr;
     }
 
     sptr<IRemoteObject::DeathRecipient> dr = new UserIDMDeathRecipient();
     if ((obj->IsProxyObject()) && (!obj->AddDeathRecipient(dr))) {
-        USERIDM_HILOGE(MODULE_INNERKIT, "Failed to add death recipient.");
+        USERIDM_HILOGE(MODULE_CLIENT, "Failed to add death recipient.");
         return nullptr;
     }
 
     proxy_ = iface_cast<IUserIDM>(obj);
     deathRecipient_ = dr;
 
-    USERIDM_HILOGE(MODULE_INNERKIT, "Succeed to connect distributed gallery manager service.");
+    USERIDM_HILOGD(MODULE_CLIENT, "Succeed to connect manager service.");
     return proxy_;
 }
 
 void UserIDMClient::ResetUserIDMProxy(const wptr<IRemoteObject>& remote)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, " ResetUserIDMProxy  enter");
+    USERIDM_HILOGD(MODULE_CLIENT, " ResetUserIDMProxy enter");
 
     std::lock_guard<std::mutex> lock(mutex_);
     if (!proxy_) {
@@ -81,24 +81,24 @@ void UserIDMClient::ResetUserIDMProxy(const wptr<IRemoteObject>& remote)
 
 void UserIDMClient::UserIDMDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, " OnRemoteDied  enter");
+    USERIDM_HILOGD(MODULE_CLIENT, " OnRemoteDied enter");
 
     if (remote == nullptr) {
-        USERIDM_HILOGE(MODULE_INNERKIT, "OnRemoteDied failed, remote is nullptr");
+        USERIDM_HILOGE(MODULE_CLIENT, "OnRemoteDied failed, remote is nullptr");
         return;
     }
 
     UserIDMClient::GetInstance().ResetUserIDMProxy(remote);
-    USERIDM_HILOGE(MODULE_INNERKIT, "DistributedGalleryDeathRecipient::Recv death notice.");
+    USERIDM_HILOGE(MODULE_CLIENT, "DistributedGalleryDeathRecipient::Recv death notice.");
 }
 
 uint64_t UserIDMClient::OpenSession()
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, " OpenSession  enter");
+    USERIDM_HILOGD(MODULE_CLIENT, " OpenSession enter");
 
     auto proxy = GetUserIDMProxy();
     if (proxy == nullptr) {
-        USERIDM_HILOGE(MODULE_INNERKIT, " OpenSession proxy is nullptr");
+        USERIDM_HILOGE(MODULE_CLIENT, " OpenSession proxy is nullptr");
         return FAIL;
     }
 
@@ -109,11 +109,11 @@ uint64_t UserIDMClient::OpenSession()
 
 void UserIDMClient::CloseSession()
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, " CloseSession  enter");
+    USERIDM_HILOGD(MODULE_CLIENT, " CloseSession enter");
 
     auto proxy = GetUserIDMProxy();
     if (proxy == nullptr) {
-        USERIDM_HILOGE(MODULE_INNERKIT, " CloseSession proxy is nullptr");
+        USERIDM_HILOGE(MODULE_CLIENT, " CloseSession proxy is nullptr");
         return;
     }
 
@@ -122,7 +122,7 @@ void UserIDMClient::CloseSession()
 
 int32_t UserIDMClient::GetAuthInfo(int32_t userId, AuthType authType, const std::shared_ptr<GetInfoCallback>& callback)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, " GetAuthInfoById  enter");
+    USERIDM_HILOGD(MODULE_CLIENT, " GetAuthInfoById enter");
 
     auto proxy = GetUserIDMProxy();
     if (proxy == nullptr) {
@@ -138,7 +138,7 @@ int32_t UserIDMClient::GetAuthInfo(int32_t userId, AuthType authType, const std:
 
 int32_t UserIDMClient::GetAuthInfo(AuthType authType, const std::shared_ptr<GetInfoCallback>& napiCallback)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, " GetAuthInfo  enter");
+    USERIDM_HILOGD(MODULE_CLIENT, " GetAuthInfo enter");
 
     auto proxy = GetUserIDMProxy();
     if (proxy == nullptr) {
@@ -154,27 +154,27 @@ int32_t UserIDMClient::GetAuthInfo(AuthType authType, const std::shared_ptr<GetI
 
 int32_t UserIDMClient::GetSecInfo(const std::shared_ptr<GetSecInfoCallback>& napiCallback)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, " GetSecInfo  enter");
+    USERIDM_HILOGD(MODULE_CLIENT, " GetSecInfo enter");
 
     auto proxy = GetUserIDMProxy();
     if (proxy == nullptr) {
         return FAIL;
     }
 
-    sptr<IGetSecInfoCallback> callbackStub= new UserIDMGetSecInfoCallbackStub(napiCallback);
+    sptr<IGetSecInfoCallback> callbackStub = new UserIDMGetSecInfoCallbackStub(napiCallback);
 
     int32_t res = proxy->GetSecInfo(callbackStub);
 
     return res;
 }
 
-void UserIDMClient::AddCredential(AddCredInfo & credInfo, const std::shared_ptr<IDMCallback>& napiCallback)
+void UserIDMClient::AddCredential(AddCredInfo& credInfo, const std::shared_ptr<IDMCallback>& napiCallback)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, " AddCredential  enter");
+    USERIDM_HILOGD(MODULE_CLIENT, " AddCredential enter");
 
     auto proxy = GetUserIDMProxy();
     if (proxy == nullptr) {
-        USERIDM_HILOGE(MODULE_INNERKIT, " AddCredential proxy is nullptr");
+        USERIDM_HILOGE(MODULE_CLIENT, " AddCredential proxy is nullptr");
         return;
     }
 
@@ -183,13 +183,13 @@ void UserIDMClient::AddCredential(AddCredInfo & credInfo, const std::shared_ptr<
     proxy->AddCredential(credInfo, callbackStub);
 }
 
-void UserIDMClient::UpdateCredential(AddCredInfo & credInfo, const std::shared_ptr<IDMCallback>& napiCallback)
+void UserIDMClient::UpdateCredential(AddCredInfo& credInfo, const std::shared_ptr<IDMCallback>& napiCallback)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, " UpdateCredential  enter");
+    USERIDM_HILOGD(MODULE_CLIENT, " UpdateCredential enter");
 
     auto proxy = GetUserIDMProxy();
     if (proxy == nullptr) {
-        USERIDM_HILOGE(MODULE_INNERKIT, " UpdateCredential proxy is nullptr");
+        USERIDM_HILOGE(MODULE_CLIENT, " UpdateCredential proxy is nullptr");
         return;
     }
 
@@ -200,7 +200,7 @@ void UserIDMClient::UpdateCredential(AddCredInfo & credInfo, const std::shared_p
 
 int32_t UserIDMClient::Cancel(uint64_t challenge)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, " Cancel  enter");
+    USERIDM_HILOGD(MODULE_CLIENT, " Cancel enter");
 
     auto proxy = GetUserIDMProxy();
     if (proxy == nullptr) {
@@ -214,7 +214,7 @@ int32_t UserIDMClient::Cancel(uint64_t challenge)
 
 int32_t UserIDMClient::EnforceDelUser(int32_t userId, const std::shared_ptr<IDMCallback>& napiCallback)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, " EnforceDelUser  enter");
+    USERIDM_HILOGD(MODULE_CLIENT, " EnforceDelUser enter");
 
     auto proxy = GetUserIDMProxy();
     if (proxy == nullptr) {
@@ -230,11 +230,11 @@ int32_t UserIDMClient::EnforceDelUser(int32_t userId, const std::shared_ptr<IDMC
 
 void UserIDMClient::DelUser(std::vector<uint8_t> authToken, const std::shared_ptr<IDMCallback>& napiCallback)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, " DelUser  enter");
+    USERIDM_HILOGD(MODULE_CLIENT, " DelUser enter");
 
     auto proxy = GetUserIDMProxy();
     if (proxy == nullptr) {
-        USERIDM_HILOGE(MODULE_INNERKIT, " DelUser proxy is nullptr");
+        USERIDM_HILOGE(MODULE_CLIENT, " DelUser proxy is nullptr");
         return;
     }
 
@@ -246,11 +246,11 @@ void UserIDMClient::DelUser(std::vector<uint8_t> authToken, const std::shared_pt
 void UserIDMClient::DelCred(uint64_t credentialId, std::vector<uint8_t> authToken,
                             const std::shared_ptr<IDMCallback>& napiCallback)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, " DelCred  enter");
+    USERIDM_HILOGD(MODULE_CLIENT, " DelCred enter");
 
     auto proxy = GetUserIDMProxy();
     if (proxy == nullptr) {
-        USERIDM_HILOGE(MODULE_INNERKIT, " DelCred proxy is nullptr");
+        USERIDM_HILOGE(MODULE_CLIENT, " DelCred proxy is nullptr");
         return;
     }
     sptr<IIDMCallback> callbackStub = new UserIDMCallbackStub(napiCallback);

@@ -34,12 +34,24 @@ public:
     void OnResult(uint32_t result, std::vector<uint8_t> &extraInfo) override;
 
 private:
+    // add cred death recipient
+    class SetPropCallbackDeathRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        SetPropCallbackDeathRecipient(UserIDMSetPropHandler* parent);
+        ~SetPropCallbackDeathRecipient() = default;
+        void OnRemoteDied(const wptr<IRemoteObject>& remote) override;
+    private:
+        UserIDMSetPropHandler* parent_;
+        DISALLOW_COPY_AND_MOVE(SetPropCallbackDeathRecipient);
+    };
+
+private:
     uint64_t lastChallenge_;
-    uint64_t lastSessionId_;
+    uint64_t lastScheduleId_;
     uint64_t lastCredentialId_;
     std::shared_ptr<UserIDMMoudle> propDataCallback_;
     sptr<IIDMCallback> propInnerCallback_;
-    AuthType type_;   // 0: add cred 1: modify cred
+    AuthType type_; // 0: add cred 1: modify cred
 };
 }  // namespace UserIDM
 }  // namespace UserIAM

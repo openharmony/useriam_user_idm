@@ -53,6 +53,7 @@ ohos_shared_library("useridmservice") {
     "//base/user_iam/auth_executor_mgr/common:useriam_common_lib",
     "//base/user_iam/auth_executor_mgr/interfaces/innerkits:coauth_framework",
     "//drivers/peripheral/display/hal:hdi_display_device",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler:libeventhandler",
     "//utils/native/base:utils",
   ]
 

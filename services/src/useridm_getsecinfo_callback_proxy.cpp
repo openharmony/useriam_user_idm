@@ -13,49 +13,48 @@
  * limitations under the License.
  */
 
-#include "useridm_getsecinfo_callback_proxy.h"
 #include "useridm_hilog_wrapper.h"
-
+#include "useridm_getsecinfo_callback_proxy.h"
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
 void UserIDMGetSecInfoCallbackProxy::OnGetSecInfo(SecInfo &info)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, "UserIDMGetSecInfoCallbackProxy OnGetSecInfo enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMGetSecInfoCallbackProxy OnGetSecInfo enter");
 
     MessageParcel data;
     MessageParcel reply;
     bool ret = 0;
 
     if (!data.WriteInterfaceToken(UserIDMGetSecInfoCallbackProxy::GetDescriptor())) {
-        USERIDM_HILOGI(MODULE_INNERKIT, "write descriptor failed!");
+        USERIDM_HILOGI(MODULE_SERVICE, "write descriptor failed!");
         return;
     }
 
     if (!data.WriteUint64(info.secureUid)) {
-        USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteUint64(info.secureUid).");
+        USERIDM_HILOGE(MODULE_SERVICE, "failed to WriteUint64(info.secureUid).");
         return;
     }
 
     if (!data.WriteUint32(info.enrolledInfoLen)) {
-        USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteUint32(info.authType).");
+        USERIDM_HILOGE(MODULE_SERVICE, "failed to WriteUint32(info.authType).");
         return;
     }
 
     ret = SendRequest(ON_GET_SEC_INFO, data, reply);
     if (ret) {
         int32_t result = reply.ReadInt32();
-        USERIDM_HILOGI(MODULE_INNERKIT, "result = %{public}d", result);
+        USERIDM_HILOGI(MODULE_SERVICE, "result = %{public}d", result);
     }
 }
 
 bool UserIDMGetSecInfoCallbackProxy::SendRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, bool isSync)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, "UserIDMGetSecInfoCallbackProxy SendRequest enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMGetSecInfoCallbackProxy SendRequest enter");
 
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
-        USERIDM_HILOGE(MODULE_INNERKIT, "failed to get remote.");
+        USERIDM_HILOGE(MODULE_SERVICE, "failed to get remote.");
         return false;
     }
     
@@ -66,7 +65,7 @@ bool UserIDMGetSecInfoCallbackProxy::SendRequest(uint32_t code, MessageParcel &d
 
     int32_t result = remote->SendRequest(code, data, reply, option);
     if (result != OHOS::UserIAM::UserIDM::SUCCESS) {
-        USERIDM_HILOGE(MODULE_INNERKIT, "failed to SendRequest.result = %{public}d", result);
+        USERIDM_HILOGE(MODULE_SERVICE, "failed to SendRequest.result = %{public}d", result);
         return false;
     }
 

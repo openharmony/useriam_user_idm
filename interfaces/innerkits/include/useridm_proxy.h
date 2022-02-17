@@ -35,8 +35,8 @@ public:
     int32_t GetAuthInfo(AuthType authType, const sptr<IGetInfoCallback>& callback) override;
     int32_t GetAuthInfo(int32_t userId, AuthType authType, const sptr<IGetInfoCallback>& callback) override;
     int32_t GetSecInfo(const sptr<IGetSecInfoCallback>& callback) override;
-    void AddCredential(AddCredInfo & credInfo, const sptr<IIDMCallback>& callback) override;
-    void UpdateCredential(AddCredInfo & credInfo, const sptr<IIDMCallback>& callback) override;
+    void AddCredential(AddCredInfo& credInfo, const sptr<IIDMCallback>& callback) override;
+    void UpdateCredential(AddCredInfo& credInfo, const sptr<IIDMCallback>& callback) override;
     int32_t Cancel(uint64_t challenge) override;
     int32_t EnforceDelUser(int32_t userId, const sptr<IIDMCallback>& callback) override;
     void DelUser(std::vector<uint8_t> authToken, const sptr<IIDMCallback>& callback) override;
@@ -53,4 +53,4 @@ private:
 }  // namespace OHOS
 
 
-#endif  // USERIDM_PROXY_H
+#endif // USERIDM_PROXY_H

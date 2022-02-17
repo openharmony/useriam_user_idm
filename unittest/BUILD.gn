@@ -15,7 +15,7 @@ import("//base/user_iam/user_idm/useridm.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
 
-module_output_path = "useridm/UserIDM_UT_test"
+module_output_path = "user_idm/UserIDM_UT_test"
 
 ohos_unittest("UserIDM_UT_test") {
   module_out_path = module_output_path
