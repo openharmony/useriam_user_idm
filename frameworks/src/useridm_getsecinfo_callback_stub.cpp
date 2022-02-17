@@ -29,13 +29,11 @@ UserIDMGetSecInfoCallbackStub::UserIDMGetSecInfoCallbackStub(const std::shared_p
 int32_t UserIDMGetSecInfoCallbackStub::OnRemoteRequest(uint32_t code,
                                                        MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, "UserIDMGetSecInfoCallbackStub::OnRemoteRequest,cmd = %d, flags= %d",
+    USERIDM_HILOGI(MODULE_CLIENT, "UserIDMGetSecInfoCallbackStub::OnRemoteRequest,cmd = %u, flags= %d",
                    code, option.GetFlags());
 
-    std::u16string descripter = UserIDMGetSecInfoCallbackStub::GetDescriptor();
-    std::u16string remoteDescripter = data.ReadInterfaceToken();
-    if (descripter != remoteDescripter) {
-        USERIDM_HILOGE(MODULE_INNERKIT,
+    if (UserIDMGetSecInfoCallbackStub::GetDescriptor() != data.ReadInterfaceToken()) {
+        USERIDM_HILOGE(MODULE_CLIENT,
                        "UserIDMGetSecInfoCallbackStub::OnRemoteRequest failed, descriptor is not matched!");
         return FAIL;
     }
@@ -50,7 +48,7 @@ int32_t UserIDMGetSecInfoCallbackStub::OnRemoteRequest(uint32_t code,
 
 int32_t UserIDMGetSecInfoCallbackStub::OnGetSecInfoStub(MessageParcel& data, MessageParcel& reply)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, "UserIDMGetSecInfoCallbackStub OnResultStub enter ");
+    USERIDM_HILOGI(MODULE_CLIENT, "UserIDMGetSecInfoCallbackStub OnResultStub enter");
 
     int32_t ret = SUCCESS;
     SecInfo info;
@@ -60,7 +58,7 @@ int32_t UserIDMGetSecInfoCallbackStub::OnGetSecInfoStub(MessageParcel& data, Mes
 
     this->OnGetSecInfo(info);
     if (!reply.WriteInt32(ret)) {
-        USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteInt32(ret)");
+        USERIDM_HILOGE(MODULE_CLIENT, "failed to WriteInt32(ret)");
         ret = FAIL;
     }
 
@@ -69,10 +67,10 @@ int32_t UserIDMGetSecInfoCallbackStub::OnGetSecInfoStub(MessageParcel& data, Mes
 
 void UserIDMGetSecInfoCallbackStub::OnGetSecInfo(SecInfo &info)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, "UserIDMGetSecInfoCallbackStub OnGetSecInfo enter ");
+    USERIDM_HILOGI(MODULE_CLIENT, "UserIDMGetSecInfoCallbackStub OnGetSecInfo enter");
 
     if (callback_ == nullptr) {
-        USERIDM_HILOGE(MODULE_INNERKIT, "UserIDMGetSecInfoCallbackStub callback_ is nullptr ");
+        USERIDM_HILOGE(MODULE_CLIENT, "UserIDMGetSecInfoCallbackStub callback_ is nullptr");
         return;
     } else {
         // Call the NaPi interface and return the data to JS

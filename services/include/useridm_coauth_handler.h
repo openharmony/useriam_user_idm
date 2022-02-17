@@ -29,8 +29,8 @@ namespace UserIAM {
 namespace UserIDM {
 class UserIDMCoAuthHandler : public CoAuth::CoAuthCallback {
 public:
-    explicit UserIDMCoAuthHandler(CoAuthType type, const uint64_t challenge,
-        const uint64_t sessionId, const std::shared_ptr<UserIDMMoudle>& data, const sptr<IIDMCallback>& callback);
+    explicit UserIDMCoAuthHandler(CoAuthType type, const uint64_t challenge, const uint64_t sessionId,
+                                  const std::shared_ptr<UserIDMMoudle>& data, const sptr<IIDMCallback>& callback);
     // param3: Function pointer passed in to the caller
     virtual ~UserIDMCoAuthHandler() = default;
 
@@ -38,13 +38,24 @@ public:
     void OnAcquireInfo(uint32_t acquire) override;
 
 private:
-    void OnFinishModify(uint32_t resultCode, std::vector<uint8_t> &scheduleToken,
-							uint64_t& credentialId, int32_t result);
+    // add death recipient
+    class CoAuthCallbackDeathRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        CoAuthCallbackDeathRecipient(UserIDMCoAuthHandler* parent);
+        ~CoAuthCallbackDeathRecipient() = default;
+        void OnRemoteDied(const wptr<IRemoteObject>& remote) override;
+    private:
+        UserIDMCoAuthHandler* parent_;
+        DISALLOW_COPY_AND_MOVE(CoAuthCallbackDeathRecipient);
+    };
+
+private:
+    int32_t OnFinishModify(uint32_t resultCode, std::vector<uint8_t> &scheduleToken, uint64_t& credentialId);
     uint64_t lastChallenge_;
-    uint64_t lastSessionId_;
+    uint64_t lastScheduleId_;
     std::shared_ptr<UserIDMMoudle> dataCallback_;
     sptr<IIDMCallback> innerCallback_;
-    CoAuthType type_;   // 0: add cred 1: modify cred
+    CoAuthType type_; // 0: add cred 1: modify cred
 };
 }  // namespace UserIDM
 }  // namespace UserIAM

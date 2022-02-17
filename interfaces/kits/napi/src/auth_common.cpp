@@ -103,9 +103,9 @@ std::vector<uint8_t> AuthCommon::GetNamedAttribute(napi_env env, napi_value obj)
     }
     napi_get_typedarray_info(env, token, &arraytype, &length, reinterpret_cast<void **>(&data), &buffer, &offset);
     if (arraytype == napi_uint8_array) {
-        HILOG_INFO("token is uint8 array ");
+        HILOG_INFO("token is uint8 array");
     } else {
-        HILOG_ERROR("token is not a uint8 array ");
+        HILOG_ERROR("token is not a uint8 array");
         return RetNull;
     }
     if (offset != 0) {
@@ -222,9 +222,9 @@ std::vector<uint8_t> AuthCommon::JudgeArryType(napi_env env, size_t argc, napi_v
     }
     napi_get_typedarray_info(env, argv[argc], &arraytype, &length, reinterpret_cast<void **>(&data), &buffer, &offset);
     if (arraytype == napi_uint8_array) {
-        HILOG_INFO("this is a uint8 array ");
+        HILOG_INFO("this is a uint8 array");
     } else {
-        HILOG_ERROR("this is not a uint8 array ");
+        HILOG_ERROR("this is not a uint8 array");
         return RetNull;
     }
     if (offset != 0) {

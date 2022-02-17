@@ -13,53 +13,66 @@
  * limitations under the License.
  */
 
-#include "useridm_coauth_handler.h"
+#include "inner_event.h"
 #include "useridm_hilog_wrapper.h"
 #include "useridm_adapter.h"
-
+#include "useridm_coauth_handler.h"
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
-UserIDMCoAuthHandler::UserIDMCoAuthHandler(CoAuthType type, const uint64_t challenge, const uint64_t sessionId,
+UserIDMCoAuthHandler::UserIDMCoAuthHandler(CoAuthType type, const uint64_t challenge, const uint64_t scheduleId,
                                            const std::shared_ptr<UserIDMMoudle>& data,
                                            const sptr<IIDMCallback>& callback)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, "UserIDMCoAuthHandler constructor enter ");
+    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMCoAuthHandler constructor enter");
 
     type_ = type;
     lastChallenge_ = challenge;
-    lastSessionId_ = sessionId;
+    lastScheduleId_ = scheduleId;
     dataCallback_ = data;
     innerCallback_ = callback;
-}
-void UserIDMCoAuthHandler::OnFinishModify(uint32_t resultCode, std::vector<uint8_t> &scheduleToken,
-                                          uint64_t& credentialId, int32_t result)
-{
-    // success
-    // check sessionId:
-    // if have: session is still alive
-    // if not:  session has been canceled
-    uint64_t challenge = 0;
-    uint64_t sessionId = 0;
-    bool res = dataCallback_->CheckChallenge(challenge);
-    if (!res) {
-        // challenge miss return error, need openSession()
-        USERIDM_HILOGE(MODULE_INNERKIT, "check challenge num error: no challenge!");
-        return;
+    if (innerCallback_ == nullptr) {
+        USERIDM_HILOGE(MODULE_SERVICE, "sorry: input callback is nullptr!");
     }
 
-    res = dataCallback_->CheckSessionId(sessionId);    // todo check same sessionId
-    if (res && (sessionId == lastSessionId_)) {
+    // add death recipient start
+    sptr<IRemoteObject::DeathRecipient> dr = new CoAuthCallbackDeathRecipient(this);
+    if (!callback->AsObject()->AddDeathRecipient(dr)) {
+        USERIDM_HILOGE(MODULE_SERVICE, "Failed to add death recipient CoAuthCallbackDeathRecipient");
+    }
+    USERIDM_HILOGI(MODULE_SERVICE, "add death recipient success!");
+    // add death recipient end
+}
+int32_t UserIDMCoAuthHandler::OnFinishModify(uint32_t resultCode, std::vector<uint8_t> &scheduleToken,
+                                             uint64_t& credentialId)
+{
+    if (innerCallback_ == nullptr) {
+        USERIDM_HILOGE(MODULE_SERVICE, "sorry: innerCallback_ is nullptr!");
+        return INVALID_PARAMETERS;
+    }
+    uint64_t challenge = 0;
+    uint64_t scheduleId = 0;
+    if (dataCallback_ == nullptr) {
+        USERIDM_HILOGE(MODULE_SERVICE, "dataCallback error: no found!");
+        return FAIL;
+    }
+    bool res = dataCallback_->CheckChallenge(challenge);
+    if (!res) {
+        USERIDM_HILOGE(MODULE_SERVICE, "check challenge num error: no challenge!");
+        return FAIL;
+    }
+
+    res = dataCallback_->CheckScheduleIdIsActive(scheduleId); // check same scheduleId
+    if (res && (scheduleId == lastScheduleId_)) {
         // if have: session is still alive
         // call TA info
-        // UserIDMAdapter::GetInstance().AddCredential(scheduleToken, credentialId);
         CredentialInfo credentialInfo;
         UserIDMAdapter::GetInstance().UpdateCredential(scheduleToken, credentialId, credentialInfo);
 
         // callback: as set prop info param
         std::shared_ptr<UserIDMSetPropHandler> setPropCallback =
                                                 std::make_shared<UserIDMSetPropHandler>(PIN, challenge,
-                                                                                        sessionId,
+                                                                                        scheduleId,
                                                                                         credentialId,
                                                                                         dataCallback_,
                                                                                         innerCallback_);
@@ -73,15 +86,21 @@ void UserIDMCoAuthHandler::OnFinishModify(uint32_t resultCode, std::vector<uint8
 
         // Call the collaboration interface again to delete the template ID and password
         CoAuth::CoAuth::GetInstance().SetExecutorProp(condition, setPropCallback);
+        return SUCCESS;
     } else {
-        USERIDM_HILOGE(MODULE_INNERKIT, "sessionId wrong!");
+        USERIDM_HILOGE(MODULE_SERVICE, "scheduleId wrong!");
+        return FAIL;
     }
 }
+
 void UserIDMCoAuthHandler::OnFinish(uint32_t resultCode, std::vector<uint8_t> &scheduleToken)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, "UserIDMCoAuthHandler OnFinish enter: %{public}d type_ is %{public}d",
+    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMCoAuthHandler OnFinish enter: %{public}d type_ is %{public}u",
                    resultCode, type_);
-
+    if (innerCallback_ == nullptr) {
+        USERIDM_HILOGE(MODULE_SERVICE, "sorry: innerCallback_ is nullptr!");
+        return;
+    }
     int32_t result = FAIL;
     uint64_t credentialId = 0;
     if (resultCode != SUCCESS) {
@@ -92,15 +111,14 @@ void UserIDMCoAuthHandler::OnFinish(uint32_t resultCode, std::vector<uint8_t> &s
         return;
     }
     if ((ADD_PIN_CRED == type_) || (ADD_FACE_CRED == type_)) {
-        uint64_t sessionId = 0;
-        bool res = dataCallback_->CheckSessionId(sessionId);    // check same sessionId
-        if (res && (sessionId == lastSessionId_)) {
+        uint64_t scheduleId = 0;
+        bool res = dataCallback_->CheckScheduleIdIsActive(scheduleId); // check same scheduleId
+        if (res && (scheduleId == lastScheduleId_)) {
             // if have: session is still alive
             // call TA info
             result = UserIDMAdapter::GetInstance().AddCredential(scheduleToken, credentialId);
             if (SUCCESS != result) {
-                // current session in active
-                USERIDM_HILOGE(MODULE_INNERKIT, "call TA info addCred failed!");
+                USERIDM_HILOGE(MODULE_SERVICE, "call TA info addCred failed!");
             }
         }
         // clean session data
@@ -109,31 +127,50 @@ void UserIDMCoAuthHandler::OnFinish(uint32_t resultCode, std::vector<uint8_t> &s
         reqRet.credentialId = credentialId;
         innerCallback_->OnResult(result, reqRet);
     } else if (MODIFY_CRED == type_) {
-        int32_t result = FAIL;
-        OnFinishModify(resultCode, scheduleToken, credentialId, result);
-
+        result = OnFinishModify(resultCode, scheduleToken, credentialId);
         // if not:  session has been canceled
         RequestResult reqRet;
         reqRet.credentialId = credentialId;
         innerCallback_->OnResult(result, reqRet);
         // clean session data
         dataCallback_->DeleteSessionId();
-        return;
     } else {
-        // do nothing
-        USERIDM_HILOGE(MODULE_INNERKIT, "callback type error: %d!", type_);
+        USERIDM_HILOGE(MODULE_SERVICE, "callback type error: %d!", type_);
     }
 }
 
 void UserIDMCoAuthHandler::OnAcquireInfo(uint32_t acquire)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, "UserIDMCoAuthHandler OnAcquireInfo enter ");
+    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMCoAuthHandler OnAcquireInfo enter");
+    if (innerCallback_ == nullptr) {
+        USERIDM_HILOGE(MODULE_SERVICE, "sorry: innerCallback_ is nullptr!");
+        return;
+    }
 
     if (ADD_FACE_CRED == type_) {
         RequestResult reqRet;
         reqRet.credentialId = 0;
-        innerCallback_->OnResult(acquire, reqRet);   // Prompt information is returned through callback
+        innerCallback_->OnResult(acquire, reqRet); // Prompt information is returned through callback
     }
+}
+
+// add cred death recipient
+UserIDMCoAuthHandler::CoAuthCallbackDeathRecipient::CoAuthCallbackDeathRecipient(UserIDMCoAuthHandler* parent)
+    : parent_(parent)
+{
+}
+
+void UserIDMCoAuthHandler::CoAuthCallbackDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
+{
+    if (remote == nullptr) {
+        USERIDM_HILOGE(MODULE_SERVICE, "AddCredCallback OnRemoteDied failed, remote is nullptr");
+        return;
+    }
+
+    if (parent_ != nullptr) {
+        parent_->innerCallback_ = nullptr;
+    }
+    USERIDM_HILOGI(MODULE_SERVICE, "CoAuthCallbackDeathRecipient: normal notice: no more hode the callback.");
 }
 }  // namespace UserIDM
 }  // namespace UserIAM

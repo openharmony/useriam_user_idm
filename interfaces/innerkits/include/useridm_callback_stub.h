@@ -38,7 +38,7 @@ private:
     int32_t OnResultStub(MessageParcel& data, MessageParcel& reply);
     int32_t OnAcquireInfoStub(MessageParcel& data, MessageParcel& reply);
 
-    //  Callback defines a callback that accepts NaPi. When a callback is called,
+    // Callback defines a callback that accepts NaPi. When a callback is called,
     // it calls the recorded NaPi callback and returns the result
     std::shared_ptr<IDMCallback> callback_;
 };

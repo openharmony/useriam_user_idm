@@ -84,7 +84,7 @@ struct CredentialInfo {
     AuthType authType;
     AuthSubType authSubType;
     uint64_t templateId;
-} ;
+};
 
 // struct
 struct EnrolledCredInfo {
@@ -92,34 +92,34 @@ struct EnrolledCredInfo {
     AuthType authType;          // Credential type
     AuthSubType authSubType;       // Subclass
     uint64_t templateId;        // Credential template ID
-} ;
+};
 
 // struct
 struct EnrolledInfo {
     AuthType authType;              // Credential type
     uint64_t enrolledId;            // Registration ID
-} ;
+};
 
 // struct
 struct SecInfo {
     uint64_t secureUid;                   // Security index value
     uint32_t enrolledInfoLen;             // Credential type
     std::vector<EnrolledInfo> enrolledInfo;
-} ;
+};
 
 // struct
 struct AddCredInfo {
     AuthType authType;              // Credential type
     AuthSubType authSubType;        // Subclass
     std::vector<uint8_t> token;        // password authentication token
-} ;
+};
 
 // struct
 struct  RequestResult {
     uint64_t credentialId;   // Credential index value
-} ;
+};
 }  // namespace UserIDM
 }  // namespace UserIAM
 }  // namespace OHOS
 
-#endif  // USERIDM_INFO_H
+#endif // USERIDM_INFO_H

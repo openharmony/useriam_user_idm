@@ -19,6 +19,8 @@ void UseriamUtTest_001(void);
 void UseriamUtTest_002(void);
 void UseriamUtTest_003(void);
 void UseriamUtTest_003b(void);
+void UseriamUtTest_003c(void);
+void UseriamUtTest_003d(void);
 void UseriamUtTest_004(void);
 void UseriamUtTest_004b(void);
 void UseriamUtTest_005(void);
@@ -34,5 +36,9 @@ void UseriamUtTest_009(void);
 void UseriamUtTest_009b(void);
 void UseriamUtTest_010(void);
 void UseriamUtTest_010b(void);
+void UseriamUtTest_011(void);
+void UseriamUtTest_011b(void);
+void UseriamUtTest_011c(void);
+void UseriamUtTest_011d(void);
 
 #endif

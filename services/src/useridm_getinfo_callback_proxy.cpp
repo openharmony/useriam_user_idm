@@ -13,26 +13,25 @@
  * limitations under the License.
  */
 
-#include "useridm_getinfo_callback_proxy.h"
 #include "useridm_hilog_wrapper.h"
-
+#include "useridm_getinfo_callback_proxy.h"
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
 void UserIDMGetInfoCallbackProxy::OnGetInfo(std::vector<CredentialInfo>& credInfos)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, "UserIDMGetInfoCallbackProxy OnResult enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMGetInfoCallbackProxy OnResult enter");
 
     MessageParcel data;
     MessageParcel reply;
 
     if (!data.WriteInterfaceToken(UserIDMGetInfoCallbackProxy::GetDescriptor())) {
-        USERIDM_HILOGI(MODULE_INNERKIT, "write descriptor failed!");
+        USERIDM_HILOGI(MODULE_SERVICE, "write descriptor failed!");
         return;
     }
     // Write container size first
     if (!data.WriteUint32(credInfos.size())) {
-        USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteUint32(credInfos.size()).");
+        USERIDM_HILOGE(MODULE_SERVICE, "failed to WriteUint32(credInfos.size()).");
         return;
     }
     if (credInfos.size() > 0) {
@@ -40,19 +39,19 @@ void UserIDMGetInfoCallbackProxy::OnGetInfo(std::vector<CredentialInfo>& credInf
         for (uint32_t i = 0; i < credInfos.size(); i++) {
             // credInfos[i].authType
             if (!data.WriteUint64(credInfos[i].credentialId)) {
-                USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteUint64(info.credentialId).");
+                USERIDM_HILOGE(MODULE_SERVICE, "failed to WriteUint64(info.credentialId).");
                 return;
             }
             if (!data.WriteUint32(credInfos[i].authType)) {
-                USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteUint32(info.authType).");
+                USERIDM_HILOGE(MODULE_SERVICE, "failed to WriteUint32(info.authType).");
                 return;
             }
             if (!data.WriteUint64(credInfos[i].authSubType)) {
-                USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteUint64(info.authSubType).");
+                USERIDM_HILOGE(MODULE_SERVICE, "failed to WriteUint64(info.authSubType).");
                 return;
             }
             if (!data.WriteUint64(credInfos[i].templateId)) {
-                USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteUint64(info.templateId).");
+                USERIDM_HILOGE(MODULE_SERVICE, "failed to WriteUint64(info.templateId).");
                 return;
             }
         }
@@ -60,17 +59,17 @@ void UserIDMGetInfoCallbackProxy::OnGetInfo(std::vector<CredentialInfo>& credInf
     bool ret = SendRequest(ON_GET_INFO, data, reply);
     if (ret) {
         int32_t result = reply.ReadInt32();
-        USERIDM_HILOGI(MODULE_INNERKIT, "result = %{public}d", result);
+        USERIDM_HILOGI(MODULE_SERVICE, "result = %{public}d", result);
     }
 }
 
 bool UserIDMGetInfoCallbackProxy::SendRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, bool isSync)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, "UserIDMGetInfoCallbackProxy SendRequest enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMGetInfoCallbackProxy SendRequest enter");
 
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
-        USERIDM_HILOGE(MODULE_INNERKIT, "failed to get remote.");
+        USERIDM_HILOGE(MODULE_SERVICE, "failed to get remote.");
         return false;
     }
 
@@ -81,7 +80,7 @@ bool UserIDMGetInfoCallbackProxy::SendRequest(uint32_t code, MessageParcel &data
 
     int32_t result = remote->SendRequest(code, data, reply, option);
     if (result != OHOS::UserIAM::UserIDM::SUCCESS) {
-        USERIDM_HILOGE(MODULE_INNERKIT, "failed to SendRequest.result = %{public}d", result);
+        USERIDM_HILOGE(MODULE_SERVICE, "failed to SendRequest.result = %{public}d", result);
         return false;
     }
     return true;

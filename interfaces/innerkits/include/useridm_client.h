@@ -35,8 +35,8 @@ public:
     int32_t GetAuthInfo(AuthType authType, const std::shared_ptr<GetInfoCallback>& callback);
     int32_t GetAuthInfo(int32_t userId, AuthType authType, const std::shared_ptr<GetInfoCallback>& callback);
     int32_t GetSecInfo(const std::shared_ptr<GetSecInfoCallback>& callback);
-    void AddCredential(AddCredInfo & credInfo, const std::shared_ptr<IDMCallback>& callback);
-    void UpdateCredential(AddCredInfo & credInfo, const std::shared_ptr<IDMCallback>& callback);
+    void AddCredential(AddCredInfo& credInfo, const std::shared_ptr<IDMCallback>& callback);
+    void UpdateCredential(AddCredInfo& credInfo, const std::shared_ptr<IDMCallback>& callback);
     int32_t Cancel(uint64_t challenge);
     int32_t EnforceDelUser(int32_t userId, const std::shared_ptr<IDMCallback>& callback);
     void DelUser(std::vector<uint8_t> authToken, const std::shared_ptr<IDMCallback>& callback);

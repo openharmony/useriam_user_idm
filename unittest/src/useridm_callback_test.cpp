@@ -13,33 +13,32 @@
  * limitations under the License.
  */
 
-#include "useridm_callback_test.h"
 #include "useridm_hilog_wrapper.h"
-
+#include "useridm_callback_test.h"
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
 void GetInfoCallbackUT::OnGetInfo(std::vector<CredentialInfo>& info)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, "GetInfoCallbackUT  OnGetInfo");
+    USERIDM_HILOGI(MODULE_CLIENT, "GetInfoCallbackUT  OnGetInfo");
     return;
 }
 
 void GetSecInfoCallbackUT::OnGetSecInfo(SecInfo &info)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, "GetSecInfoCallbackUT  OnGetSecInfo");
+    USERIDM_HILOGI(MODULE_CLIENT, "GetSecInfoCallbackUT  OnGetSecInfo");
     return;
 }
 
 void IDMCallbackUT::OnResult(int32_t result, RequestResult reqRet)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, "IDMCallbackUT  OnResult");
+    USERIDM_HILOGI(MODULE_CLIENT, "IDMCallbackUT  OnResult");
     return;
 }
 
 void IDMCallbackUT::OnAcquireInfo(int32_t module, int32_t acquire, RequestResult reqRet)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, "IDMCallbackUT  OnAcquireInfo");
+    USERIDM_HILOGI(MODULE_CLIENT, "IDMCallbackUT  OnAcquireInfo");
     return;
 }
 }  // namespace UserIDM

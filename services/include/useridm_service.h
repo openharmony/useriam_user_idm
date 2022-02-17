@@ -42,11 +42,11 @@ public:
     int32_t GetAuthInfo(AuthType authType, const sptr<IGetInfoCallback>& callback) override;
     int32_t GetAuthInfo(int32_t userId, AuthType authType, const sptr<IGetInfoCallback>& callback) override;
     int32_t GetSecInfo(const sptr<IGetSecInfoCallback>& callback) override;
-    void AddCredential(AddCredInfo & credInfo, const sptr<IIDMCallback>& callback) override;
-    void UpdateCredential(AddCredInfo & credInfo, const sptr<IIDMCallback>& callback) override;
+    void AddCredential(AddCredInfo& credInfo, const sptr<IIDMCallback>& callback) override;
+    void UpdateCredential(AddCredInfo& credInfo, const sptr<IIDMCallback>& callback) override;
     int32_t Cancel(uint64_t challenge) override;
-    int32_t EnforceDelUser(int32_t userId, const sptr<IIDMCallback>& callback) override;       // del user
-    void DelUser(std::vector<uint8_t> authToken, const sptr<IIDMCallback>& callback) override;           // del pin
+    int32_t EnforceDelUser(int32_t userId, const sptr<IIDMCallback>& callback) override; // del user
+    void DelUser(std::vector<uint8_t> authToken, const sptr<IIDMCallback>& callback) override; // del pin
     void DelCred(uint64_t credentialId, std::vector<uint8_t> authToken, const sptr<IIDMCallback>& callback) override;
     // del face
 

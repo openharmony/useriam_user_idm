@@ -66,19 +66,19 @@ public:
 
     /**
      * @brief add Credential info
-     * @param AddCredInfo credInfo to be add.
+     * @param AddCredInfo credInfo.
      * @param callback The callback function provided for caller to handle response data.
      * @return void.
      */
-    virtual void AddCredential(AddCredInfo & credInfo, const sptr<IIDMCallback>& callback) = 0;
+    virtual void AddCredential(AddCredInfo& credInfo, const sptr<IIDMCallback>& callback) = 0;
 
     /**
      * @brief update credential info
-     * @param AddCredInfo credInfo to be add.
+     * @param AddCredInfo credInfo.
      * @param callback The callback function provided for caller to handle response data.
      * @return void.
      */
-    virtual void UpdateCredential(AddCredInfo & credInfo, const sptr<IIDMCallback>& callback) = 0;
+    virtual void UpdateCredential(AddCredInfo& credInfo, const sptr<IIDMCallback>& callback) = 0;
 
     /**
      * @brief cancel credential info add or update handle
@@ -121,7 +121,7 @@ public:
         USERIDM_GET_SEC_INFO,           // get user security ID
         USERIDM_ADD_CREDENTIAL,         // add user credential information
         USERIDM_UPDATE_CREDENTIAL,      // update user credential information
-        USERIDM_CANCEL,                                 // cancel entry
+        USERIDM_CANCEL,                 // cancel entry
         USERIDM_ENFORCE_DELUSER,        // forcibly delete the user
         USERIDM_DELUSER,                // delete password
         USERIDM_DELCRED,                // face deletion
