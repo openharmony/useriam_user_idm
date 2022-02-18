@@ -25,6 +25,7 @@ UserIDMStub::UserIDMStub()
     m_handle_[static_cast<int32_t>(IUserIDM::USERIDM_OPEN_SESSION)]  = &UserIDMStub::OpenSessionStub;
     m_handle_[static_cast<int32_t>(IUserIDM::USERIDM_CLOSE_SESSION)] = &UserIDMStub::CloseSessionStub;
     m_handle_[static_cast<int32_t>(IUserIDM::USERIDM_GET_AUTH_INFO)] = &UserIDMStub::GetAuthInfoStub;
+    m_handle_[static_cast<int32_t>(IUserIDM::USERIDM_GET_AUTH_INFO_BY_ID)] = &UserIDMStub::GetAuthInfoByIdStub;
     m_handle_[static_cast<int32_t>(IUserIDM::USERIDM_GET_SEC_INFO)]  = &UserIDMStub::GetSecInfoStub;
     m_handle_[static_cast<int32_t>(IUserIDM::USERIDM_ADD_CREDENTIAL)] = &UserIDMStub::AddCredentialStub;
     m_handle_[static_cast<int32_t>(IUserIDM::USERIDM_UPDATE_CREDENTIAL)] = &UserIDMStub::UpdateCredentialStub;
@@ -99,7 +100,7 @@ int32_t UserIDMStub::GetAuthInfoStub(MessageParcel& data, MessageParcel& reply)
 
 int32_t UserIDMStub::GetAuthInfoByIdStub(MessageParcel& data, MessageParcel& reply)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "GetAuthInfoStub enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "GetAuthInfoByIdStub enter");
 
     int32_t userId = data.ReadInt32();
     AuthType authType = static_cast<AuthType>(data.ReadUint32());
