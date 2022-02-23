@@ -213,6 +213,12 @@ void AuthFaceInit(napi_env env, napi_value exports)
     status = napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
     if (status != napi_ok) {
         HILOG_ERROR("napi_define_properties faild");
+        return;
+    }
+
+    status = napi_set_named_property(env, exports, "UserIdentityManager", GetCtor(env));
+    if (status != napi_ok) {
+        HILOG_ERROR("napi_set_named_property faild");
     }
 }
 
