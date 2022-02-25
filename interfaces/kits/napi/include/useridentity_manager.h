@@ -87,8 +87,8 @@ typedef struct AsyncHolder {
 } AsyncHolder;
 class UserIdentityManager {
 public:
-    UserIdentityManager() ;
-    ~UserIdentityManager() ;
+    UserIdentityManager();
+    ~UserIdentityManager();
     napi_value NAPI_OpenSession(napi_env env, napi_callback_info info);
     napi_value NAPI_AddCredential(napi_env env, napi_callback_info info);
     napi_value NAPI_UpdateCredential(napi_env env, napi_callback_info info);

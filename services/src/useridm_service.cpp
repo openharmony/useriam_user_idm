@@ -124,7 +124,7 @@ int32_t UserIDMService::GetAuthInfo(AuthType authType, const sptr<IGetInfoCallba
 
 int32_t UserIDMService::GetAuthInfo(int32_t userId, AuthType authType, const sptr<IGetInfoCallback>& callback)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "service GetAuthInfo enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "service GetAuthInfoById enter");
 
     std::vector<CredentialInfo> credInfos;
     int32_t ret = idmController_.GetAuthInfoCtrl(userId, authType, credInfos);

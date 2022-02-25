@@ -14,7 +14,7 @@
  */
 #include <iremote_broker.h>
 
-#include "hilog_wrapper.h"
+#include "useridm_hilog_wrapper.h"
 #include "useridentity_manager.h"
 #include "authface_userIDM_helper.h"
 
@@ -31,7 +31,7 @@ napi_ref g_ctor;
  */
 napi_value UserIdentityManagerConstructor(napi_env env, napi_callback_info info)
 {
-    HILOG_INFO("authFace : %{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
     std::shared_ptr<UserIdentityManager> userIdentityManager;
     userIdentityManager.reset(new UserIdentityManager());
     napi_value thisVar = nullptr;
@@ -59,7 +59,7 @@ napi_value UserIdentityManagerConstructor(napi_env env, napi_callback_info info)
  */
 napi_value OpenSession(napi_env env, napi_callback_info info)
 {
-    HILOG_INFO("authFace : %{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
     napi_value thisVar = nullptr;
     size_t argcAsync = 0;
     napi_value argv[ARGS_MAX_COUNT] = {nullptr};
@@ -78,7 +78,7 @@ napi_value OpenSession(napi_env env, napi_callback_info info)
  */
 napi_value AddCredential(napi_env env, napi_callback_info info)
 {
-    HILOG_INFO("authFace : %{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
     napi_value thisVar = nullptr;
     size_t argcAsync = 0;
     napi_value argv[ARGS_MAX_COUNT] = {nullptr};
@@ -97,7 +97,7 @@ napi_value AddCredential(napi_env env, napi_callback_info info)
  */
 napi_value UpdateCredential(napi_env env, napi_callback_info info)
 {
-    HILOG_INFO("authFace : %{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
     napi_value thisVar = nullptr;
     size_t argcAsync = 0;
     napi_value argv[ARGS_MAX_COUNT] = {nullptr};
@@ -116,7 +116,7 @@ napi_value UpdateCredential(napi_env env, napi_callback_info info)
  */
 napi_value CloseSession(napi_env env, napi_callback_info info)
 {
-    HILOG_INFO("authFace : %{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
     napi_value thisVar = nullptr;
     size_t argcAsync = 0;
     napi_value argv[ARGS_MAX_COUNT] = {nullptr};
@@ -136,7 +136,7 @@ napi_value CloseSession(napi_env env, napi_callback_info info)
  */
 napi_value Cancel(napi_env env, napi_callback_info info)
 {
-    HILOG_INFO("authFace : %{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
     napi_value thisVar = nullptr;
     size_t argcAsync = 0;
     napi_value argv[ARGS_MAX_COUNT] = {nullptr};
@@ -156,7 +156,7 @@ napi_value Cancel(napi_env env, napi_callback_info info)
  */
 napi_value DelUser(napi_env env, napi_callback_info info)
 {
-    HILOG_INFO("authFace : %{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
     napi_value thisVar = nullptr;
     size_t argcAsync = 0;
     napi_value argv[ARGS_MAX_COUNT] = {nullptr};
@@ -175,7 +175,7 @@ napi_value DelUser(napi_env env, napi_callback_info info)
  */
 napi_value DelCred(napi_env env, napi_callback_info info)
 {
-    HILOG_INFO("authFace : %{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
     napi_value thisVar = nullptr;
     size_t argcAsync = 0;
     napi_value argv[ARGS_MAX_COUNT] = {nullptr};
@@ -187,7 +187,7 @@ napi_value DelCred(napi_env env, napi_callback_info info)
 
 napi_value GetAuthInfo(napi_env env, napi_callback_info info)
 {
-    HILOG_INFO("authFace : %{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
     napi_value thisVar = nullptr;
     size_t argcAsync = 0;
     napi_value argv[ARGS_MAX_COUNT] = {nullptr};
@@ -205,26 +205,24 @@ napi_value GetAuthInfo(napi_env env, napi_callback_info info)
  */
 void AuthFaceInit(napi_env env, napi_value exports)
 {
-    HILOG_INFO("authFace : %{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
     napi_status status;
     napi_property_descriptor exportFuncs[] = {
         DECLARE_NAPI_FUNCTION("constructor", OHOS::UserIAM::UserIDM::Constructor),
     };
     status = napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
     if (status != napi_ok) {
-        HILOG_ERROR("napi_define_properties faild");
-        return;
+        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_define_properties faild");
     }
-
     status = napi_set_named_property(env, exports, "UserIdentityManager", GetCtor(env));
     if (status != napi_ok) {
-        HILOG_ERROR("napi_set_named_property faild");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_set_named_property faild");
     }
 }
 
 napi_value Constructor(napi_env env, napi_callback_info info)
 {
-    HILOG_INFO("authFace : %{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
     napi_value thisVar;
     napi_value UserIdentityManager;
     NAPI_CALL(env, napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr));
@@ -234,7 +232,7 @@ napi_value Constructor(napi_env env, napi_callback_info info)
 
 napi_value GetCtor(napi_env env)
 {
-    HILOG_INFO("authFace : %{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
     napi_value cons;
     if (g_ctor != nullptr) {
         NAPI_CALL(env, napi_get_reference_value(env, g_ctor, &cons));
@@ -251,8 +249,8 @@ napi_value GetCtor(napi_env env)
         DECLARE_NAPI_FUNCTION("getAuthInfo", GetAuthInfo),
     };
     NAPI_CALL(env, napi_define_class(env, "UserIdentityManager", NAPI_AUTO_LENGTH, UserIdentityManagerConstructor,
-              nullptr, sizeof(clzDes) / sizeof(napi_property_descriptor), clzDes, &cons));
-        NAPI_CALL(env, napi_create_reference(env, cons, 1, &g_ctor));
+                                     nullptr, sizeof(clzDes) / sizeof(napi_property_descriptor), clzDes, &cons));
+    NAPI_CALL(env, napi_create_reference(env, cons, 1, &g_ctor));
     return cons;
 }
 } // namespace UserIDM
