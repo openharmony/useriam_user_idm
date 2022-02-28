@@ -75,7 +75,8 @@ enum IDMResultCode {
     BUSY = 7,
     INVALID_PARAMETERS = 8,
     LOCKED = 9,
-    NOT_ENROLLED = 10
+    NOT_ENROLLED = 10,
+    CHECK_PERMISSION_FAILED = 11,
 };
 
 // struct

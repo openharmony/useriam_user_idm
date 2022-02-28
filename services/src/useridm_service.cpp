@@ -25,6 +25,9 @@ namespace UserIDM {
 // define System Ability
 REGISTER_SYSTEM_ABILITY_BY_ID(UserIDMService, SUBSYS_USERIAM_SYS_ABILITY_USERIDM, true);
 
+static const std::string MANAGE_USER_IDM_PERMISSION = "ohos.permission.MANAGE_USER_IDM";
+static const std::string USE_USER_IDM_PERMISSION = "ohos.permission.USE_USER_IDM";
+
 UserIDMService::UserIDMService(int32_t systemAbilityId, bool runOnCreate)
     : SystemAbility(systemAbilityId, runOnCreate)
 {
@@ -57,17 +60,18 @@ void UserIDMService::OnStop()
 
 int32_t UserIDMService::GetCallingUserID(int32_t &userID)
 {
+    using namespace Security::AccessToken;
     uint32_t tokenID = this->GetFirstTokenID();
     if (tokenID == 0) {
         tokenID = this->GetCallingTokenID();
     }
-    Security::AccessToken::ATokenTypeEnum callingType = Security::AccessToken::AccessTokenKit::GetTokenType(tokenID);
-    if (callingType != Security::AccessToken::TOKEN_HAP) {
+    ATokenTypeEnum callingType = AccessTokenKit::GetTokenType(tokenID);
+    if (callingType != TOKEN_HAP) {
         USERIDM_HILOGI(MODULE_SERVICE, "CallingType is not hap.");
         return TYPE_NOT_SUPPORT;
     }
-    Security::AccessToken::HapTokenInfo hapTokenInfo;
-    int result = Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenID, hapTokenInfo);
+    HapTokenInfo hapTokenInfo;
+    int result = AccessTokenKit::GetHapTokenInfo(tokenID, hapTokenInfo);
     if (result != SUCCESS) {
         USERIDM_HILOGI(MODULE_SERVICE, "Get hap token info failed.");
         return TYPE_NOT_SUPPORT;
@@ -77,9 +81,23 @@ int32_t UserIDMService::GetCallingUserID(int32_t &userID)
     return SUCCESS;
 }
 
+bool UserIDMService::CheckPermission(const std::string &permission)
+{
+    using namespace Security::AccessToken;
+    uint32_t tokenID = this->GetFirstTokenID();
+    if (tokenID == 0) {
+        tokenID = this->GetCallingTokenID();
+    }
+    return AccessTokenKit::VerifyAccessToken(tokenID, permission) == RET_SUCCESS;
+}
+
 uint64_t UserIDMService::OpenSession()
 {
     USERIDM_HILOGD(MODULE_SERVICE, "service OpenSession enter");
+    if (!CheckPermission(MANAGE_USER_IDM_PERMISSION)) {
+        USERIDM_HILOGE(MODULE_SERVICE, "check permission failed");
+        return 0;
+    }
 
     int32_t userId = 0;
     uint64_t challenge = 0;
@@ -98,6 +116,10 @@ uint64_t UserIDMService::OpenSession()
 void UserIDMService::CloseSession()
 {
     USERIDM_HILOGD(MODULE_SERVICE, "service CloseSession enter");
+    if (!CheckPermission(MANAGE_USER_IDM_PERMISSION)) {
+        USERIDM_HILOGE(MODULE_SERVICE, "check permission failed");
+        return;
+    }
 
     idmController_.CloseEditSessionCtrl();
 }
@@ -105,6 +127,10 @@ void UserIDMService::CloseSession()
 int32_t UserIDMService::GetAuthInfo(AuthType authType, const sptr<IGetInfoCallback>& callback)
 {
     USERIDM_HILOGD(MODULE_SERVICE, "service GetAuthInfo enter");
+    if (!CheckPermission(USE_USER_IDM_PERMISSION)) {
+        USERIDM_HILOGE(MODULE_SERVICE, "check permission failed");
+        return CHECK_PERMISSION_FAILED;
+    }
 
     int32_t userId = 0;
 
@@ -138,6 +164,10 @@ int32_t UserIDMService::GetAuthInfo(int32_t userId, AuthType authType, const spt
 int32_t UserIDMService::GetSecInfo(const sptr<IGetSecInfoCallback>& callback)
 {
     USERIDM_HILOGD(MODULE_SERVICE, "service GetSecInfo enter");
+    if (!CheckPermission(USE_USER_IDM_PERMISSION)) {
+        USERIDM_HILOGE(MODULE_SERVICE, "check permission failed");
+        return CHECK_PERMISSION_FAILED;
+    }
 
     int32_t userId = 0;
 
@@ -163,6 +193,12 @@ int32_t UserIDMService::GetSecInfo(const sptr<IGetSecInfoCallback>& callback)
 void UserIDMService::AddCredential(AddCredInfo& credInfo, const sptr<IIDMCallback>& callback)
 {
     USERIDM_HILOGI(MODULE_SERVICE, "service AddCredential enter");
+    if (!CheckPermission(MANAGE_USER_IDM_PERMISSION)) {
+        USERIDM_HILOGE(MODULE_SERVICE, "check permission failed");
+        RequestResult reqRet;
+        callback->OnResult(CHECK_PERMISSION_FAILED, reqRet);
+        return;
+    }
     uint64_t callerID = this->GetCallingUid();
 
     int32_t userId = 0;
@@ -179,6 +215,12 @@ void UserIDMService::AddCredential(AddCredInfo& credInfo, const sptr<IIDMCallbac
 void UserIDMService::UpdateCredential(AddCredInfo& credInfo, const sptr<IIDMCallback>& innerkitsCallback)
 {
     USERIDM_HILOGD(MODULE_SERVICE, "service UpdateCredential enter");
+    if (!CheckPermission(MANAGE_USER_IDM_PERMISSION)) {
+        USERIDM_HILOGE(MODULE_SERVICE, "check permission failed");
+        RequestResult reqRet;
+        innerkitsCallback->OnResult(CHECK_PERMISSION_FAILED, reqRet);
+        return;
+    }
     uint64_t callerID = this->GetCallingUid();
     std::string callerName = std::to_string(callerID);
     int32_t userId = 0;
@@ -195,6 +237,10 @@ void UserIDMService::UpdateCredential(AddCredInfo& credInfo, const sptr<IIDMCall
 int32_t UserIDMService::Cancel(uint64_t challenge)
 {
     USERIDM_HILOGD(MODULE_SERVICE, "service Cancel enter");
+    if (!CheckPermission(MANAGE_USER_IDM_PERMISSION)) {
+        USERIDM_HILOGE(MODULE_SERVICE, "check permission failed");
+        return CHECK_PERMISSION_FAILED;
+    }
 
     // Check the sessionid corresponding to the challenge, query the map and thread lock
     int32_t ret = idmController_.DelSchedleIdCtrl(challenge);
@@ -227,6 +273,12 @@ int32_t UserIDMService::EnforceDelUser(int32_t userId, const sptr<IIDMCallback>&
 void UserIDMService::DelUser(std::vector<uint8_t> authToken, const sptr<IIDMCallback>& callback)
 {
     USERIDM_HILOGD(MODULE_SERVICE, "service DelUser enter");
+    if (!CheckPermission(MANAGE_USER_IDM_PERMISSION)) {
+        USERIDM_HILOGE(MODULE_SERVICE, "check permission failed");
+        RequestResult reqRet;
+        callback->OnResult(CHECK_PERMISSION_FAILED, reqRet);
+        return;
+    }
 
     int32_t userId = 0;
     int32_t ret =  this->GetCallingUserID(userId);
@@ -253,6 +305,12 @@ void UserIDMService::DelCred(uint64_t credentialId, std::vector<uint8_t> authTok
                              const sptr<IIDMCallback>& innerkitsCallback)
 {
     USERIDM_HILOGD(MODULE_SERVICE, "service DelCred enter");
+    if (!CheckPermission(MANAGE_USER_IDM_PERMISSION)) {
+        USERIDM_HILOGE(MODULE_SERVICE, "check permission failed");
+        RequestResult reqRet;
+        innerkitsCallback->OnResult(CHECK_PERMISSION_FAILED, reqRet);
+        return;
+    }
 
     int32_t userId = 0;
     int32_t ret = this->GetCallingUserID(userId);

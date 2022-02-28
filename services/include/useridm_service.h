@@ -21,6 +21,7 @@
 #include <iremote_stub.h>
 #include <system_ability.h>
 #include <system_ability_definition.h>
+#include <string>
 
 #include "useridm_stub.h"
 #include "useridm_hilog_wrapper.h"
@@ -52,6 +53,7 @@ public:
 
 private:
     int32_t GetCallingUserID(int32_t &userID);
+    bool CheckPermission(const std::string &permission);
     // add controller point
     UserIDMController idmController_;
 };
