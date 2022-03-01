@@ -30,6 +30,11 @@ class UserIDMClient : public DelayedRefSingleton<UserIDM::UserIDMClient> {
     DECLARE_DELAYED_REF_SINGLETON(UserIDMClient);
 public:
     DISALLOW_COPY_AND_MOVE(UserIDMClient);
+
+    /**
+     * the user id that can be used for getting all credential info
+     */
+    static const int32_t ALL_INFO_GET_USER_ID = -1;
     uint64_t OpenSession();
     void CloseSession();
     int32_t GetAuthInfo(AuthType authType, const std::shared_ptr<GetInfoCallback>& callback);
