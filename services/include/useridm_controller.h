@@ -34,7 +34,7 @@ public:
     void OpenEditSessionCtrl(int32_t userId, uint64_t &challenge);
     void CloseEditSessionCtrl();
     int32_t GetAuthInfoCtrl(int32_t userId, AuthType authType, std::vector<CredentialInfo>& credInfos);
-    int32_t GetSecureInfoCtrl(int32_t userId, uint64_t& secureUid, std::vector<EnrolledInfo>& enroInfos);
+    int32_t GetSecureInfoCtrl(int32_t userId, uint64_t& secureUid, std::vector<EnrolledInfo>& enrolledInfos);
     int32_t DeleteCredentialCtrl(int32_t userId, uint64_t credentialId,
                                  std::vector<uint8_t> authToken, CredentialInfo& credInfo);
     int32_t DeleteUserCtrl(int32_t userId, std::vector<uint8_t> authToken, std::vector<CredentialInfo>& credInfo);
@@ -49,10 +49,10 @@ public:
     int32_t DelSchedleIdCtrl(uint64_t challenge);
     int32_t DelFaceCredentialCtrl(AuthType authType, AuthSubType authSubType,
                                   uint64_t credentialId, uint64_t templateId, const sptr<IIDMCallback>& innerCallback);
-    int32_t DelExecutorPinInofCtrl(const sptr<IIDMCallback>& innerCallback, std::vector<CredentialInfo>& info);
+    int32_t DelExecutorPinInfoCtrl(const sptr<IIDMCallback>& innerCallback, std::vector<CredentialInfo>& info);
 
 private:
-    std::shared_ptr<UserIDMMoudle> data_;
+    std::shared_ptr<UserIDMModule> data_;
 };
 }  // namespace UserIDM
 }  // namespace UserIAM

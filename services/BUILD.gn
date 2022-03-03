@@ -36,7 +36,7 @@ ohos_shared_library("useridmservice") {
     "${useridm_services_path}/src/useridm_controller.cpp",
     "${useridm_services_path}/src/useridm_getinfo_callback_proxy.cpp",
     "${useridm_services_path}/src/useridm_getsecinfo_callback_proxy.cpp",
-    "${useridm_services_path}/src/useridm_moudle.cpp",
+    "${useridm_services_path}/src/useridm_module.cpp",
     "${useridm_services_path}/src/useridm_service.cpp",
     "${useridm_services_path}/src/useridm_setprop_handler.cpp",
     "${useridm_services_path}/src/useridm_stub.cpp",

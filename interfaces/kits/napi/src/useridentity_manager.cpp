@@ -101,7 +101,10 @@ napi_value OpenSessionRet(napi_env env, AsyncOpenSession* asyncOpenSession)
     napi_value arrayBuffer = nullptr;
     size_t bufferSize = length;
     NAPI_CALL(env, napi_create_arraybuffer(env, bufferSize, &data, &arrayBuffer));
-    memcpy_s(data, bufferSize, reinterpret_cast<const void*>(&asyncOpenSession->OpenSession), bufferSize);
+    if (memcpy_s(data, bufferSize, reinterpret_cast<const void*>(&asyncOpenSession->OpenSession),
+        bufferSize) != EOK) {
+        USERIDM_HILOGE(MODULE_JS_NAPI, "memcpy_s fail.");
+    }
     napi_value result = nullptr;
     NAPI_CALL(env, napi_create_typedarray(env, napi_uint8_array, bufferSize, arrayBuffer, 0, &result));
     return result;
@@ -131,7 +134,7 @@ napi_value UserIdentityManager::OpenSessionCallback(napi_env env, napi_value *ar
             napi_value callResult = ZERO_PARAMETER;
             result[0] = OpenSessionRet(env, asyncInfo);
             if (result[0] == nullptr) {
-                USERIDM_HILOGE(MODULE_JS_NAPI, "translate uint64 to uint8Array faild");
+                USERIDM_HILOGE(MODULE_JS_NAPI, "translate uint64 to uint8Array failed");
             }
             napi_get_undefined(env, &undefined);
             napi_get_reference_value(env, asyncInfo->callback, &callback_);
@@ -167,7 +170,7 @@ napi_value UserIdentityManager::OpenSessionPromise(napi_env env, napi_value *arg
             napi_value RetPromise = nullptr;
             RetPromise = OpenSessionRet(env, asyncInfo);
             if (RetPromise == nullptr) {
-                USERIDM_HILOGE(MODULE_JS_NAPI, "translate uint64 to uint8Array faild");
+                USERIDM_HILOGE(MODULE_JS_NAPI, "translate uint64 to uint8Array failed");
             }
             napi_resolve_deferred(asyncInfo->env, asyncInfo->deferred, RetPromise);
             napi_delete_async_work(env, asyncInfo->asyncWork);
@@ -372,7 +375,7 @@ napi_value UserIdentityManager::NAPI_CloseSession(napi_env env, napi_callback_in
 }
 
 /**
- * @brief NAPI method : Cancle.
+ * @brief NAPI method : Cancel.
  *
  * @param env
  * @param info

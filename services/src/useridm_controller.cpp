@@ -28,7 +28,7 @@ namespace UserIDM {
 UserIDMController::UserIDMController()
 {
     USERIDM_HILOGD(MODULE_SERVICE, "UserIDMController constructor");
-    data_ = std::make_shared<UserIDMMoudle>();
+    data_ = std::make_shared<UserIDMModule>();
 }
 
 UserIDMController::~UserIDMController()
@@ -77,10 +77,11 @@ int32_t UserIDMController::GetAuthInfoCtrl(int32_t userId, AuthType authType, st
     return UserIDMAdapter::GetInstance().QueryCredential(userId, authType, credInfos);
 }
 
-int32_t UserIDMController::GetSecureInfoCtrl(int32_t userId, uint64_t& secureUid, std::vector<EnrolledInfo>& enroInfos)
+int32_t UserIDMController::GetSecureInfoCtrl(int32_t userId, uint64_t& secureUid,
+    std::vector<EnrolledInfo>& enrolledInfos)
 {
     USERIDM_HILOGD(MODULE_SERVICE, "GetSecureInfoCtrl enter");
-    return UserIDMAdapter::GetInstance().GetSecureUid(userId, secureUid, enroInfos);
+    return UserIDMAdapter::GetInstance().GetSecureUid(userId, secureUid, enrolledInfos);
 }
 
 int32_t UserIDMController::DeleteCredentialCtrl(int32_t userId, uint64_t credentialId, std::vector<uint8_t> authToken,
@@ -284,10 +285,11 @@ int32_t UserIDMController::DelFaceCredentialCtrl(AuthType authType, AuthSubType 
     return SUCCESS;
 }
 
-int32_t UserIDMController::DelExecutorPinInofCtrl(const sptr<IIDMCallback>& innerCallback,
+int32_t UserIDMController::DelExecutorPinInfoCtrl(const sptr<IIDMCallback>& innerCallback,
                                                   std::vector<CredentialInfo>& info)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "DelExecutorPinInofCtrl enter: info.size(): %{public}zu.", info.size());
+    // 拼写错误
+    USERIDM_HILOGD(MODULE_SERVICE, "DelExecutorPinInfoCtrl enter: info.size(): %{public}zu.", info.size());
 
     if (info.size() < MIN_VECTOR_SIZE) {
         USERIDM_HILOGI(MODULE_SERVICE, "info size error!: %{public}zu.", info.size());

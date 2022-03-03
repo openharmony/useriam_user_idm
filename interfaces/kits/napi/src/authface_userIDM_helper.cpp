@@ -212,11 +212,11 @@ napi_value AuthFaceInit(napi_env env, napi_value exports)
     };
     status = napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
     if (status != napi_ok) {
-        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_define_properties faild");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_define_properties failed");
     }
     status = napi_set_named_property(env, exports, "UserIdentityManager", GetCtor(env));
     if (status != napi_ok) {
-        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_set_named_property faild");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_set_named_property failed");
     }
     return exports;
 }

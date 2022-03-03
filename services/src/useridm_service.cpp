@@ -264,7 +264,7 @@ int32_t UserIDMService::EnforceDelUser(int32_t userId, const sptr<IIDMCallback>&
         reqRet.credentialId = 0;
         callback->OnResult(ret, reqRet);
     } else {
-        ret = idmController_.DelExecutorPinInofCtrl(callback, credInfos);
+        ret = idmController_.DelExecutorPinInfoCtrl(callback, credInfos);
     }
 
     return ret;
@@ -293,7 +293,7 @@ void UserIDMService::DelUser(std::vector<uint8_t> authToken, const sptr<IIDMCall
     ret =  idmController_.DeleteUserCtrl(userId, authToken, credInfos);
     if (ret == SUCCESS) {
         USERIDM_HILOGE(MODULE_SERVICE, "DeleteUserCtrl success");
-        idmController_.DelExecutorPinInofCtrl(callback, credInfos);
+        idmController_.DelExecutorPinInfoCtrl(callback, credInfos);
     } else {
         USERIDM_HILOGE(MODULE_SERVICE, "DeleteUserCtrl failed");
         RequestResult reqRet;
