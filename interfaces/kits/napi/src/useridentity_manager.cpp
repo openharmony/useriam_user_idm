@@ -706,8 +706,9 @@ napi_value UserIdentityManager::GetAuthInfoPromise(napi_env env, napi_value *arg
 
 static napi_value Init(napi_env env, napi_value exports)
 {
-    OHOS::UserIAM::UserIDM::AuthFaceInit(env, exports);
-    return exports;
+    napi_value val = AuthFaceInit(env, exports);
+    val = EnumExport(env, val);
+    return val;
 }
 
 /**

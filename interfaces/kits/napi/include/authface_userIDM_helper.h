@@ -21,13 +21,17 @@
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
+napi_value EnumExport(napi_env env, napi_value exports);
+napi_value AuthSubTypeConstructor(napi_env env);
+napi_value AuthTypeConstructor(napi_env env);
+
 /**
  * @brief Napi initialization
  *
  * @param env
  * @param exports
  */
-void AuthFaceInit(napi_env env, napi_value exports);
+napi_value AuthFaceInit(napi_env env, napi_value exports);
 
 /**
  * @brief Get the Ctor object

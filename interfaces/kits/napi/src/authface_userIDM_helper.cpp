@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 #include <iremote_broker.h>
-
+#include "useridm_info.h"
 #include "useridm_hilog_wrapper.h"
 #include "useridentity_manager.h"
 #include "authface_userIDM_helper.h"
@@ -203,7 +203,7 @@ napi_value GetAuthInfo(napi_env env, napi_callback_info info)
  * @param env
  * @param exports
  */
-void AuthFaceInit(napi_env env, napi_value exports)
+napi_value AuthFaceInit(napi_env env, napi_value exports)
 {
     USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
     napi_status status;
@@ -218,6 +218,52 @@ void AuthFaceInit(napi_env env, napi_value exports)
     if (status != napi_ok) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "napi_set_named_property faild");
     }
+    return exports;
+}
+
+napi_value AuthTypeConstructor(napi_env env)
+{
+    napi_value authType = nullptr;
+    napi_value pin = nullptr;
+    napi_value face = nullptr;
+    NAPI_CALL(env, napi_create_object(env, &authType));
+    NAPI_CALL(env, napi_create_int32(env, AuthType::PIN, &pin));
+    NAPI_CALL(env, napi_create_int32(env, AuthType::FACE, &face));
+    NAPI_CALL(env, napi_set_named_property(env, authType, "PIN", pin));
+    NAPI_CALL(env, napi_set_named_property(env, authType, "FACE", face));
+    return authType;
+}
+
+napi_value AuthSubTypeConstructor(napi_env env)
+{
+    napi_value authSubType = nullptr;
+    napi_value pinSix = nullptr;
+    napi_value pinNumber = nullptr;
+    napi_value pinMixed = nullptr;
+    napi_value face2d = nullptr;
+    napi_value face3d = nullptr;
+    NAPI_CALL(env, napi_create_object(env, &authSubType));
+    NAPI_CALL(env, napi_create_int32(env, AuthSubType::PIN_SIX, &pinSix));
+    NAPI_CALL(env, napi_create_int32(env, AuthSubType::PIN_NUMBER, &pinNumber));
+    NAPI_CALL(env, napi_create_int32(env, AuthSubType::PIN_MIXED, &pinMixed));
+    NAPI_CALL(env, napi_create_int32(env, AuthSubType::FACE_2D, &face2d));
+    NAPI_CALL(env, napi_create_int32(env, AuthSubType::FACE_3D, &face3d));
+    NAPI_CALL(env, napi_set_named_property(env, authSubType, "PIN_SIX", pinSix));
+    NAPI_CALL(env, napi_set_named_property(env, authSubType, "PIN_NUMBER", pinNumber));
+    NAPI_CALL(env, napi_set_named_property(env, authSubType, "PIN_MIXED", pinMixed));
+    NAPI_CALL(env, napi_set_named_property(env, authSubType, "FACE_2D", face2d));
+    NAPI_CALL(env, napi_set_named_property(env, authSubType, "FACE_3D", face3d));
+    return authSubType;
+}
+
+napi_value EnumExport(napi_env env, napi_value exports)
+{
+    napi_property_descriptor descriptors[] = {
+        DECLARE_NAPI_PROPERTY("AuthType", AuthTypeConstructor(env)),
+        DECLARE_NAPI_PROPERTY("AuthSubType", AuthSubTypeConstructor(env)),
+    };
+    napi_define_properties(env, exports, sizeof(descriptors) / sizeof(*descriptors), descriptors);
+    return exports;
 }
 
 napi_value Constructor(napi_env env, napi_callback_info info)
