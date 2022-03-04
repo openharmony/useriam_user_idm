@@ -321,7 +321,7 @@ bool UserIDMProxy::SendRequest(uint32_t code, MessageParcel &data, MessageParcel
         USERIDM_HILOGE(MODULE_CLIENT, "failed to get remote.");
         return false;
     }
-    
+
     MessageOption option(MessageOption::TF_SYNC);
     if (!isSync) {
         option.SetFlags(MessageOption::TF_ASYNC);

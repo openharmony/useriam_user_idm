@@ -76,7 +76,7 @@ int32_t UserIDMCoAuthHandler::OnFinishModify(uint32_t resultCode, std::vector<ui
                                                                                         credentialId,
                                                                                         dataCallback_,
                                                                                         innerCallback_);
-            
+
         AuthResPool::AuthAttributes condition;
         condition.SetUint32Value(AuthAttributeType::AUTH_PROPERTY_MODE, 0);
         condition.SetUint64Value(AuthAttributeType::AUTH_CALLER_UID, 0);

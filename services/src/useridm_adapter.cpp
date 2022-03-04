@@ -53,7 +53,7 @@ int32_t UserIDMAdapter::QueryCredential(int32_t userId, AuthType authType,
         USERIDM_HILOGE(MODULE_SERVICE, "call ta info error: %{public}d", ret);
         return ret;
     }
-    
+
     uint32_t vectorSize = taInfos.size();
     if (vectorSize > 0) {
         for (uint32_t i = 0; i < vectorSize; i++) {
