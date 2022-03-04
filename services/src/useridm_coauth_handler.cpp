@@ -21,7 +21,7 @@ namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
 UserIDMCoAuthHandler::UserIDMCoAuthHandler(CoAuthType type, const uint64_t challenge, const uint64_t scheduleId,
-                                           const std::shared_ptr<UserIDMMoudle>& data,
+                                           const std::shared_ptr<UserIDMModule>& data,
                                            const sptr<IIDMCallback>& callback)
 {
     USERIDM_HILOGD(MODULE_SERVICE, "UserIDMCoAuthHandler constructor enter");

@@ -70,7 +70,7 @@ int32_t UserIDMAdapter::QueryCredential(int32_t userId, AuthType authType,
 }
 
 int32_t UserIDMAdapter::GetSecureUid(int32_t userId, uint64_t& secureUid,
-                                     std::vector<OHOS::UserIAM::UserIDM::EnrolledInfo>& enroInfos)
+                                     std::vector<OHOS::UserIAM::UserIDM::EnrolledInfo>& enrolledInfos)
 {
     USERIDM_HILOGI(MODULE_SERVICE, "UserIDMAdapter GetSecureUid enter");
 
@@ -83,10 +83,10 @@ int32_t UserIDMAdapter::GetSecureUid(int32_t userId, uint64_t& secureUid,
     uint32_t vectorSize = taInfos.size();
     if (vectorSize > 0) {
         for (uint32_t i = 0; i < vectorSize; i++) {
-            OHOS::UserIAM::UserIDM::EnrolledInfo enroInfo;
-            enroInfo.authType = OHOS::UserIAM::UserIDM::AuthType(taInfos[i].authType);
-            enroInfo.enrolledId = taInfos[i].enrolledId;
-            enroInfos.push_back(enroInfo);
+            OHOS::UserIAM::UserIDM::EnrolledInfo enrollInfo;
+            enrollInfo.authType = OHOS::UserIAM::UserIDM::AuthType(taInfos[i].authType);
+            enrollInfo.enrolledId = taInfos[i].enrolledId;
+            enrolledInfos.push_back(enrollInfo);
         }
     } else {
         USERIDM_HILOGI(MODULE_SERVICE, "vector size is: %{public}u", vectorSize);

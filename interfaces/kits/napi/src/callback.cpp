@@ -40,7 +40,9 @@ napi_value GetAuthInfoRet(napi_env env, uint64_t Ret)
     napi_value arrayBuffer = nullptr;
     size_t bufferSize = length;
     NAPI_CALL(env, napi_create_arraybuffer(env, bufferSize, &data, &arrayBuffer));
-    memcpy_s(data, bufferSize, reinterpret_cast<const void*>(&Ret), bufferSize);
+    if (memcpy_s(data, bufferSize, reinterpret_cast<const void*>(&Ret), bufferSize) != EOK) {
+        USERIDM_HILOGE(MODULE_JS_NAPI, "memcpy_s failed");
+    }
     napi_value result = nullptr;
     NAPI_CALL(env, napi_create_typedarray(env, napi_uint8_array, bufferSize, arrayBuffer, 0, &result));
     return result;
@@ -50,7 +52,7 @@ static AsyncCallbackContext *CopyAsyncCallbackContext(AsyncCallbackContext *asyn
 {
     AsyncCallbackContext *copy = new (std::nothrow) AsyncCallbackContext();
     if (copy == nullptr) {
-        USERIDM_HILOGE(MODULE_JS_NAPI, "new copy faild");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "new copy failed");
         return copy;
     }
     copy->env = asyncCallbackContext->env;
@@ -91,27 +93,27 @@ static void OnResultWork(uv_work_t* work, int status)
     napi_value param[TWO_PARAMETER] = {0};
     napi_status napiStatus = napi_create_int32(env, asyncCallbackContext->result, &param[0]);
     if (napiStatus != napi_ok) {
-        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_create_int32 faild");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_create_int32 failed");
         goto EXIT;
     }
     param[ONE_PARAMETER] = AuthCommon::CreateObject(env, FUNC_ONRESULT, asyncCallbackContext->retCredentialId);
     if (param[ONE_PARAMETER] == nullptr) {
-        USERIDM_HILOGE(MODULE_JS_NAPI, "create object faild");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "create object failed");
         goto EXIT;
     }
     napiStatus =napi_get_reference_value(env, asyncCallbackContext->callbackInfo.onResult, &callbackRef);
     if (napiStatus != napi_ok) {
-        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_get_reference_value faild");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_get_reference_value failed");
         goto EXIT;
     }
     napiStatus =napi_get_global(env, &global);
     if (napiStatus != napi_ok) {
-        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_get_global faild");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_get_global failed");
         goto EXIT;
     }
     napiStatus = napi_call_function(env, global, callbackRef, PARAMTWO, param, &callResult);
     if (napiStatus != napi_ok) {
-        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_call_function faild");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_call_function failed");
         goto EXIT;
     }
 EXIT:
@@ -172,32 +174,32 @@ static void OnAcquireInfoWork(uv_work_t* work, int status)
     napi_value params[THREE_PARAMETER] = {0};
     napi_status napiStatus = napi_create_int32(env, asyncCallbackContext->module, &params[ZERO_PARAMETER]);
     if (napiStatus != napi_ok) {
-        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_create_int32 faild");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_create_int32 failed");
         goto EXIT;
     }
     napiStatus = napi_create_int32(env, asyncCallbackContext->acquire, &params[ONE_PARAMETER]);
     if (napiStatus != napi_ok) {
-        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_create_int32 faild");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_create_int32 failed");
         goto EXIT;
     }
     params[TWO_PARAMETER] = AuthCommon::CreateObject(env, FUNC_ONACQUIREINFO, asyncCallbackContext->retCredentialId);
     if (params[TWO_PARAMETER] == nullptr) {
-        USERIDM_HILOGE(MODULE_JS_NAPI, "create object faild");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "create object failed");
         goto EXIT;
     }
     napiStatus = napi_get_reference_value(env, asyncCallbackContext->callbackInfo.onAcquireInfo, &callbackRef);
     if (napiStatus != napi_ok) {
-        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_get_reference_value faild");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_get_reference_value failed");
         goto EXIT;
     }
     napiStatus = napi_get_global(env, &global);
     if (napiStatus != napi_ok) {
-        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_get_global faild");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_get_global failed");
         goto EXIT;
     }
     napiStatus = napi_call_function(env, global, callbackRef, PARAMTHREE, params, &callResult);
     if (napiStatus != napi_ok) {
-        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_call_function faild");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_call_function failed");
         goto EXIT;
     }
 EXIT:
@@ -254,7 +256,7 @@ static napi_value CreateCredentialInfo(AsyncGetAuthInfo *asyncGetAuthInfo)
         NAPI_CALL(env, napi_create_object(env, &obj));
         napi_value credentialId = GetAuthInfoRet(env, (asyncGetAuthInfo->info[Vect].credentialId));
         if (credentialId == nullptr) {
-            USERIDM_HILOGE(MODULE_JS_NAPI, "GetAuthInfo faild");
+            USERIDM_HILOGE(MODULE_JS_NAPI, "GetAuthInfo failed");
             return nullptr;
         }
         napi_value authType;
@@ -265,7 +267,7 @@ static napi_value CreateCredentialInfo(AsyncGetAuthInfo *asyncGetAuthInfo)
             static_cast<int32_t>(asyncGetAuthInfo->info[Vect].authSubType), &authSubType));
         napi_value templateId = GetAuthInfoRet(env, (asyncGetAuthInfo->info[Vect].templateId));
         if (templateId == nullptr) {
-            USERIDM_HILOGE(MODULE_JS_NAPI, "GetAuthInfo faild");
+            USERIDM_HILOGE(MODULE_JS_NAPI, "GetAuthInfo failed");
         }
         NAPI_CALL(env, napi_set_named_property(env, obj, "credentialId", credentialId));
         NAPI_CALL(env, napi_set_named_property(env, obj, "authType", authType));
@@ -280,7 +282,7 @@ static AsyncGetAuthInfo *CopyAsyncGetAuthInfo(AsyncGetAuthInfo *asyncGetAuthInfo
 {
     AsyncGetAuthInfo *copy = new (std::nothrow) AsyncGetAuthInfo();
     if (copy == nullptr) {
-        USERIDM_HILOGE(MODULE_JS_NAPI, "new copy faild");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "new copy failed");
         return copy;
     }
     copy->env = asyncGetAuthInfo->env;
@@ -298,13 +300,13 @@ static void OnGetInfoPromiseWork(AsyncGetAuthInfo *asyncGetAuthInfo)
     napi_value result[ONE_PARAMETER] = {0};
     result[ZERO_PARAMETER] = CreateCredentialInfo(asyncGetAuthInfo);
     if (result[ZERO_PARAMETER] == nullptr) {
-        USERIDM_HILOGE(MODULE_JS_NAPI, "createCredentialInfo faild");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "createCredentialInfo failed");
         return;
     }
     napi_value retPromise = result[ZERO_PARAMETER];
     napi_status napiStatus = napi_resolve_deferred(asyncGetAuthInfo->env, asyncGetAuthInfo->deferred, retPromise);
     if (napiStatus != napi_ok) {
-        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_resolve_deferred faild");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_resolve_deferred failed");
         return;
     }
 }
@@ -317,22 +319,22 @@ static void OnGetInfoCallbackWork(AsyncGetAuthInfo *asyncGetAuthInfo)
     napi_value callbackRet = 0;
     result[ZERO_PARAMETER] = CreateCredentialInfo(asyncGetAuthInfo);
     if (result[ZERO_PARAMETER] == nullptr) {
-        USERIDM_HILOGE(MODULE_JS_NAPI, "createCredentialInfo faild");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "createCredentialInfo failed");
         return;
     }
     napi_status napiStatus = napi_get_reference_value(asyncGetAuthInfo->env, asyncGetAuthInfo->callback, &callback);
     if (napiStatus != napi_ok) {
-        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_get_reference_value faild");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_get_reference_value failed");
         return;
     }
     napiStatus = napi_get_global(asyncGetAuthInfo->env, &global);
     if (napiStatus != napi_ok) {
-        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_get_global faild");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_get_global failed");
         return;
     }
     napiStatus = napi_call_function(asyncGetAuthInfo->env, global, callback, 1, result, &callbackRet);
     if (napiStatus != napi_ok) {
-        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_call_function faild");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_call_function failed");
         return;
     }
 }

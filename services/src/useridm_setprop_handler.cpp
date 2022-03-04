@@ -20,7 +20,7 @@ namespace UserIAM {
 namespace UserIDM {
 UserIDMSetPropHandler::UserIDMSetPropHandler(AuthType type, const uint64_t challenge,
                                              const uint64_t sessionId, uint64_t credentialId,
-                                             const std::shared_ptr<UserIDMMoudle>& data,
+                                             const std::shared_ptr<UserIDMModule>& data,
                                              const sptr<IIDMCallback>& callback)
 {
     USERIDM_HILOGD(MODULE_SERVICE, "UserIDMSetPropHandler constructor enter");

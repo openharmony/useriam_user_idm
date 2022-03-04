@@ -13,15 +13,15 @@
  * limitations under the License.
  */
 
-#ifndef USERIDM_MOUDLE_H
-#define USERIDM_MOUDLE_H
+#ifndef USERIDM_MODULE_H
+#define USERIDM_MODULE_H
 
 #include <mutex>
 
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
-class UserIDMMoudle {
+class UserIDMModule {
 public:
     bool InsertChallenge(uint64_t challenge);
     bool InsertScheduleId(uint64_t scheduleId);
@@ -40,4 +40,4 @@ private:
 }  // namespace UserIDM
 }  // namespace UserIAM
 }  // namespace OHOS
-#endif // USERIDM_MOUDLE_H
+#endif // USERIDM_MODULE_H
