@@ -57,7 +57,7 @@ bool UserIDMGetSecInfoCallbackProxy::SendRequest(uint32_t code, MessageParcel &d
         USERIDM_HILOGE(MODULE_SERVICE, "failed to get remote.");
         return false;
     }
-    
+
     MessageOption option(MessageOption::TF_SYNC);
     if (!isSync) {
         option.SetFlags(MessageOption::TF_ASYNC);
