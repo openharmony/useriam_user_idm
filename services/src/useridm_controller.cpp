@@ -76,7 +76,8 @@ int32_t UserIDMController::GetAuthInfoCtrl(int32_t userId, AuthType authType, st
     return UserIDMAdapter::GetInstance().QueryCredential(userId, authType, credInfos);
 }
 
-int32_t UserIDMController::GetSecureInfoCtrl(int32_t userId, uint64_t& secureUid, std::vector<EnrolledInfo>& enrolledInfos)
+int32_t UserIDMController::GetSecureInfoCtrl(int32_t userId, uint64_t& secureUid,
+    std::vector<EnrolledInfo>& enrolledInfos)
 {
     USERIDM_HILOGD(MODULE_SERVICE, "GetSecureInfoCtrl enter");
     return UserIDMAdapter::GetInstance().GetSecureUid(userId, secureUid, enrolledInfos);
