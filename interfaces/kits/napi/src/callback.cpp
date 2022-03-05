@@ -25,6 +25,7 @@
 #include "napi/native_common.h"
 #include "useridentity_manager.h"
 #include "callback.h"
+
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
@@ -61,8 +62,8 @@ static AsyncCallbackContext *CopyAsyncCallbackContext(AsyncCallbackContext *asyn
     copy->authSubType = asyncCallbackContext->authSubType;
     copy->credentialId = asyncCallbackContext->credentialId;
     copy->token = asyncCallbackContext->token;
-    copy->IdmCallOnResult = asyncCallbackContext->IdmCallOnResult;
-    copy->IdmCallonAcquireInfo = asyncCallbackContext->IdmCallonAcquireInfo;
+    copy->idmCallOnResult = asyncCallbackContext->idmCallOnResult;
+    copy->idmCallonAcquireInfo = asyncCallbackContext->idmCallonAcquireInfo;
     copy->result = asyncCallbackContext->result;
     copy->retCredentialId = asyncCallbackContext->retCredentialId;
     copy->module = asyncCallbackContext->module;
@@ -114,7 +115,6 @@ static void OnResultWork(uv_work_t* work, int status)
     napiStatus = napi_call_function(env, global, callbackRef, PARAMTWO, param, &callResult);
     if (napiStatus != napi_ok) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "napi_call_function failed");
-        goto EXIT;
     }
 EXIT:
     delete asyncCallbackContext;
@@ -200,7 +200,6 @@ static void OnAcquireInfoWork(uv_work_t* work, int status)
     napiStatus = napi_call_function(env, global, callbackRef, PARAMTHREE, params, &callResult);
     if (napiStatus != napi_ok) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "napi_call_function failed");
-        goto EXIT;
     }
 EXIT:
     delete asyncCallbackContext;

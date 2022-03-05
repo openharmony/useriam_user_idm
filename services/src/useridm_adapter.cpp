@@ -15,6 +15,7 @@
 
 #include "useridm_hilog_wrapper.h"
 #include "useridm_adapter.h"
+
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
@@ -65,6 +66,8 @@ int32_t UserIDMAdapter::QueryCredential(int32_t userId, AuthType authType,
             credInfo.templateId = taInfo.templateId;
             credInfos.push_back(credInfo);
         }
+    } else {
+        USERIDM_HILOGE(MODULE_SERVICE, "vector size is: %{public}u", vectorSize);
     }
     return ret;
 }
@@ -89,7 +92,7 @@ int32_t UserIDMAdapter::GetSecureUid(int32_t userId, uint64_t& secureUid,
             enrolledInfos.push_back(enrollInfo);
         }
     } else {
-        USERIDM_HILOGI(MODULE_SERVICE, "vector size is: %{public}u", vectorSize);
+        USERIDM_HILOGE(MODULE_SERVICE, "vector size is: %{public}u", vectorSize);
     }
     return ret;
 }
@@ -133,13 +136,12 @@ int32_t UserIDMAdapter::DeleteUser(int32_t userId, std::vector<uint8_t> authToke
 
     std::vector<OHOS::UserIAM::UserIDM::Hal::CredentialInfo> taInfos;
     int32_t ret = OHOS::UserIAM::UserIDM::Hal::DeleteUser(userId, authToken, taInfos);
-    USERIDM_HILOGI(MODULE_SERVICE, "### ---> after Hal info");
     if (ret != SUCCESS) {
         USERIDM_HILOGE(MODULE_SERVICE, "get ta info error: %{public}d", ret);
         return ret;
     }
     uint32_t vectorSize = taInfos.size();
-    USERIDM_HILOGI(MODULE_SERVICE, "### ---> taInfos.size() %{public}zu", taInfos.size());
+    USERIDM_HILOGI(MODULE_SERVICE, "taInfos.size() %{public}zu", taInfos.size());
     if (vectorSize > 0) {
         for (uint32_t i = 0; i < vectorSize; i++) {
             OHOS::UserIAM::UserIDM::CredentialInfo credInfo;
@@ -149,7 +151,7 @@ int32_t UserIDMAdapter::DeleteUser(int32_t userId, std::vector<uint8_t> authToke
             credInfo.templateId = taInfos[i].templateId;
             credInfos.push_back(credInfo);
         }
-        USERIDM_HILOGI(MODULE_SERVICE, "### ---> after for");
+        USERIDM_HILOGE(MODULE_SERVICE, "vector size is wrong");
     }
 
     return ret;
@@ -176,6 +178,8 @@ int32_t UserIDMAdapter::DeleteUserEnforce(int32_t userId,
             credInfo.templateId = taInfos[i].templateId;
             credInfos.push_back(credInfo);
         }
+    } else {
+        USERIDM_HILOGE(MODULE_SERVICE, "vector size is wrong");
     }
     return ret;
 }
@@ -203,7 +207,7 @@ int32_t UserIDMAdapter::UpdateCredential(std::vector<uint8_t> enrollToken, uint6
         deletedCredential.credentialId = taInfo.credentialId;
         deletedCredential.templateId = taInfo.templateId;
     } else {
-        USERIDM_HILOGI(MODULE_SERVICE, "Call TA info: UpdateCredential: %{public}d", ret);
+        USERIDM_HILOGE(MODULE_SERVICE, "Call TA info: UpdateCredential: %{public}d", ret);
     }
 
     return ret;

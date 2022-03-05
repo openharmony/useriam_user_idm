@@ -13,9 +13,8 @@
  * limitations under the License.
  */
 
-
-#ifndef USERIDM_SET_PROP_HANDLER_PROXY_H
-#define USERIDM_SET_PROP_HANDLER_PROXY_H
+#ifndef USERIDM_SET_PROP_HANDLER_H
+#define USERIDM_SET_PROP_HANDLER_H
 
 #include "iuseridm_callback.h"
 #include "useridm_module.h"

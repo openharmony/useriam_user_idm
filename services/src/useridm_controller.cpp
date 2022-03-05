@@ -18,13 +18,12 @@
 #include "useridm_adapter.h"
 #include "inner_event.h"
 #include "useridm_controller.h"
-namespace {
-    const int MIN_VECTOR_SIZE = 1;
-}
 
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
+const int MIN_VECTOR_SIZE = 1;
+
 UserIDMController::UserIDMController()
 {
     USERIDM_HILOGD(MODULE_SERVICE, "UserIDMController constructor");
@@ -77,8 +76,7 @@ int32_t UserIDMController::GetAuthInfoCtrl(int32_t userId, AuthType authType, st
     return UserIDMAdapter::GetInstance().QueryCredential(userId, authType, credInfos);
 }
 
-int32_t UserIDMController::GetSecureInfoCtrl(int32_t userId, uint64_t& secureUid,
-    std::vector<EnrolledInfo>& enrolledInfos)
+int32_t UserIDMController::GetSecureInfoCtrl(int32_t userId, uint64_t& secureUid, std::vector<EnrolledInfo>& enrolledInfos)
 {
     USERIDM_HILOGD(MODULE_SERVICE, "GetSecureInfoCtrl enter");
     return UserIDMAdapter::GetInstance().GetSecureUid(userId, secureUid, enrolledInfos);
@@ -92,7 +90,7 @@ int32_t UserIDMController::DeleteCredentialCtrl(int32_t userId, uint64_t credent
 }
 
 int32_t UserIDMController::DeleteUserCtrl(int32_t userId, std::vector<uint8_t> authToken,
-                                          std::vector<CredentialInfo>& credInfo)
+    std::vector<CredentialInfo>& credInfo)
 {
     USERIDM_HILOGD(MODULE_SERVICE, "DeleteUserCtrl enter");
     return UserIDMAdapter::GetInstance().DeleteUser(userId, authToken, credInfo);
@@ -105,8 +103,7 @@ int32_t UserIDMController::DeleteUserByForceCtrl(int32_t userId, std::vector<Cre
 }
 
 int32_t UserIDMController::AddCredentialCallCoauth(uint64_t callerID, AddCredInfo& credInfo,
-                                                   const sptr<IIDMCallback>& innerkitsCallback, uint64_t& challenge,
-                                                   uint64_t& scheduleId)
+    const sptr<IIDMCallback>& innerkitsCallback, uint64_t& challenge, uint64_t& scheduleId)
 {
     USERIDM_HILOGD(MODULE_SERVICE, "AddCredentialCallCoauth enter");
     if (innerkitsCallback == nullptr) {
@@ -125,14 +122,14 @@ int32_t UserIDMController::AddCredentialCallCoauth(uint64_t callerID, AddCredInf
     USERIDM_HILOGE(MODULE_SERVICE, "credInfo.authType is [%{public}d]!", credInfo.authType);
     if (credInfo.authType == PIN) {
         coAuthCallback = std::make_shared<UserIDMCoAuthHandler>(ADD_PIN_CRED, challenge, scheduleId, data_,
-                                                                innerkitsCallback);
+            innerkitsCallback);
     } else if (FACE == credInfo.authType) {
         coAuthCallback = std::make_shared<UserIDMCoAuthHandler>(ADD_FACE_CRED, challenge, scheduleId, data_,
-                                                                innerkitsCallback);
+            innerkitsCallback);
     } else {
         USERIDM_HILOGE(MODULE_SERVICE, "credInfo.authType error: %{public}d!", credInfo.authType);
         coAuthCallback = std::make_shared<UserIDMCoAuthHandler>(ADD_PIN_CRED, challenge, scheduleId, data_,
-                                                                innerkitsCallback);
+            innerkitsCallback);
     }
 
     if (coAuthCallback == nullptr) {
@@ -146,7 +143,7 @@ int32_t UserIDMController::AddCredentialCallCoauth(uint64_t callerID, AddCredInf
 }
 
 int32_t UserIDMController::AddCredentialCtrl(int32_t userId, uint64_t callerID, AddCredInfo& credInfo,
-                                             const sptr<IIDMCallback>& innerkitsCallback)
+    const sptr<IIDMCallback>& innerkitsCallback)
 {
     USERIDM_HILOGD(MODULE_SERVICE, "AddCredentialCtrl enter");
 
@@ -174,7 +171,7 @@ int32_t UserIDMController::AddCredentialCtrl(int32_t userId, uint64_t callerID, 
         return BUSY;
     }
     int32_t ret = UserIDMAdapter::GetInstance().InitSchedulation(credInfo.token, userId, credInfo.authType,
-                                                                 credInfo.authSubType, scheduleId);
+        credInfo.authSubType, scheduleId);
     if (ret == SUCCESS) {
         ret = AddCredentialCallCoauth(callerID, credInfo, innerkitsCallback, challenge, scheduleId);
     } else {
@@ -187,7 +184,7 @@ int32_t UserIDMController::AddCredentialCtrl(int32_t userId, uint64_t callerID, 
 }
 
 int32_t UserIDMController::UpdateCredentialCtrl(int32_t userId, uint64_t callerID, std::string callerName,
-                                                AddCredInfo & credInfo, const sptr<IIDMCallback>& innerkitsCallback)
+    AddCredInfo& credInfo, const sptr<IIDMCallback>& innerkitsCallback)
 {
     USERIDM_HILOGD(MODULE_SERVICE, "UpdateCredentialCtrl enter");
     if (innerkitsCallback == nullptr) {
@@ -213,15 +210,13 @@ int32_t UserIDMController::UpdateCredentialCtrl(int32_t userId, uint64_t callerI
         return BUSY;
     }
     int32_t ret = UserIDMAdapter::GetInstance().InitSchedulation(credInfo.token, userId, credInfo.authType,
-                                                                 credInfo.authSubType, scheduleId);
-    if (SUCCESS == ret) {
+        credInfo.authSubType, scheduleId);
+    if (ret == SUCCESS) {
         USERIDM_HILOGI(MODULE_SERVICE, "InitSchedulation SUCCESS");
         // success
         data_->InsertScheduleId(scheduleId);
         std::shared_ptr<UserIDMCoAuthHandler> coAuthCallback =
-                                               std::make_shared<UserIDMCoAuthHandler>(MODIFY_CRED, challenge,
-                                                                                      scheduleId, data_,
-                                                                                      innerkitsCallback);
+            std::make_shared<UserIDMCoAuthHandler>(MODIFY_CRED, challenge, scheduleId, data_, innerkitsCallback);
         CoAuth::AuthInfo paramInfo;
         paramInfo.SetPkgName(callerName);
         paramInfo.SetCallerUid(callerID);
@@ -261,14 +256,13 @@ int32_t UserIDMController::DelSchedleIdCtrl(uint64_t challenge)
 }
 
 int32_t UserIDMController::DelFaceCredentialCtrl(AuthType authType, AuthSubType authSubType, uint64_t credentialId,
-                                                 uint64_t templateId, const sptr<IIDMCallback>& innerCallback)
+    uint64_t templateId, const sptr<IIDMCallback>& innerCallback)
 {
     USERIDM_HILOGD(MODULE_SERVICE, "DelFaceCredentialCtrl enter authType: %{public}d", authType);
 
     if (authType == FACE) { // FACE
         std::shared_ptr<UserIDMSetPropHandler> setPropCallback =
-                                               std::make_shared<UserIDMSetPropHandler>(FACE, 0, 0, credentialId,
-                                                                                       data_, innerCallback);
+            std::make_shared<UserIDMSetPropHandler>(FACE, 0, 0, credentialId, data_, innerCallback);
         // set timeout in <UserIDMSetPropHandler>
         AuthResPool::AuthAttributes condition;
         condition.SetUint32Value(AuthAttributeType::AUTH_PROPERTY_MODE, 0);
@@ -292,19 +286,16 @@ int32_t UserIDMController::DelExecutorPinInfoCtrl(const sptr<IIDMCallback>& inne
     USERIDM_HILOGD(MODULE_SERVICE, "DelExecutorPinInfoCtrl enter: info.size(): %{public}zu.", info.size());
 
     if (info.size() < MIN_VECTOR_SIZE) {
-        USERIDM_HILOGI(MODULE_SERVICE, "info size error!: %{public}zu.", info.size());
+        USERIDM_HILOGE(MODULE_SERVICE, "info size error!: %{public}zu.", info.size());
         RequestResult reqRet;
         innerCallback->OnResult(FAIL, reqRet);
         return FAIL;
     }
 
     for (uint32_t i = 0; i < info.size(); i++) {
-        if (PIN == info[i].authType) {
-            // PIN
+        if (info[i].authType == PIN) {
             std::shared_ptr<UserIDMSetPropHandler> setPropCallback =
-                                                   std::make_shared<UserIDMSetPropHandler>(PIN, 0, 0,
-                                                                                           info[i].credentialId,
-                                                                                           data_, innerCallback);
+                std::make_shared<UserIDMSetPropHandler>(PIN, 0, 0, info[i].credentialId, data_, innerCallback);
             AuthResPool::AuthAttributes condition;
             condition.SetUint32Value(AuthAttributeType::AUTH_PROPERTY_MODE, 0);
             condition.SetUint64Value(AuthAttributeType::AUTH_CALLER_UID, 0);
@@ -314,11 +305,8 @@ int32_t UserIDMController::DelExecutorPinInfoCtrl(const sptr<IIDMCallback>& inne
             condition.SetUint64Value(AuthAttributeType::AUTH_TEMPLATE_ID, info[i].templateId);
             CoAuth::CoAuth::GetInstance().SetExecutorProp(condition, setPropCallback);
         } else if (info[i].authType == FACE) {
-            // FACE
             std::shared_ptr<UserIDMSetPropHandler> setPropCallback =
-                                                   std::make_shared<UserIDMSetPropHandler>(FACE, 0, 0,
-                                                                                           info[i].credentialId,
-                                                                                           data_, innerCallback);
+                std::make_shared<UserIDMSetPropHandler>(FACE, 0, 0, info[i].credentialId, data_, innerCallback);
             AuthResPool::AuthAttributes condition;
             condition.SetUint32Value(AuthAttributeType::AUTH_PROPERTY_MODE, 0);
             condition.SetUint64Value(AuthAttributeType::AUTH_CALLER_UID, 0);
@@ -327,7 +315,7 @@ int32_t UserIDMController::DelExecutorPinInfoCtrl(const sptr<IIDMCallback>& inne
             condition.SetUint64Value(AuthAttributeType::AUTH_CREDENTIAL_ID, info[i].credentialId);
             condition.SetUint64Value(AuthAttributeType::AUTH_TEMPLATE_ID, info[i].templateId);
             CoAuth::CoAuth::GetInstance().SetExecutorProp(condition, setPropCallback);
-        }   // endif
+        }
     }   // end for
     return SUCCESS;
 }

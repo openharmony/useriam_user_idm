@@ -26,14 +26,15 @@ namespace UserIAM {
 namespace UserIDM {
 class AuthCommon {
 public:
-static napi_value CreateObject(napi_env env, const std::string &keyStr, uint64_t credentialId);
-static int32_t GetNamedProperty(napi_env env, napi_value obj, const std::string &keyStr);
-static std::vector<uint8_t> GetNamedAttribute(napi_env env, napi_value obj);
-static napi_status JudgeObjectType (napi_env env, napi_callback_info info, AsyncCallbackContext* asyncCallbackContext);
-static std::vector<uint8_t> JudgeArryType(napi_env env, size_t argc, napi_value* argv);
-static void JudgeDelUserType (napi_env env, napi_callback_info info, AsyncCallbackContext* asyncCallbackContext);
-static void JudgeDelCredType(napi_env env, napi_callback_info info, AsyncCallbackContext* asyncCallbackContext);
-static void SaveCallback (napi_env env, size_t argc, napi_value* argv, AsyncCallbackContext* asyncCallbackContext);
+    static napi_value CreateObject(napi_env env, const std::string& keyStr, uint64_t credentialId);
+    static int32_t GetNamedProperty(napi_env env, napi_value obj, const std::string& keyStr);
+    static std::vector<uint8_t> GetNamedAttribute(napi_env env, napi_value obj);
+    static napi_status JudgeObjectType (napi_env env, napi_callback_info info,
+        AsyncCallbackContext* asyncCallbackContext);
+    static std::vector<uint8_t> JudgeArryType(napi_env env, size_t argc, napi_value* argv);
+    static void JudgeDelUserType (napi_env env, napi_callback_info info, AsyncCallbackContext* asyncCallbackContext);
+    static void JudgeDelCredType(napi_env env, napi_callback_info info, AsyncCallbackContext* asyncCallbackContext);
+    static void SaveCallback (napi_env env, size_t argc, napi_value* argv, AsyncCallbackContext* asyncCallbackContext);
 };
 } // namespace UserIDM
 } // namespace UserIAM

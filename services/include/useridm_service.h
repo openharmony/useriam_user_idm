@@ -49,7 +49,6 @@ public:
     int32_t EnforceDelUser(int32_t userId, const sptr<IIDMCallback>& callback) override; // del user
     void DelUser(std::vector<uint8_t> authToken, const sptr<IIDMCallback>& callback) override; // del pin
     void DelCred(uint64_t credentialId, std::vector<uint8_t> authToken, const sptr<IIDMCallback>& callback) override;
-    // del face
 
 private:
     int32_t GetCallingUserID(int32_t &userID);
