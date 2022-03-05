@@ -26,7 +26,7 @@ uint64_t UserIDMProxy::OpenSession()
     MessageParcel reply;
 
     if (!data.WriteInterfaceToken(UserIDMProxy::GetDescriptor())) {
-        USERIDM_HILOGI(MODULE_CLIENT, "write descriptor failed!");
+        USERIDM_HILOGE(MODULE_CLIENT, "write descriptor failed!");
         return FAIL;
     }
 

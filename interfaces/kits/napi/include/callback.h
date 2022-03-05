@@ -50,6 +50,7 @@ public:
     void OnGetInfo(std::vector<CredentialInfo>& info) override;
     void OnGetInfolog(std::vector<CredentialInfo>& info);
 };
+
 napi_value GetAuthInfoRet(napi_env env, AsyncGetAuthInfo* asyncGetAuthInfo);
 } // namespace UserIDM
 } // namespace UserIAM

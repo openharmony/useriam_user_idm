@@ -15,6 +15,7 @@
 
 #include "useridm_hilog_wrapper.h"
 #include "useridm_getinfo_callback_proxy.h"
+
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
@@ -26,7 +27,7 @@ void UserIDMGetInfoCallbackProxy::OnGetInfo(std::vector<CredentialInfo>& credInf
     MessageParcel reply;
 
     if (!data.WriteInterfaceToken(UserIDMGetInfoCallbackProxy::GetDescriptor())) {
-        USERIDM_HILOGI(MODULE_SERVICE, "write descriptor failed!");
+        USERIDM_HILOGE(MODULE_SERVICE, "write descriptor failed!");
         return;
     }
     // Write container size first

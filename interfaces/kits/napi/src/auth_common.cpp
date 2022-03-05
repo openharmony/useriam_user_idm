@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include <cstdio>
 #include <iostream>
 #include <sstream>
@@ -28,7 +29,7 @@ namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
 void AuthCommon::SaveCallback(napi_env env, size_t argc, napi_value* argv,
-                              AsyncCallbackContext* asyncCallbackContext)
+    AsyncCallbackContext* asyncCallbackContext)
 {
     USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
     napi_valuetype valueType;
@@ -39,27 +40,27 @@ void AuthCommon::SaveCallback(napi_env env, size_t argc, napi_value* argv,
     if (valueType == napi_object) {
         asyncCallbackContext->callbackInfo.env = env;
         status = napi_get_named_property(env, argv[argc], "onResult",
-            &asyncCallbackContext->IdmCallOnResult);
+            &asyncCallbackContext->idmCallOnResult);
         if (status != napi_ok) {
             USERIDM_HILOGE(MODULE_JS_NAPI, "napi_get_named_property failed");
         }
         status = napi_create_reference(
-            env, asyncCallbackContext->IdmCallOnResult, 1, &asyncCallbackContext->callbackInfo.onResult);
+            env, asyncCallbackContext->idmCallOnResult, 1, &asyncCallbackContext->callbackInfo.onResult);
         if (status != napi_ok) {
             USERIDM_HILOGE(MODULE_JS_NAPI, "napi_create_reference failed");
         }
         status = napi_get_named_property(
-            env, argv[argc], "onAcquireInfo", &asyncCallbackContext->IdmCallonAcquireInfo);
+            env, argv[argc], "onAcquireInfo", &asyncCallbackContext->idmCallonAcquireInfo);
         if (status != napi_ok) {
             USERIDM_HILOGE(MODULE_JS_NAPI, "napi_get_named_property failed");
         }
         status = napi_create_reference(
-            env, asyncCallbackContext->IdmCallonAcquireInfo, 1, &asyncCallbackContext->callbackInfo.onAcquireInfo);
+            env, asyncCallbackContext->idmCallonAcquireInfo, 1, &asyncCallbackContext->callbackInfo.onAcquireInfo);
         if (status != napi_ok) {
             USERIDM_HILOGE(MODULE_JS_NAPI, "napi_create_reference failed");
         }
     } else {
-        USERIDM_HILOGI(MODULE_JS_NAPI, "type mismatch");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "type mismatch");
     }
 }
 
@@ -98,7 +99,7 @@ std::vector<uint8_t> AuthCommon::GetNamedAttribute(napi_env env, napi_value obj)
     if (isTypedArray) {
         USERIDM_HILOGI(MODULE_JS_NAPI, "token is a array");
     } else {
-        USERIDM_HILOGI(MODULE_JS_NAPI, "token is not a array");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "token is not a array");
         return retNull;
     }
     napi_get_typedarray_info(env, token, &arraytype, &length, reinterpret_cast<void **>(&data), &buffer, &offset);
@@ -109,14 +110,14 @@ std::vector<uint8_t> AuthCommon::GetNamedAttribute(napi_env env, napi_value obj)
         return retNull;
     }
     if (offset != 0) {
-        USERIDM_HILOGI(MODULE_JS_NAPI, "offset is %{public}zu", offset);
+        USERIDM_HILOGE(MODULE_JS_NAPI, "offset is %{public}zu", offset);
         return retNull;
     }
     std::vector<uint8_t> result(data, data + length);
     return result;
 }
 
-napi_value AuthCommon::CreateObject(napi_env env, const std::string &keyStr, uint64_t credentialId)
+napi_value AuthCommon::CreateObject(napi_env env, const std::string& keyStr, uint64_t credentialId)
 {
     USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
     napi_value obj;
@@ -205,7 +206,7 @@ void AuthCommon::JudgeDelCredType(napi_env env, napi_callback_info info, AsyncCa
     SaveCallback(env, TWO_PARAMETER, argv, asyncCallbackContext);
 }
 
-std::vector<uint8_t> AuthCommon::JudgeArryType(napi_env env, size_t argc, napi_value *argv)
+std::vector<uint8_t> AuthCommon::JudgeArryType(napi_env env, size_t argc, napi_value* argv)
 {
     USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
     std::vector<uint8_t> retNull = {0};
@@ -219,7 +220,7 @@ std::vector<uint8_t> AuthCommon::JudgeArryType(napi_env env, size_t argc, napi_v
     if (isTypedArray) {
         USERIDM_HILOGI(MODULE_JS_NAPI, "this is a array");
     } else {
-        USERIDM_HILOGI(MODULE_JS_NAPI, "this is not a array");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "this is not a array");
         return retNull;
     }
     napi_get_typedarray_info(env, argv[argc], &arraytype, &length, reinterpret_cast<void **>(&data), &buffer, &offset);
@@ -230,14 +231,14 @@ std::vector<uint8_t> AuthCommon::JudgeArryType(napi_env env, size_t argc, napi_v
         return retNull;
     }
     if (offset != 0) {
-        USERIDM_HILOGI(MODULE_JS_NAPI, " offset is %{public}zu", offset);
+        USERIDM_HILOGE(MODULE_JS_NAPI, "offset is %{public}zu", offset);
         return retNull;
     }
     std::vector<uint8_t> result(data, data + length);
     return result;
 }
 
-AsyncGetAuthInfo *GCreateAsyncInfo(napi_env env)
+AsyncGetAuthInfo* GCreateAsyncInfo(napi_env env)
 {
     USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
     return new (std::nothrow) AsyncGetAuthInfo {
@@ -246,7 +247,7 @@ AsyncGetAuthInfo *GCreateAsyncInfo(napi_env env)
     };
 }
 
-AsyncOpenSession *OCreateAsyncInfo(napi_env env)
+AsyncOpenSession* OCreateAsyncInfo(napi_env env)
 {
     USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
     return new (std::nothrow) AsyncOpenSession {

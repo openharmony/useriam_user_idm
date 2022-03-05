@@ -22,6 +22,7 @@ namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
 napi_ref g_ctor;
+
 /**
  * @brief Instance passed to context
  *

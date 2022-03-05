@@ -34,7 +34,7 @@ public:
     // param3: Function pointer passed in to the caller
     virtual ~UserIDMCoAuthHandler() = default;
 
-    void OnFinish(uint32_t resultCode, std::vector<uint8_t> &scheduleToken) override;
+    void OnFinish(uint32_t resultCode, std::vector<uint8_t>& scheduleToken) override;
     void OnAcquireInfo(uint32_t acquire) override;
 
 private:
@@ -50,7 +50,7 @@ private:
     };
 
 private:
-    int32_t OnFinishModify(uint32_t resultCode, std::vector<uint8_t> &scheduleToken, uint64_t& credentialId);
+    int32_t OnFinishModify(uint32_t resultCode, std::vector<uint8_t>& scheduleToken, uint64_t& credentialId);
     uint64_t lastChallenge_;
     uint64_t lastScheduleId_;
     std::shared_ptr<UserIDMModule> dataCallback_;

@@ -15,6 +15,7 @@
 
 #include "useridm_hilog_wrapper.h"
 #include "useridm_callback_test.h"
+
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
