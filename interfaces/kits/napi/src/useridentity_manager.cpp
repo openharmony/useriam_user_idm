@@ -710,9 +710,15 @@ napi_value UserIdentityManager::GetAuthInfoCallback(napi_env env, napi_value *ar
     }
 
     if (argc == ARGC) {
-        int32_t authType_ = 0;
-        NAPI_CALL(env, napi_get_value_int32(env, argv[0], &authType_));
-        asyncGetAuthInfo->authType = static_cast<AuthType>(authType_);
+        napi_valuetype valuetype = napi_undefined;
+        NAPI_CALL(env, napi_typeof(env, argv[0], &valuetype));
+        if (valuetype == napi_number) {
+            int32_t authType_ = 0;
+            NAPI_CALL(env, napi_get_value_int32(env, argv[0], &authType_));
+            asyncGetAuthInfo->authType = static_cast<AuthType>(authType_);
+        } else {
+            asyncGetAuthInfo->authType = static_cast<AuthType>(0);
+        }
     }
     napi_value result = nullptr;
     NAPI_CALL(env, napi_get_null(env, &result));
