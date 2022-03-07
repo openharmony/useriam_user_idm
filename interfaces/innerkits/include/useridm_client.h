@@ -57,7 +57,7 @@ private:
     private:
         DISALLOW_COPY_AND_MOVE(UserIDMDeathRecipient);
     };
-    
+
     void ResetUserIDMProxy(const wptr<IRemoteObject>& remote);
     sptr<IUserIDM> GetUserIDMProxy();
 
