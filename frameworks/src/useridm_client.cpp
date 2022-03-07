@@ -193,7 +193,7 @@ void UserIDMClient::AddCredential(AddCredInfo& credInfo, const std::shared_ptr<I
 
     if (napiCallback == nullptr) {
         USERIDM_HILOGE(MODULE_CLIENT, " callback is nullptr");
-        return INVALID_PARAMETERS;
+        return;
     }
 
     auto proxy = GetUserIDMProxy();
@@ -213,7 +213,7 @@ void UserIDMClient::UpdateCredential(AddCredInfo& credInfo, const std::shared_pt
 
     if (napiCallback == nullptr) {
         USERIDM_HILOGE(MODULE_CLIENT, " callback is nullptr");
-        return INVALID_PARAMETERS;
+        return;
     }
 
     auto proxy = GetUserIDMProxy();
@@ -270,7 +270,7 @@ void UserIDMClient::DelUser(std::vector<uint8_t> authToken, const std::shared_pt
 
     if (napiCallback == nullptr) {
         USERIDM_HILOGE(MODULE_CLIENT, " callback is nullptr");
-        return INVALID_PARAMETERS;
+        return;
     }
 
     auto proxy = GetUserIDMProxy();
@@ -291,7 +291,7 @@ void UserIDMClient::DelCred(uint64_t credentialId, std::vector<uint8_t> authToke
 
     if (napiCallback == nullptr) {
         USERIDM_HILOGE(MODULE_CLIENT, " callback is nullptr");
-        return INVALID_PARAMETERS;
+        return;
     }
 
     auto proxy = GetUserIDMProxy();
