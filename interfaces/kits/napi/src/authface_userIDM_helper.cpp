@@ -21,7 +21,6 @@
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
-
 /**
  * @brief Instance passed to context
  *
