@@ -21,7 +21,6 @@
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
-napi_ref g_ctor;
 
 /**
  * @brief Instance passed to context
@@ -325,10 +324,6 @@ napi_value GetCtor(napi_env env)
 {
     USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
     napi_value cons;
-    if (g_ctor != nullptr) {
-        NAPI_CALL(env, napi_get_reference_value(env, g_ctor, &cons));
-        return cons;
-    }
     napi_property_descriptor clzDes[] = {
         DECLARE_NAPI_FUNCTION("openSession", OpenSession),
         DECLARE_NAPI_FUNCTION("addCredential", AddCredential),
@@ -341,7 +336,6 @@ napi_value GetCtor(napi_env env)
     };
     NAPI_CALL(env, napi_define_class(env, "UserIdentityManager", NAPI_AUTO_LENGTH, UserIdentityManagerConstructor,
                                      nullptr, sizeof(clzDes) / sizeof(napi_property_descriptor), clzDes, &cons));
-    NAPI_CALL(env, napi_create_reference(env, cons, 1, &g_ctor));
     return cons;
 }
 } // namespace UserIDM
