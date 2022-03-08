@@ -15,6 +15,7 @@
 
 #include "useridm_hilog_wrapper.h"
 #include "useridm_getsecinfo_callback_proxy.h"
+
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
@@ -24,10 +25,9 @@ void UserIDMGetSecInfoCallbackProxy::OnGetSecInfo(SecInfo &info)
 
     MessageParcel data;
     MessageParcel reply;
-    bool ret = 0;
 
     if (!data.WriteInterfaceToken(UserIDMGetSecInfoCallbackProxy::GetDescriptor())) {
-        USERIDM_HILOGI(MODULE_SERVICE, "write descriptor failed!");
+        USERIDM_HILOGE(MODULE_SERVICE, "write descriptor failed!");
         return;
     }
 
@@ -41,7 +41,7 @@ void UserIDMGetSecInfoCallbackProxy::OnGetSecInfo(SecInfo &info)
         return;
     }
 
-    ret = SendRequest(ON_GET_SEC_INFO, data, reply);
+    bool ret = SendRequest(ON_GET_SEC_INFO, data, reply);
     if (ret) {
         int32_t result = reply.ReadInt32();
         USERIDM_HILOGI(MODULE_SERVICE, "result = %{public}d", result);
@@ -57,7 +57,7 @@ bool UserIDMGetSecInfoCallbackProxy::SendRequest(uint32_t code, MessageParcel &d
         USERIDM_HILOGE(MODULE_SERVICE, "failed to get remote.");
         return false;
     }
-    
+
     MessageOption option(MessageOption::TF_SYNC);
     if (!isSync) {
         option.SetFlags(MessageOption::TF_ASYNC);

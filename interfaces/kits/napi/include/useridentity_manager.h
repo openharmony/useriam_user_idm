@@ -46,8 +46,9 @@ typedef struct AsyncOpenSession {
     napi_deferred deferred;
     napi_value promise;
     napi_ref callback;
-    uint64_t OpenSession;
+    uint64_t openSession;
 } AsyncOpenSession;
+
 typedef struct AsyncGetAuthInfo {
     napi_env env;
     uint64_t openSession;
@@ -57,11 +58,13 @@ typedef struct AsyncGetAuthInfo {
     napi_value promise;
     std::vector<CredentialInfo> info;
 } AsyncGetAuthInfo;
+
 typedef struct CallbackInfo {
     napi_env env;
     napi_ref onResult;
     napi_ref onAcquireInfo;
 } CallbackInfo;
+
 typedef struct AsyncCallbackContext {
     napi_env env;
     CallbackInfo callbackInfo;
@@ -69,22 +72,25 @@ typedef struct AsyncCallbackContext {
     AuthSubType authSubType;
     std::vector<uint8_t> credentialId;
     std::vector<uint8_t> token;
-    napi_value IdmCallOnResult;
-    napi_value IdmCallonAcquireInfo;
+    napi_value idmCallOnResult;
+    napi_value idmCallonAcquireInfo;
     int32_t result;
     uint64_t retCredentialId;
     int32_t module;
     int32_t acquire;
 } AsyncCallbackContext;
+
 typedef struct SyncCancelContext {
     napi_env env;
     std::vector<uint8_t> challenge;
 } SyncCancelContext;
+
 typedef struct AsyncHolder {
     AsyncHolder() : data(nullptr), asyncWork(nullptr) {};
     void *data;
     napi_async_work asyncWork;
 } AsyncHolder;
+
 class UserIdentityManager {
 public:
     UserIdentityManager();
@@ -122,8 +128,9 @@ private:
     static void DelCredExecute(napi_env env, void *data);
     static void DelCredComplete(napi_env env, napi_status status, void *data);
 };
-AsyncGetAuthInfo *GCreateAsyncInfo(napi_env env);
-AsyncOpenSession *OCreateAsyncInfo(napi_env env);
+
+AsyncGetAuthInfo* GCreateAsyncInfo(napi_env env);
+AsyncOpenSession* OCreateAsyncInfo(napi_env env);
 napi_value OpenSessionRet(napi_env env, AsyncOpenSession* asyncOpenSession);
 } // namespace UserIDM
 } // namespace UserIAM

@@ -15,6 +15,7 @@
 
 #include "useridm_hilog_wrapper.h"
 #include "useridm_callback_proxy.h"
+
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
@@ -26,7 +27,7 @@ void UserIDMCallbackProxy::OnResult(int32_t result, RequestResult reqRet)
     MessageParcel reply;
 
     if (!data.WriteInterfaceToken(UserIDMCallbackProxy::GetDescriptor())) {
-        USERIDM_HILOGI(MODULE_SERVICE, "write descriptor failed!");
+        USERIDM_HILOGE(MODULE_SERVICE, "write descriptor failed!");
         return;
     }
 
@@ -55,7 +56,7 @@ void UserIDMCallbackProxy::OnAcquireInfo(int32_t module, int32_t acquire, Reques
     MessageParcel reply;
 
     if (!data.WriteInterfaceToken(UserIDMCallbackProxy::GetDescriptor())) {
-        USERIDM_HILOGI(MODULE_SERVICE, "write descriptor failed!");
+        USERIDM_HILOGE(MODULE_SERVICE, "write descriptor failed!");
         return;
     }
 

@@ -18,49 +18,26 @@
 
 #include "useridm_info.h"
 #include "useridm_callback.h"
+
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
 class GetInfoCallbackUT : public GetInfoCallback {
 public:
-    /**
-     * @brief
-     * @param info.
-     * @return void.
-     */
     virtual ~GetInfoCallbackUT() =default;
     void OnGetInfo(std::vector<CredentialInfo>& info)override;
 };
 
 class GetSecInfoCallbackUT : public GetSecInfoCallback {
 public:
-    /**
-     * @brief
-     * @param info .
-     * @return void.
-     */
     virtual ~GetSecInfoCallbackUT() = default;
     void OnGetSecInfo(SecInfo &info)override;
 };
 
 class IDMCallbackUT : public IDMCallback {
 public:
-    /**
-     * @brief
-     * @param result .
-     * @param strcut reqRet .
-     * @return void.
-     */
     virtual ~IDMCallbackUT() = default;
     void OnResult(int32_t result, RequestResult reqRet) override;
-
-    /**
-     * @brief
-     * @param module .
-     * @param acquire .
-     * @param reqRet .
-     * @return void.
-     */
     void OnAcquireInfo(int32_t module, int32_t acquire, RequestResult reqRet) override;
 };
 }  // namespace UserIDM

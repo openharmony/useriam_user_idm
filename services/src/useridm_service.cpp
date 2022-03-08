@@ -13,12 +13,10 @@
  * limitations under the License.
  */
 
-// #include<fstream>
-// #include<iomanip>
-
 #include "useriam_common.h"
 #include "accesstoken_kit.h"
 #include "useridm_service.h"
+
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
@@ -67,17 +65,16 @@ int32_t UserIDMService::GetCallingUserID(int32_t &userID)
     }
     ATokenTypeEnum callingType = AccessTokenKit::GetTokenType(tokenID);
     if (callingType != TOKEN_HAP) {
-        USERIDM_HILOGI(MODULE_SERVICE, "CallingType is not hap.");
+        USERIDM_HILOGE(MODULE_SERVICE, "CallingType is not hap.");
         return TYPE_NOT_SUPPORT;
     }
     HapTokenInfo hapTokenInfo;
     int result = AccessTokenKit::GetHapTokenInfo(tokenID, hapTokenInfo);
     if (result != SUCCESS) {
-        USERIDM_HILOGI(MODULE_SERVICE, "Get hap token info failed.");
+        USERIDM_HILOGE(MODULE_SERVICE, "Get hap token info failed.");
         return TYPE_NOT_SUPPORT;
     }
     userID = (int32_t)hapTokenInfo.userID;
-    USERIDM_HILOGI(MODULE_SERVICE, "GetCallingUserID is %{public}d", userID);
     return SUCCESS;
 }
 
@@ -140,7 +137,7 @@ int32_t UserIDMService::GetAuthInfo(AuthType authType, const sptr<IGetInfoCallba
         return ret;
     }
     std::vector<CredentialInfo> credInfos;
-    ret =  idmController_.GetAuthInfoCtrl(userId, authType, credInfos);
+    ret = idmController_.GetAuthInfoCtrl(userId, authType, credInfos);
 
     // return data
     callback->OnGetInfo(credInfos);
@@ -177,8 +174,8 @@ int32_t UserIDMService::GetSecInfo(const sptr<IGetSecInfoCallback>& callback)
         return ret;
     }
     SecInfo secInfos;
-    ret =  idmController_.GetSecureInfoCtrl(userId, secInfos.secureUid, secInfos.enrolledInfo);
-    if (SUCCESS != ret) {
+    ret = idmController_.GetSecureInfoCtrl(userId, secInfos.secureUid, secInfos.enrolledInfo);
+    if (ret != SUCCESS) {
         USERIDM_HILOGE(MODULE_SERVICE, "GetSecureInfoCtrl failed");
     }
 
@@ -252,19 +249,17 @@ int32_t UserIDMService::EnforceDelUser(int32_t userId, const sptr<IIDMCallback>&
 {
     USERIDM_HILOGD(MODULE_SERVICE, "service EnforceDelUser enter");
 
-    int32_t ret = 0;
-
     // get accountmgr info
     std::vector<CredentialInfo> credInfos;
 
-    ret = idmController_.DeleteUserByForceCtrl(userId, credInfos);
-    if (SUCCESS != ret) {
+    int32_t ret = idmController_.DeleteUserByForceCtrl(userId, credInfos);
+    if (ret != SUCCESS) {
         USERIDM_HILOGE(MODULE_SERVICE, "DeleteUserByForceCtrl return fail");
         RequestResult reqRet;
         reqRet.credentialId = 0;
         callback->OnResult(ret, reqRet);
     } else {
-        ret = idmController_.DelExecutorPinInofCtrl(callback, credInfos);
+        ret = idmController_.DelExecutorPinInfoCtrl(callback, credInfos);
     }
 
     return ret;
@@ -290,10 +285,10 @@ void UserIDMService::DelUser(std::vector<uint8_t> authToken, const sptr<IIDMCall
     }
     std::vector<CredentialInfo> credInfos;
 
-    ret =  idmController_.DeleteUserCtrl(userId, authToken, credInfos);
+    ret = idmController_.DeleteUserCtrl(userId, authToken, credInfos);
     if (ret == SUCCESS) {
         USERIDM_HILOGE(MODULE_SERVICE, "DeleteUserCtrl success");
-        idmController_.DelExecutorPinInofCtrl(callback, credInfos);
+        idmController_.DelExecutorPinInfoCtrl(callback, credInfos);
     } else {
         USERIDM_HILOGE(MODULE_SERVICE, "DeleteUserCtrl failed");
         RequestResult reqRet;
@@ -320,7 +315,7 @@ void UserIDMService::DelCred(uint64_t credentialId, std::vector<uint8_t> authTok
         innerkitsCallback->OnResult(ret, reqRet);
     }
     CredentialInfo credentialInfo;
-    ret =  idmController_.DeleteCredentialCtrl(userId, credentialId, authToken, credentialInfo);
+    ret = idmController_.DeleteCredentialCtrl(userId, credentialId, authToken, credentialInfo);
     if (ret == SUCCESS) {
         USERIDM_HILOGI(MODULE_SERVICE, "DeleteCredentialCtrl success");
 

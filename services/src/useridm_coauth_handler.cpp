@@ -21,7 +21,7 @@ namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
 UserIDMCoAuthHandler::UserIDMCoAuthHandler(CoAuthType type, const uint64_t challenge, const uint64_t scheduleId,
-                                           const std::shared_ptr<UserIDMMoudle>& data,
+                                           const std::shared_ptr<UserIDMModule>& data,
                                            const sptr<IIDMCallback>& callback)
 {
     USERIDM_HILOGD(MODULE_SERVICE, "UserIDMCoAuthHandler constructor enter");
@@ -43,7 +43,8 @@ UserIDMCoAuthHandler::UserIDMCoAuthHandler(CoAuthType type, const uint64_t chall
     USERIDM_HILOGI(MODULE_SERVICE, "add death recipient success!");
     // add death recipient end
 }
-int32_t UserIDMCoAuthHandler::OnFinishModify(uint32_t resultCode, std::vector<uint8_t> &scheduleToken,
+
+int32_t UserIDMCoAuthHandler::OnFinishModify(uint32_t resultCode, std::vector<uint8_t>& scheduleToken,
                                              uint64_t& credentialId)
 {
     if (innerCallback_ == nullptr) {
@@ -71,12 +72,9 @@ int32_t UserIDMCoAuthHandler::OnFinishModify(uint32_t resultCode, std::vector<ui
 
         // callback: as set prop info param
         std::shared_ptr<UserIDMSetPropHandler> setPropCallback =
-                                                std::make_shared<UserIDMSetPropHandler>(PIN, challenge,
-                                                                                        scheduleId,
-                                                                                        credentialId,
-                                                                                        dataCallback_,
-                                                                                        innerCallback_);
-            
+            std::make_shared<UserIDMSetPropHandler>(PIN, challenge, scheduleId, credentialId,
+                                                    dataCallback_, innerCallback_);
+
         AuthResPool::AuthAttributes condition;
         condition.SetUint32Value(AuthAttributeType::AUTH_PROPERTY_MODE, 0);
         condition.SetUint64Value(AuthAttributeType::AUTH_CALLER_UID, 0);
@@ -93,10 +91,10 @@ int32_t UserIDMCoAuthHandler::OnFinishModify(uint32_t resultCode, std::vector<ui
     }
 }
 
-void UserIDMCoAuthHandler::OnFinish(uint32_t resultCode, std::vector<uint8_t> &scheduleToken)
+void UserIDMCoAuthHandler::OnFinish(uint32_t resultCode, std::vector<uint8_t>& scheduleToken)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMCoAuthHandler OnFinish enter: %{public}d type_ is %{public}u",
-                   resultCode, type_);
+    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMCoAuthHandler OnFinish enter: %{public}u type_ is %{public}d",
+        resultCode, type_);
     if (innerCallback_ == nullptr) {
         USERIDM_HILOGE(MODULE_SERVICE, "sorry: innerCallback_ is nullptr!");
         return;
@@ -110,14 +108,14 @@ void UserIDMCoAuthHandler::OnFinish(uint32_t resultCode, std::vector<uint8_t> &s
         innerCallback_->OnResult(result, reqRet);
         return;
     }
-    if ((ADD_PIN_CRED == type_) || (ADD_FACE_CRED == type_)) {
+    if ((type_ == ADD_PIN_CRED) || (type_ == ADD_FACE_CRED)) {
         uint64_t scheduleId = 0;
         bool res = dataCallback_->CheckScheduleIdIsActive(scheduleId); // check same scheduleId
         if (res && (scheduleId == lastScheduleId_)) {
             // if have: session is still alive
             // call TA info
             result = UserIDMAdapter::GetInstance().AddCredential(scheduleToken, credentialId);
-            if (SUCCESS != result) {
+            if (result != SUCCESS) {
                 USERIDM_HILOGE(MODULE_SERVICE, "call TA info addCred failed!");
             }
         }
@@ -126,7 +124,7 @@ void UserIDMCoAuthHandler::OnFinish(uint32_t resultCode, std::vector<uint8_t> &s
         RequestResult reqRet;
         reqRet.credentialId = credentialId;
         innerCallback_->OnResult(result, reqRet);
-    } else if (MODIFY_CRED == type_) {
+    } else if (type_ == MODIFY_CRED) {
         result = OnFinishModify(resultCode, scheduleToken, credentialId);
         // if not:  session has been canceled
         RequestResult reqRet;
@@ -135,7 +133,7 @@ void UserIDMCoAuthHandler::OnFinish(uint32_t resultCode, std::vector<uint8_t> &s
         // clean session data
         dataCallback_->DeleteSessionId();
     } else {
-        USERIDM_HILOGE(MODULE_SERVICE, "callback type error: %d!", type_);
+        USERIDM_HILOGE(MODULE_SERVICE, "callback type error: %{public}d!", type_);
     }
 }
 
@@ -147,7 +145,7 @@ void UserIDMCoAuthHandler::OnAcquireInfo(uint32_t acquire)
         return;
     }
 
-    if (ADD_FACE_CRED == type_) {
+    if (type_ == ADD_FACE_CRED) {
         RequestResult reqRet;
         reqRet.credentialId = 0;
         innerCallback_->OnResult(acquire, reqRet); // Prompt information is returned through callback

@@ -51,8 +51,7 @@ int32_t UserIDMGetSecInfoCallbackStub::OnGetSecInfoStub(MessageParcel& data, Mes
     USERIDM_HILOGI(MODULE_CLIENT, "UserIDMGetSecInfoCallbackStub OnResultStub enter");
 
     int32_t ret = SUCCESS;
-    SecInfo info;
-
+    SecInfo info = {};
     info.secureUid = data.ReadUint64();
     info.enrolledInfoLen = data.ReadUint32();
 

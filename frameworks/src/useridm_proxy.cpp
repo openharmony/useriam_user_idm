@@ -26,7 +26,7 @@ uint64_t UserIDMProxy::OpenSession()
     MessageParcel reply;
 
     if (!data.WriteInterfaceToken(UserIDMProxy::GetDescriptor())) {
-        USERIDM_HILOGI(MODULE_CLIENT, "write descriptor failed!");
+        USERIDM_HILOGE(MODULE_CLIENT, "write descriptor failed!");
         return FAIL;
     }
 
@@ -321,7 +321,7 @@ bool UserIDMProxy::SendRequest(uint32_t code, MessageParcel &data, MessageParcel
         USERIDM_HILOGE(MODULE_CLIENT, "failed to get remote.");
         return false;
     }
-    
+
     MessageOption option(MessageOption::TF_SYNC);
     if (!isSync) {
         option.SetFlags(MessageOption::TF_ASYNC);

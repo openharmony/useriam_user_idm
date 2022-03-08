@@ -14,60 +14,61 @@
  */
 
 #include "useridm_hilog_wrapper.h"
-#include "useridm_moudle.h"
+#include "useridm_module.h"
+
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
-bool UserIDMMoudle::InsertChallenge(uint64_t challenge)
+bool UserIDMModule::InsertChallenge(uint64_t challenge)
 {
     std::lock_guard<std::mutex> idmMutexGuard(mutex_);
-    USERIDM_HILOGI(MODULE_SERVICE, "Data moudle InsertChallenge enter");
+    USERIDM_HILOGI(MODULE_SERVICE, "Data module InsertChallenge enter");
 
     challengeAndScheduleId_.first = challenge;
 
     return true;
 }
 
-bool UserIDMMoudle::InsertScheduleId(uint64_t scheduleId)
+bool UserIDMModule::InsertScheduleId(uint64_t scheduleId)
 {
     std::lock_guard<std::mutex> idmMutexGuard(mutex_);
-    USERIDM_HILOGI(MODULE_SERVICE, "Data moudle InsertScheduleId enter");
+    USERIDM_HILOGI(MODULE_SERVICE, "Data module InsertScheduleId enter");
 
     challengeAndScheduleId_.second = scheduleId;
 
     return true;
 }
 
-void UserIDMMoudle::DeleteChallenge()
+void UserIDMModule::DeleteChallenge()
 {
     std::lock_guard<std::mutex> idmMutexGuard(mutex_);
-    USERIDM_HILOGI(MODULE_SERVICE, "Data moudle DeleteChallenge enter");
+    USERIDM_HILOGI(MODULE_SERVICE, "Data module DeleteChallenge enter");
 
     challengeAndScheduleId_.first = 0;
 }
 
-void UserIDMMoudle::DeleteSessionId()
+void UserIDMModule::DeleteSessionId()
 {
     std::lock_guard<std::mutex> idmMutexGuard(mutex_);
-    USERIDM_HILOGI(MODULE_SERVICE, "Data moudle DeleteSessionId enter");
+    USERIDM_HILOGI(MODULE_SERVICE, "Data module DeleteSessionId enter");
 
     challengeAndScheduleId_.second = 0;
 }
 
-void UserIDMMoudle::CleanData()
+void UserIDMModule::CleanData()
 {
     std::lock_guard<std::mutex> idmMutexGuard(mutex_);
-    USERIDM_HILOGI(MODULE_SERVICE, "Data moudle CleanData enter");
+    USERIDM_HILOGI(MODULE_SERVICE, "Data module CleanData enter");
 
     // clean pair
     challengeAndScheduleId_.first = 0;
     challengeAndScheduleId_.second = 0;
 }
 
-bool UserIDMMoudle::CheckChallenge(uint64_t& challenge)
+bool UserIDMModule::CheckChallenge(uint64_t& challenge)
 {
     std::lock_guard<std::mutex> idmMutexGuard(mutex_);
-    USERIDM_HILOGI(MODULE_SERVICE, "Data moudle CheckChallenge enter");
+    USERIDM_HILOGI(MODULE_SERVICE, "Data module CheckChallenge enter");
     bool res = false;
 
     if (challengeAndScheduleId_.first == 0) {
@@ -80,10 +81,10 @@ bool UserIDMMoudle::CheckChallenge(uint64_t& challenge)
     return res;
 }
 
-bool UserIDMMoudle::CheckScheduleIdIsActive(uint64_t& scheduleId)
+bool UserIDMModule::CheckScheduleIdIsActive(uint64_t& scheduleId)
 {
     std::lock_guard<std::mutex> idmMutexGuard(mutex_);
-    USERIDM_HILOGI(MODULE_SERVICE, "Data moudle CheckScheduleIdIsActive enter");
+    USERIDM_HILOGI(MODULE_SERVICE, "Data module CheckScheduleIdIsActive enter");
     bool res = false;
 
     if (challengeAndScheduleId_.second == 0) {

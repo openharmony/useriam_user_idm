@@ -17,6 +17,7 @@
 
 #include "useridm_hilog_wrapper.h"
 #include "useridm_stub.h"
+
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
@@ -44,8 +45,7 @@ int32_t UserIDMStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Message
         USERIDM_HILOGE(MODULE_SERVICE, "UserIDMStub::OnRemoteRequest failed, descriptor is not matched!");
         return FAIL;
     }
-    typedef std::map<int32_t, PHandle>::const_iterator CI;
-    CI iter = m_handle_.find(code);
+    std::map<int32_t, PHandle>::const_iterator iter = m_handle_.find(code);
     if (iter == m_handle_.end()) {
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -57,9 +57,7 @@ int32_t UserIDMStub::OpenSessionStub(MessageParcel& data, MessageParcel& reply)
 {
     USERIDM_HILOGD(MODULE_SERVICE, "OpenSessionStub enter");
 
-    uint64_t ret = 0;
-
-    ret = OpenSession();
+    uint64_t ret = OpenSession();
     if (!reply.WriteUint64(ret)) {
         USERIDM_HILOGE(MODULE_SERVICE, "failed to WriteUint64(ret)");
         return FAIL;
