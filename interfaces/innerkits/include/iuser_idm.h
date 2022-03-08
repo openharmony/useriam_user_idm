@@ -25,7 +25,7 @@ namespace UserIDM {
 class IUserIDM : public IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.useridm.IUserIDM");
-    
+
     /**
      * @brief openSession before PIN or FACE handle
      *
