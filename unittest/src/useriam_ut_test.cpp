@@ -124,7 +124,7 @@ HWTEST_F(UseriamUtTest, UseriamUtTest_005, TestSize.Level1)
 HWTEST_F(UseriamUtTest, UseriamUtTest_005b, TestSize.Level1)
 {
     AddCredInfo cre;
-    cre.authType=FACE;
+    cre.authType = FACE;
     std::shared_ptr<IDMCallback> call = std::make_shared<IDMCallbackUT>();
     USERIDM_HILOGI(MODULE_CLIENT, " UseriamUtTest_005b  enter");
     UserIDMClient::GetInstance().OpenSession();
@@ -133,7 +133,7 @@ HWTEST_F(UseriamUtTest, UseriamUtTest_005b, TestSize.Level1)
 HWTEST_F(UseriamUtTest, UseriamUtTest_005c, TestSize.Level1)
 {
     AddCredInfo cre;
-    cre.authType=PIN;
+    cre.authType = PIN;
     std::shared_ptr<IDMCallback> call = nullptr;
     USERIDM_HILOGI(MODULE_CLIENT, " UseriamUtTest_005c  enter");
     UserIDMClient::GetInstance().OpenSession();
@@ -142,7 +142,7 @@ HWTEST_F(UseriamUtTest, UseriamUtTest_005c, TestSize.Level1)
 HWTEST_F(UseriamUtTest, UseriamUtTest_005d, TestSize.Level1)
 {
     AddCredInfo cre;
-    cre.authType=PIN;
+    cre.authType = PIN;
     std::shared_ptr<IDMCallback> call = std::make_shared<IDMCallbackUT>();
     USERIDM_HILOGI(MODULE_CLIENT, " UseriamUtTest_005d  enter");
     UserIDMClient::GetInstance().OpenSession();
@@ -173,15 +173,15 @@ HWTEST_F(UseriamUtTest, UseriamUtTest_007, TestSize.Level1)
 }
 HWTEST_F(UseriamUtTest, UseriamUtTest_008, TestSize.Level1)
 {
-    uint32_t userid =1;
+    uint32_t userid = 0;
     std::shared_ptr<IDMCallback> call = nullptr;
     USERIDM_HILOGI(MODULE_CLIENT, " UseriamUtTest_008  enter");
     int32_t ret = UserIDMClient::GetInstance().EnforceDelUser(userid, call);
-    EXPECT_EQ(SUCCESS, ret);
+    EXPECT_NE(SUCCESS, ret);
 }
 HWTEST_F(UseriamUtTest, UseriamUtTest_008b, TestSize.Level1)
 {
-    uint32_t userid =1;
+    uint32_t userid = 1;
     std::shared_ptr<IDMCallback> call = std::make_shared<IDMCallbackUT>();
     USERIDM_HILOGI(MODULE_CLIENT, " UseriamUtTest_008b  enter");
     int32_t ret = UserIDMClient::GetInstance().EnforceDelUser(userid, call);
@@ -246,7 +246,7 @@ HWTEST_F(UseriamUtTest, UseriamUtTest_011c, TestSize.Level1)
 }
 HWTEST_F(UseriamUtTest, UseriamUtTest_011d, TestSize.Level1)
 {
-    AuthType aut=FACE;
+    AuthType aut = FACE;
     int32_t userId = 0;
     std::shared_ptr<GetInfoCallback> call = std::make_shared<GetInfoCallbackUT>();
     USERIDM_HILOGI(MODULE_CLIENT, " UseriamUtTest_011d  enter");
