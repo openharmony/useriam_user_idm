@@ -59,10 +59,11 @@ public:
 
     /**
      * @brief get sec info
+     * @param userId user id.
      * @param callback The callback function provided for caller to handle response data.
      * @return void.
      */
-    virtual int32_t GetSecInfo(const sptr<IGetSecInfoCallback>& callback) = 0;
+    virtual int32_t GetSecInfo(int32_t userId, const sptr<IGetSecInfoCallback>& callback) = 0;
 
     /**
      * @brief add Credential info

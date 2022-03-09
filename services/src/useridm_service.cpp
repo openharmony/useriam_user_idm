@@ -158,33 +158,21 @@ int32_t UserIDMService::GetAuthInfo(int32_t userId, AuthType authType, const spt
     return ret;
 }
 
-int32_t UserIDMService::GetSecInfo(const sptr<IGetSecInfoCallback>& callback)
+int32_t UserIDMService::GetSecInfo(int32_t userId, const sptr<IGetSecInfoCallback>& callback)
 {
     USERIDM_HILOGD(MODULE_SERVICE, "service GetSecInfo enter");
-    if (!CheckPermission(USE_USER_IDM_PERMISSION)) {
-        USERIDM_HILOGE(MODULE_SERVICE, "check permission failed");
-        return CHECK_PERMISSION_FAILED;
-    }
-
-    int32_t userId = 0;
-
-    int32_t ret = this->GetCallingUserID(userId);
-    if (ret != SUCCESS) {
-        USERIDM_HILOGE(MODULE_SERVICE, "Failed to get userId");
-        return ret;
-    }
-    SecInfo secInfos;
-    ret = idmController_.GetSecureInfoCtrl(userId, secInfos.secureUid, secInfos.enrolledInfo);
-    if (ret != SUCCESS) {
+    SecInfo secInfos = {};
+    if (idmController_.GetSecureInfoCtrl(userId, secInfos.secureUid, secInfos.enrolledInfo) != SUCCESS ||
+        secInfos.enrolledInfo.size() > UINT32_MAX) {
         USERIDM_HILOGE(MODULE_SERVICE, "GetSecureInfoCtrl failed");
+        callback->OnGetSecInfo(secInfos);
+        return FAIL;
     }
 
     secInfos.enrolledInfoLen = secInfos.enrolledInfo.size();
-    USERIDM_HILOGI(MODULE_SERVICE, "SecInfo enrolledInfoLen is %u", secInfos.enrolledInfoLen);
-
+    USERIDM_HILOGI(MODULE_SERVICE, "SecInfo enrolledInfoLen is %{public}u", secInfos.enrolledInfoLen);
     callback->OnGetSecInfo(secInfos);
-
-    return ret;
+    return SUCCESS;
 }
 
 void UserIDMService::AddCredential(AddCredInfo& credInfo, const sptr<IIDMCallback>& callback)
