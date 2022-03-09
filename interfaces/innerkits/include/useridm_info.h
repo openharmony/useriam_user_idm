@@ -31,6 +31,10 @@ enum CoAuthType {
 
 enum AuthType {
         /**
+         * Authentication type all.
+         */
+        ALL = 0,
+        /**
          * Authentication type pin.
          */
         PIN = 1,

@@ -121,13 +121,14 @@ int32_t UserIDMStub::GetSecInfoStub(MessageParcel& data, MessageParcel& reply)
 {
     USERIDM_HILOGD(MODULE_SERVICE, "GetSecInfoStub enter");
 
+    int32_t userId = data.ReadInt32();
     sptr<IGetSecInfoCallback> callback = iface_cast<IGetSecInfoCallback>(data.ReadRemoteObject());
     if (callback == nullptr) {
         USERIDM_HILOGE(MODULE_SERVICE, "callback is nullptr");
         return ERR_INVALID_VALUE;
     }
 
-    int32_t ret = GetSecInfo(callback); // Get user security ID [to service]
+    int32_t ret = GetSecInfo(userId, callback); // Get user security ID [to service]
     if (!reply.WriteInt32(ret)) {
         USERIDM_HILOGE(MODULE_SERVICE, "failed to WriteInt32(ret)");
         return FAIL;

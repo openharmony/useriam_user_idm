@@ -100,16 +100,18 @@ HWTEST_F(UseriamUtTest, UseriamUtTest_003d, TestSize.Level1)
 }
 HWTEST_F(UseriamUtTest, UseriamUtTest_004, TestSize.Level1)
 {
+    uint32_t userid = 1;
     std::shared_ptr<GetSecInfoCallback> call = nullptr;
     USERIDM_HILOGI(MODULE_CLIENT, " UseriamUtTest_004  enter");
-    int32_t ret = UserIDMClient::GetInstance().GetSecInfo(call);
+    int32_t ret = UserIDMClient::GetInstance().GetSecInfo(userid, call);
     EXPECT_NE(SUCCESS, ret);
 }
 HWTEST_F(UseriamUtTest, UseriamUtTest_004b, TestSize.Level1)
 {
+    uint32_t userid = 1;
     std::shared_ptr<GetSecInfoCallback> call = std::make_shared<GetSecInfoCallbackUT>();
     USERIDM_HILOGI(MODULE_CLIENT, " UseriamUtTest_004b  enter");
-    int32_t ret = UserIDMClient::GetInstance().GetSecInfo(call);
+    int32_t ret = UserIDMClient::GetInstance().GetSecInfo(userid, call);
     EXPECT_NE(SUCCESS, ret);
 }
 HWTEST_F(UseriamUtTest, UseriamUtTest_005, TestSize.Level1)
