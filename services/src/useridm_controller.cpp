@@ -283,7 +283,6 @@ int32_t UserIDMController::DelFaceCredentialCtrl(AuthType authType, AuthSubType 
 int32_t UserIDMController::DelExecutorPinInfoCtrl(const sptr<IIDMCallback>& innerCallback,
                                                   std::vector<CredentialInfo>& info)
 {
-    // 拼写错误
     USERIDM_HILOGD(MODULE_SERVICE, "DelExecutorPinInfoCtrl enter: info.size(): %{public}zu.", info.size());
 
     if (info.size() < MIN_VECTOR_SIZE) {
