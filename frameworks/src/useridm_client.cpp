@@ -165,7 +165,7 @@ int32_t UserIDMClient::GetAuthInfo(AuthType authType, const std::shared_ptr<GetI
     return res;
 }
 
-int32_t UserIDMClient::GetSecInfo(const std::shared_ptr<GetSecInfoCallback>& napiCallback)
+int32_t UserIDMClient::GetSecInfo(int32_t userId, const std::shared_ptr<GetSecInfoCallback>& napiCallback)
 {
     USERIDM_HILOGD(MODULE_CLIENT, "GetSecInfo enter");
 
@@ -182,7 +182,7 @@ int32_t UserIDMClient::GetSecInfo(const std::shared_ptr<GetSecInfoCallback>& nap
 
     sptr<IGetSecInfoCallback> callbackStub = new UserIDMGetSecInfoCallbackStub(napiCallback);
 
-    int32_t res = proxy->GetSecInfo(callbackStub);
+    int32_t res = proxy->GetSecInfo(userId, callbackStub);
 
     return res;
 }

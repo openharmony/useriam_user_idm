@@ -118,13 +118,18 @@ int32_t UserIDMProxy::GetAuthInfo(int32_t userId, AuthType authType, const sptr<
     return result;
 }
 
-int32_t UserIDMProxy::GetSecInfo(const sptr<IGetSecInfoCallback>& callback)
+int32_t UserIDMProxy::GetSecInfo(int32_t userId, const sptr<IGetSecInfoCallback>& callback)
 {
     MessageParcel data;
     MessageParcel reply;
 
     if (!data.WriteInterfaceToken(UserIDMProxy::GetDescriptor())) {
         USERIDM_HILOGI(MODULE_CLIENT, "write descriptor failed!");
+        return FAIL;
+    }
+
+    if (!data.WriteInt32(userId)) {
+        USERIDM_HILOGE(MODULE_CLIENT, "failed to WriteInt32(userId).");
         return FAIL;
     }
 
