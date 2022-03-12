@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -101,14 +101,14 @@ napi_value OpenSessionRet(napi_env env, AsyncOpenSession* asyncOpenSession)
         USERIDM_HILOGE(MODULE_JS_NAPI, "OpenSessionRet asyncOpenSession is nullptr");
         return nullptr;
     }
-    size_t length = sizeof(asyncOpenSession->openSession);
     void* data = nullptr;
     napi_value arrayBuffer = nullptr;
-    size_t bufferSize = length;
+    size_t bufferSize = sizeof(asyncOpenSession->openSession);
     NAPI_CALL(env, napi_create_arraybuffer(env, bufferSize, &data, &arrayBuffer));
     if (memcpy_s(data, bufferSize, reinterpret_cast<const void*>(&asyncOpenSession->openSession),
         bufferSize) != EOK) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "memcpy_s fail.");
+        return nullptr;
     }
     napi_value result = nullptr;
     NAPI_CALL(env, napi_create_typedarray(env, napi_uint8_array, bufferSize, arrayBuffer, 0, &result));
@@ -123,6 +123,8 @@ napi_value UserIdentityManager::OpenSessionCallback(napi_env env, napi_value *ar
     if (argv == nullptr || asyncInfo == nullptr) {
         return nullptr;
     }
+    napi_value result = nullptr;
+    NAPI_CALL(env, napi_get_null(env, &result));
     napi_value resourceName = nullptr;
     NAPI_CALL(env, napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName));
     NAPI_CALL(env, napi_create_async_work(
@@ -137,16 +139,16 @@ napi_value UserIdentityManager::OpenSessionCallback(napi_env env, napi_value *ar
             AsyncOpenSession *asyncInfo = (AsyncOpenSession*)data;
             if (asyncInfo != nullptr) {
                 napi_value result[1] = {0};
-                napi_value callback_;
-                napi_value undefined;
-                napi_value callResult = ZERO_PARAMETER;
+                napi_value callback = nullptr;
+                napi_value undefined = nullptr;
+                napi_value callResult = nullptr;
                 result[0] = OpenSessionRet(env, asyncInfo);
                 if (result[0] == nullptr) {
                     USERIDM_HILOGE(MODULE_JS_NAPI, "translate uint64 to uint8Array failed");
                 }
                 napi_get_undefined(env, &undefined);
-                napi_get_reference_value(env, asyncInfo->callback, &callback_);
-                napi_call_function(env, undefined, callback_, 1, result, &callResult);
+                napi_get_reference_value(env, asyncInfo->callback, &callback);
+                napi_call_function(env, undefined, callback, 1, result, &callResult);
                 napi_delete_async_work(env, asyncInfo->asyncWork);
                 delete asyncInfo;
                 asyncInfo = nullptr;
@@ -154,8 +156,6 @@ napi_value UserIdentityManager::OpenSessionCallback(napi_env env, napi_value *ar
         },
         (void *)asyncInfo, &asyncInfo->asyncWork));
     NAPI_CALL(env, napi_queue_async_work(env, asyncInfo->asyncWork));
-    napi_value result = RESULT;
-    NAPI_CALL(env, napi_get_null(env, &result));
     return result;
 }
 

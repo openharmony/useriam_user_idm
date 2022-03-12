@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,8 +22,6 @@
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
-const int MIN_VECTOR_SIZE = 1;
-
 UserIDMController::UserIDMController()
 {
     USERIDM_HILOGD(MODULE_SERVICE, "UserIDMController constructor");
@@ -120,7 +118,7 @@ int32_t UserIDMController::AddCredentialCallCoauth(uint64_t callerID, AddCredInf
     paramInfo.SetCallerUid(callerID);
     std::shared_ptr<UserIDMCoAuthHandler> coAuthCallback;
 
-    USERIDM_HILOGE(MODULE_SERVICE, "credInfo.authType is [%{public}d]!", credInfo.authType);
+    USERIDM_HILOGI(MODULE_SERVICE, "credInfo.authType is [%{public}d]!", credInfo.authType);
     if (credInfo.authType == PIN) {
         coAuthCallback = std::make_shared<UserIDMCoAuthHandler>(ADD_PIN_CRED, challenge, scheduleId, data_,
             innerkitsCallback);
@@ -218,6 +216,10 @@ int32_t UserIDMController::UpdateCredentialCtrl(int32_t userId, uint64_t callerI
         data_->InsertScheduleId(scheduleId);
         std::shared_ptr<UserIDMCoAuthHandler> coAuthCallback =
             std::make_shared<UserIDMCoAuthHandler>(MODIFY_CRED, challenge, scheduleId, data_, innerkitsCallback);
+        sptr<IRemoteObject::DeathRecipient> dr = new CoAuthCallbackDeathRecipient(coAuthCallback);
+        if (!innerkitsCallback->AsObject()->AddDeathRecipient(dr)) {
+            USERIDM_HILOGE(MODULE_SERVICE, "Failed to add death recipient CoAuthCallbackDeathRecipient");
+        }
         CoAuth::AuthInfo paramInfo;
         paramInfo.SetPkgName(callerName);
         paramInfo.SetCallerUid(callerID);
@@ -233,26 +235,24 @@ int32_t UserIDMController::UpdateCredentialCtrl(int32_t userId, uint64_t callerI
 int32_t UserIDMController::DelSchedleIdCtrl(uint64_t challenge)
 {
     USERIDM_HILOGD(MODULE_SERVICE, "DelSchedleIdCtrl enter");
-
     int32_t result = FAIL;
-
-    // check challenge -> sessionId
     uint64_t sessionId = 0;
-    uint64_t lastCha = 0;
-    data_->CheckChallenge(lastCha);
-    bool res = data_->CheckScheduleIdIsActive(sessionId);
-    if (res && (lastCha == challenge)) {
-        result = CoAuth::CoAuth::GetInstance().Cancel(sessionId);
-        if (result == SUCCESS) {
-            // clean the sessionId
-            data_->DeleteSessionId();
-        } else {
-            USERIDM_HILOGE(MODULE_SERVICE, "Cancel Failed!");
-        }
-    } else {
-        USERIDM_HILOGE(MODULE_SERVICE, "Not same challenge num!");
+    uint64_t lastChallenge = 0;
+    data_->CheckChallenge(lastChallenge);
+    if (lastChallenge != challenge) {
+         USERIDM_HILOGE(MODULE_SERVICE, "Not same challenge num!");
+         return result;
     }
-
+    if (!data_->CheckScheduleIdIsActive(sessionId)) {
+        USERIDM_HILOGE(MODULE_SERVICE, "CheckScheduleIdIsActive fail!");
+        return result;
+    }
+    result = CoAuth::CoAuth::GetInstance().Cancel(sessionId);
+    if (result != SUCCESS) {
+        USERIDM_HILOGE(MODULE_SERVICE, "Cancel fail!");
+        return result;
+    }
+    data_->DeleteSessionId();
     return result;
 }
 
@@ -260,23 +260,24 @@ int32_t UserIDMController::DelFaceCredentialCtrl(AuthType authType, AuthSubType 
     uint64_t templateId, const sptr<IIDMCallback>& innerCallback)
 {
     USERIDM_HILOGD(MODULE_SERVICE, "DelFaceCredentialCtrl enter authType: %{public}d", authType);
-
-    if (authType == FACE) { // FACE
-        std::shared_ptr<UserIDMSetPropHandler> setPropCallback =
-            std::make_shared<UserIDMSetPropHandler>(FACE, 0, 0, credentialId, data_, innerCallback);
-        // set timeout in <UserIDMSetPropHandler>
-        AuthResPool::AuthAttributes condition;
-        condition.SetUint32Value(AuthAttributeType::AUTH_PROPERTY_MODE, 0);
-        condition.SetUint64Value(AuthAttributeType::AUTH_CALLER_UID, 0);
-        condition.SetUint32Value(AuthAttributeType::AUTH_TYPE, authType);
-        condition.SetUint64Value(AuthAttributeType::AUTH_SUBTYPE, authSubType);
-        condition.SetUint64Value(AuthAttributeType::AUTH_CREDENTIAL_ID, credentialId);
-        condition.SetUint64Value(AuthAttributeType::AUTH_TEMPLATE_ID, templateId);
-        CoAuth::CoAuth::GetInstance().SetExecutorProp(condition, setPropCallback);
-    } else {
+    if (authType != FACE) {
         USERIDM_HILOGE(MODULE_SERVICE, "authType error !");
+        return FAIL;
     }
-
+    std::shared_ptr<UserIDMSetPropHandler> setPropCallback =
+        std::make_shared<UserIDMSetPropHandler>(FACE, 0, 0, credentialId, data_, innerCallback);
+    sptr<IRemoteObject::DeathRecipient> dr = new SetPropCallbackDeathRecipient(setPropCallback);
+    if (!innerCallback->AsObject()->AddDeathRecipient(dr)) {
+        USERIDM_HILOGE(MODULE_SERVICE, "Failed to add death recipient SetPropCallbackDeathRecipient");
+    }
+    AuthResPool::AuthAttributes condition;
+    condition.SetUint32Value(AuthAttributeType::AUTH_PROPERTY_MODE, 0);
+    condition.SetUint64Value(AuthAttributeType::AUTH_CALLER_UID, 0);
+    condition.SetUint32Value(AuthAttributeType::AUTH_TYPE, authType);
+    condition.SetUint64Value(AuthAttributeType::AUTH_SUBTYPE, authSubType);
+    condition.SetUint64Value(AuthAttributeType::AUTH_CREDENTIAL_ID, credentialId);
+    condition.SetUint64Value(AuthAttributeType::AUTH_TEMPLATE_ID, templateId);
+    CoAuth::CoAuth::GetInstance().SetExecutorProp(condition, setPropCallback);
     return SUCCESS;
 }
 
@@ -285,7 +286,8 @@ int32_t UserIDMController::DelExecutorPinInfoCtrl(const sptr<IIDMCallback>& inne
 {
     USERIDM_HILOGD(MODULE_SERVICE, "DelExecutorPinInfoCtrl enter: info.size(): %{public}zu.", info.size());
 
-    if (info.size() < MIN_VECTOR_SIZE) {
+    const size_t minDelSize = 1;
+    if (info.size() < minDelSize) {
         USERIDM_HILOGE(MODULE_SERVICE, "info size error!: %{public}zu.", info.size());
         RequestResult reqRet;
         innerCallback->OnResult(FAIL, reqRet);
@@ -318,6 +320,46 @@ int32_t UserIDMController::DelExecutorPinInfoCtrl(const sptr<IIDMCallback>& inne
         }
     }   // end for
     return SUCCESS;
+}
+
+UserIDMController::CoAuthCallbackDeathRecipient::CoAuthCallbackDeathRecipient(
+    std::shared_ptr<UserIDMCoAuthHandler> callback) : callback_(callback)
+{
+}
+
+void UserIDMController::CoAuthCallbackDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
+{
+    USERIDM_HILOGE(MODULE_SERVICE, "CoAuthCallbackDeathRecipient OnRemoteDied start");
+    if (remote == nullptr) {
+        USERIDM_HILOGE(MODULE_SERVICE, "CoAuthCallbackDeathRecipient OnRemoteDied failed, remote is nullptr");
+        return;
+    }
+    if (callback_ == nullptr) {
+        USERIDM_HILOGE(MODULE_SERVICE, "CoAuthCallbackDeathRecipient OnRemoteDied callback_ is nullptr");
+        return;
+    }
+    callback_->ResetCallback();
+    callback_ = nullptr;
+}
+
+UserIDMController::SetPropCallbackDeathRecipient::SetPropCallbackDeathRecipient(
+    std::shared_ptr<UserIDMSetPropHandler> callback) : callback_(callback)
+{
+}
+
+void UserIDMController::SetPropCallbackDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
+{
+    USERIDM_HILOGE(MODULE_SERVICE, "SetPropCallbackDeathRecipient OnRemoteDied start");
+    if (remote == nullptr) {
+        USERIDM_HILOGE(MODULE_SERVICE, "SetPropCallbackDeathRecipient OnRemoteDied failed, remote is nullptr");
+        return;
+    }
+    if (callback_ == nullptr) {
+        USERIDM_HILOGE(MODULE_SERVICE, "SetPropCallbackDeathRecipient OnRemoteDied callback_ is nullptr");
+        return;
+    }
+    callback_->ResetCallback();
+    callback_ = nullptr;
 }
 }  // namespace UserIDM
 }  // namespace UserIAM

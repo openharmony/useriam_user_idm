@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -134,6 +134,6 @@ AsyncOpenSession* OCreateAsyncInfo(napi_env env);
 napi_value OpenSessionRet(napi_env env, AsyncOpenSession* asyncOpenSession);
 } // namespace UserIDM
 } // namespace UserIAM
-} // namespace ohos
+} // namespace OHOS
 
-#endif // AUTHFACE_USERIDM_NAPI_H
+#endif // USERIDENTITY_MANAGER_H

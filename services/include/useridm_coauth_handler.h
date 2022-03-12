@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 
 #ifndef USERIDM_COAUTH_HANDLER_PROXY_H
 #define USERIDM_COAUTH_HANDLER_PROXY_H
@@ -36,18 +35,7 @@ public:
 
     void OnFinish(uint32_t resultCode, std::vector<uint8_t>& scheduleToken) override;
     void OnAcquireInfo(uint32_t acquire) override;
-
-private:
-    // add death recipient
-    class CoAuthCallbackDeathRecipient : public IRemoteObject::DeathRecipient {
-    public:
-        CoAuthCallbackDeathRecipient(UserIDMCoAuthHandler* parent);
-        ~CoAuthCallbackDeathRecipient() = default;
-        void OnRemoteDied(const wptr<IRemoteObject>& remote) override;
-    private:
-        UserIDMCoAuthHandler* parent_;
-        DISALLOW_COPY_AND_MOVE(CoAuthCallbackDeathRecipient);
-    };
+    void ResetCallback();
 
 private:
     int32_t OnFinishModify(uint32_t resultCode, std::vector<uint8_t>& scheduleToken, uint64_t& credentialId);
@@ -56,6 +44,7 @@ private:
     std::shared_ptr<UserIDMModule> dataCallback_;
     sptr<IIDMCallback> innerCallback_;
     CoAuthType type_; // 0: add cred 1: modify cred
+    std::mutex mutex_;
 };
 }  // namespace UserIDM
 }  // namespace UserIAM
