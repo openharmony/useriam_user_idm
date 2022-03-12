@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,16 +33,17 @@ namespace {
 const int PARAMTWO = 2;
 const int PARAMTHREE = 3;
 }
-napi_value GetAuthInfoRet(napi_env env, uint64_t Ret)
+napi_value GetAuthInfoRet(napi_env env, uint64_t ret)
 {
     USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
-    size_t length = sizeof(Ret);
+    size_t length = sizeof(ret);
     void* data = nullptr;
     napi_value arrayBuffer = nullptr;
     size_t bufferSize = length;
     NAPI_CALL(env, napi_create_arraybuffer(env, bufferSize, &data, &arrayBuffer));
-    if (memcpy_s(data, bufferSize, reinterpret_cast<const void*>(&Ret), bufferSize) != EOK) {
+    if (memcpy_s(data, bufferSize, reinterpret_cast<const void*>(&ret), bufferSize) != EOK) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "memcpy_s failed");
+        return nullptr;
     }
     napi_value result = nullptr;
     NAPI_CALL(env, napi_create_typedarray(env, napi_uint8_array, bufferSize, arrayBuffer, 0, &result));
@@ -102,12 +103,12 @@ static void OnResultWork(uv_work_t* work, int status)
         USERIDM_HILOGE(MODULE_JS_NAPI, "create object failed");
         goto EXIT;
     }
-    napiStatus =napi_get_reference_value(env, asyncCallbackContext->callbackInfo.onResult, &callbackRef);
+    napiStatus = napi_get_reference_value(env, asyncCallbackContext->callbackInfo.onResult, &callbackRef);
     if (napiStatus != napi_ok) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "napi_get_reference_value failed");
         goto EXIT;
     }
-    napiStatus =napi_get_global(env, &global);
+    napiStatus = napi_get_global(env, &global);
     if (napiStatus != napi_ok) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "napi_get_global failed");
         goto EXIT;
@@ -296,14 +297,12 @@ static AsyncGetAuthInfo *CopyAsyncGetAuthInfo(AsyncGetAuthInfo *asyncGetAuthInfo
 
 static void OnGetInfoPromiseWork(AsyncGetAuthInfo *asyncGetAuthInfo)
 {
-    napi_value result[ONE_PARAMETER] = {0};
-    result[ZERO_PARAMETER] = CreateCredentialInfo(asyncGetAuthInfo);
-    if (result[ZERO_PARAMETER] == nullptr) {
+    napi_value result = CreateCredentialInfo(asyncGetAuthInfo);
+    if (result == nullptr) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "createCredentialInfo failed");
         return;
     }
-    napi_value retPromise = result[ZERO_PARAMETER];
-    napi_status napiStatus = napi_resolve_deferred(asyncGetAuthInfo->env, asyncGetAuthInfo->deferred, retPromise);
+    napi_status napiStatus = napi_resolve_deferred(asyncGetAuthInfo->env, asyncGetAuthInfo->deferred, result);
     if (napiStatus != napi_ok) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "napi_resolve_deferred failed");
         return;
@@ -312,12 +311,11 @@ static void OnGetInfoPromiseWork(AsyncGetAuthInfo *asyncGetAuthInfo)
 
 static void OnGetInfoCallbackWork(AsyncGetAuthInfo *asyncGetAuthInfo)
 {
-    napi_value result[ONE_PARAMETER] = {0};
     napi_value callback;
     napi_value global;
     napi_value callbackRet = 0;
-    result[ZERO_PARAMETER] = CreateCredentialInfo(asyncGetAuthInfo);
-    if (result[ZERO_PARAMETER] == nullptr) {
+    napi_value result = CreateCredentialInfo(asyncGetAuthInfo);
+    if (result == nullptr) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "createCredentialInfo failed");
         return;
     }
@@ -331,7 +329,7 @@ static void OnGetInfoCallbackWork(AsyncGetAuthInfo *asyncGetAuthInfo)
         USERIDM_HILOGE(MODULE_JS_NAPI, "napi_get_global failed");
         return;
     }
-    napiStatus = napi_call_function(asyncGetAuthInfo->env, global, callback, 1, result, &callbackRet);
+    napiStatus = napi_call_function(asyncGetAuthInfo->env, global, callback, ONE_PARAMETER, &result, &callbackRet);
     if (napiStatus != napi_ok) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "napi_call_function failed");
         return;

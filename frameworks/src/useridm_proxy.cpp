@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -45,13 +45,13 @@ void UserIDMProxy::CloseSession()
     MessageParcel reply;
 
     if (!data.WriteInterfaceToken(UserIDMProxy::GetDescriptor())) {
-        USERIDM_HILOGI(MODULE_CLIENT, "write descriptor failed!");
+        USERIDM_HILOGE(MODULE_CLIENT, "write descriptor failed!");
         return;
     }
 
     bool ret = SendRequest(USERIDM_CLOSE_SESSION, data, reply);
     if (ret) {
-        USERIDM_HILOGI(MODULE_CLIENT, "ret = %{public}d", ret);
+        USERIDM_HILOGE(MODULE_CLIENT, "ret = %{public}d", ret);
     }
 }
 
@@ -61,7 +61,7 @@ int32_t UserIDMProxy::GetAuthInfo(AuthType authType, const sptr<IGetInfoCallback
     MessageParcel reply;
 
     if (!data.WriteInterfaceToken(UserIDMProxy::GetDescriptor())) {
-        USERIDM_HILOGI(MODULE_CLIENT, "write descriptor failed!");
+        USERIDM_HILOGE(MODULE_CLIENT, "write descriptor failed!");
         return FAIL;
     }
 
@@ -90,7 +90,7 @@ int32_t UserIDMProxy::GetAuthInfo(int32_t userId, AuthType authType, const sptr<
     MessageParcel reply;
 
     if (!data.WriteInterfaceToken(UserIDMProxy::GetDescriptor())) {
-        USERIDM_HILOGI(MODULE_CLIENT, "write descriptor failed!");
+        USERIDM_HILOGE(MODULE_CLIENT, "write descriptor failed!");
         return FAIL;
     }
 
@@ -124,7 +124,7 @@ int32_t UserIDMProxy::GetSecInfo(int32_t userId, const sptr<IGetSecInfoCallback>
     MessageParcel reply;
 
     if (!data.WriteInterfaceToken(UserIDMProxy::GetDescriptor())) {
-        USERIDM_HILOGI(MODULE_CLIENT, "write descriptor failed!");
+        USERIDM_HILOGE(MODULE_CLIENT, "write descriptor failed!");
         return FAIL;
     }
 
@@ -153,7 +153,7 @@ void UserIDMProxy::AddCredential(AddCredInfo& credInfo, const sptr<IIDMCallback>
     MessageParcel reply;
 
     if (!data.WriteInterfaceToken(UserIDMProxy::GetDescriptor())) {
-        USERIDM_HILOGI(MODULE_CLIENT, "write descriptor failed!");
+        USERIDM_HILOGE(MODULE_CLIENT, "write descriptor failed!");
         return;
     }
 
@@ -186,7 +186,7 @@ void UserIDMProxy::UpdateCredential(AddCredInfo& credInfo, const sptr<IIDMCallba
     MessageParcel reply;
 
     if (!data.WriteInterfaceToken(UserIDMProxy::GetDescriptor())) {
-        USERIDM_HILOGI(MODULE_CLIENT, "write descriptor failed!");
+        USERIDM_HILOGE(MODULE_CLIENT, "write descriptor failed!");
         return;
     }
 
@@ -219,7 +219,7 @@ int32_t UserIDMProxy::Cancel(uint64_t challenge)
     MessageParcel reply;
 
     if (!data.WriteInterfaceToken(UserIDMProxy::GetDescriptor())) {
-        USERIDM_HILOGI(MODULE_CLIENT, "write descriptor failed!");
+        USERIDM_HILOGE(MODULE_CLIENT, "write descriptor failed!");
         return FAIL;
     }
 
@@ -243,7 +243,7 @@ int32_t UserIDMProxy::EnforceDelUser(int32_t userId, const sptr<IIDMCallback>& c
     MessageParcel reply;
 
     if (!data.WriteInterfaceToken(UserIDMProxy::GetDescriptor())) {
-        USERIDM_HILOGI(MODULE_CLIENT, "write descriptor failed!");
+        USERIDM_HILOGE(MODULE_CLIENT, "write descriptor failed!");
         return FAIL;
     }
 
@@ -272,7 +272,7 @@ void UserIDMProxy::DelUser(std::vector<uint8_t> authToken, const sptr<IIDMCallba
     MessageParcel reply;
 
     if (!data.WriteInterfaceToken(UserIDMProxy::GetDescriptor())) {
-        USERIDM_HILOGI(MODULE_CLIENT, "write descriptor failed!");
+        USERIDM_HILOGE(MODULE_CLIENT, "write descriptor failed!");
         return;
     }
 
@@ -295,7 +295,7 @@ void UserIDMProxy::DelCred(uint64_t credentialId, std::vector<uint8_t> authToken
     MessageParcel reply;
 
     if (!data.WriteInterfaceToken(UserIDMProxy::GetDescriptor())) {
-        USERIDM_HILOGI(MODULE_CLIENT, "write descriptor failed!");
+        USERIDM_HILOGE(MODULE_CLIENT, "write descriptor failed!");
         return;
     }
 

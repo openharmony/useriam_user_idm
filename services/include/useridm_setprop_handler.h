@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,18 +31,7 @@ public:
     virtual ~UserIDMSetPropHandler() = default;
 
     void OnResult(uint32_t result, std::vector<uint8_t> &extraInfo) override;
-
-private:
-    // add cred death recipient
-    class SetPropCallbackDeathRecipient : public IRemoteObject::DeathRecipient {
-    public:
-        SetPropCallbackDeathRecipient(UserIDMSetPropHandler* parent);
-        ~SetPropCallbackDeathRecipient() = default;
-        void OnRemoteDied(const wptr<IRemoteObject>& remote) override;
-    private:
-        UserIDMSetPropHandler* parent_;
-        DISALLOW_COPY_AND_MOVE(SetPropCallbackDeathRecipient);
-    };
+    void ResetCallback();
 
 private:
     uint64_t lastChallenge_;
@@ -51,6 +40,7 @@ private:
     std::shared_ptr<UserIDMModule> propDataCallback_;
     sptr<IIDMCallback> propInnerCallback_;
     AuthType type_; // 0: add cred 1: modify cred
+    std::mutex mutex_;
 };
 }  // namespace UserIDM
 }  // namespace UserIAM

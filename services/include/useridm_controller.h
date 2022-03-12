@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -52,6 +52,26 @@ public:
     int32_t DelExecutorPinInfoCtrl(const sptr<IIDMCallback>& innerCallback, std::vector<CredentialInfo>& info);
 
 private:
+    class CoAuthCallbackDeathRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        CoAuthCallbackDeathRecipient(std::shared_ptr<UserIDMCoAuthHandler> callback);
+        ~CoAuthCallbackDeathRecipient() = default;
+        void OnRemoteDied(const wptr<IRemoteObject>& remote) override;
+    private:
+        std::shared_ptr<UserIDMCoAuthHandler> callback_;
+        DISALLOW_COPY_AND_MOVE(CoAuthCallbackDeathRecipient);
+    };
+
+    class SetPropCallbackDeathRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        SetPropCallbackDeathRecipient(std::shared_ptr<UserIDMSetPropHandler> callback);
+        ~SetPropCallbackDeathRecipient() = default;
+        void OnRemoteDied(const wptr<IRemoteObject>& remote) override;
+    private:
+        std::shared_ptr<UserIDMSetPropHandler> callback_;
+        DISALLOW_COPY_AND_MOVE(SetPropCallbackDeathRecipient);
+    };
+
     std::shared_ptr<UserIDMModule> data_;
 };
 }  // namespace UserIDM
