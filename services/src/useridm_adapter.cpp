@@ -57,7 +57,7 @@ int32_t UserIDMAdapter::QueryCredential(int32_t userId, AuthType authType,
 
     size_t vectorSize = taInfos.size();
     if (vectorSize > 0) {
-        for (uint32_t i = 0; i < vectorSize; i++) {
+        for (size_t i = 0; i < vectorSize; i++) {
             OHOS::UserIAM::UserIDM::Hal::CredentialInfo taInfo = taInfos[i];
             OHOS::UserIAM::UserIDM::CredentialInfo credInfo;
             credInfo.authSubType = OHOS::UserIAM::UserIDM::AuthSubType(taInfo.authSubType);
@@ -85,7 +85,7 @@ int32_t UserIDMAdapter::GetSecureUid(int32_t userId, uint64_t& secureUid,
     }
     size_t vectorSize = taInfos.size();
     if (vectorSize > 0) {
-        for (uint32_t i = 0; i < vectorSize; i++) {
+        for (size_t i = 0; i < vectorSize; i++) {
             OHOS::UserIAM::UserIDM::EnrolledInfo enrollInfo;
             enrollInfo.authType = OHOS::UserIAM::UserIDM::AuthType(taInfos[i].authType);
             enrollInfo.enrolledId = taInfos[i].enrolledId;
@@ -143,7 +143,7 @@ int32_t UserIDMAdapter::DeleteUser(int32_t userId, std::vector<uint8_t> authToke
     size_t vectorSize = taInfos.size();
     USERIDM_HILOGI(MODULE_SERVICE, "taInfos.size() %{public}zu", vectorSize);
     if (vectorSize > 0) {
-        for (uint32_t i = 0; i < vectorSize; i++) {
+        for (size_t i = 0; i < vectorSize; i++) {
             OHOS::UserIAM::UserIDM::CredentialInfo credInfo;
             credInfo.authSubType = OHOS::UserIAM::UserIDM::AuthSubType(taInfos[i].authSubType);
             credInfo.authType = OHOS::UserIAM::UserIDM::AuthType(taInfos[i].authType);
@@ -171,7 +171,7 @@ int32_t UserIDMAdapter::DeleteUserEnforce(int32_t userId,
     }
     size_t vectorSize = taInfos.size();
     if (vectorSize > 0) {
-        for (uint32_t i = 0; i < vectorSize; i++) {
+        for (size_t i = 0; i < vectorSize; i++) {
             OHOS::UserIAM::UserIDM::CredentialInfo credInfo;
             credInfo.authSubType = OHOS::UserIAM::UserIDM::AuthSubType(taInfos[i].authSubType);
             credInfo.authType = OHOS::UserIAM::UserIDM::AuthType(taInfos[i].authType);
