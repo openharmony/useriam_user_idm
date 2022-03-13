@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -69,16 +69,12 @@ bool UserIDMModule::CheckChallenge(uint64_t& challenge)
 {
     std::lock_guard<std::mutex> idmMutexGuard(mutex_);
     USERIDM_HILOGI(MODULE_SERVICE, "Data module CheckChallenge enter");
-    bool res = false;
-
     if (challengeAndScheduleId_.first == 0) {
         USERIDM_HILOGE(MODULE_SERVICE, "no session num!");
-    } else {
-        challenge = challengeAndScheduleId_.first;
-        res = true;
+        return false;
     }
-
-    return res;
+    challenge = challengeAndScheduleId_.first;
+    return true;
 }
 
 bool UserIDMModule::CheckScheduleIdIsActive(uint64_t& scheduleId)
