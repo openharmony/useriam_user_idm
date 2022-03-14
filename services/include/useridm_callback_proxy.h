@@ -13,12 +13,10 @@
  * limitations under the License.
  */
 
-
 #ifndef USERIDM_CALLBACK_PROXY_H
 #define USERIDM_CALLBACK_PROXY_H
 
 #include <iremote_proxy.h>
-
 #include "iuseridm_callback.h"
 
 namespace OHOS {

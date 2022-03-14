@@ -12,11 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include "authface_userIDM_helper.h"
 #include <iremote_broker.h>
 #include "useridm_info.h"
 #include "useridm_hilog_wrapper.h"
 #include "useridentity_manager.h"
-#include "authface_userIDM_helper.h"
 
 namespace OHOS {
 namespace UserIAM {

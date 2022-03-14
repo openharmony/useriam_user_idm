@@ -13,15 +13,14 @@
  * limitations under the License.
  */
 
+#include "useridm_client.h"
 #include <if_system_ability_manager.h>
 #include <iservice_registry.h>
 #include <system_ability_definition.h>
-
 #include "useridm_callback_stub.h"
 #include "useridm_getinfo_callback_stub.h"
 #include "useridm_getsecinfo_callback_stub.h"
 #include "useridm_hilog_wrapper.h"
-#include "useridm_client.h"
 
 namespace OHOS {
 namespace UserIAM {

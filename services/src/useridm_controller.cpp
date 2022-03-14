@@ -13,11 +13,10 @@
  * limitations under the License.
  */
 
+#include "useridm_controller.h"
 #include "useridm_callback_proxy.h"
 #include "useridm_hilog_wrapper.h"
 #include "useridm_adapter.h"
-#include "inner_event.h"
-#include "useridm_controller.h"
 
 namespace OHOS {
 namespace UserIAM {

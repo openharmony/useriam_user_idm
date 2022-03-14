@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "useridentity_manager.h"
 #include <cstdio>
 #include <string>
 #include <sstream>
@@ -25,7 +26,6 @@
 #include "napi/native_api.h"
 #include "napi/native_common.h"
 #include "authface_userIDM_helper.h"
-#include "useridentity_manager.h"
 
 namespace OHOS {
 namespace UserIAM {

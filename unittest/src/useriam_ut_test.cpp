@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
+#include "useridm_ut_test.h"
 #include <fstream>
 #include <iomanip>
-
 #include <gtest/gtest.h>
 #include "useridm_client.h"
 #include "useridm_callback_test.h"
 #include "useridm_hilog_wrapper.h"
-#include "useridm_test.h"
+
 using namespace testing::ext;
 namespace OHOS {
 namespace UserIAM {

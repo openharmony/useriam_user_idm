@@ -12,8 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef USERIDM_TEST_H
-#define USERIDM_TEST_H
+ 
+#ifndef USERIDM_UT_TEST_H
+#define USERIDM_UT_TEST_H
 
 void UseriamUtTest_001(void);
 void UseriamUtTest_002(void);

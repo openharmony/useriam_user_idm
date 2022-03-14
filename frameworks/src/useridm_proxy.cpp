@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
+#include "useridm_proxy.h"
 #include <cinttypes>
 #include "useridm_hilog_wrapper.h"
-#include "useridm_proxy.h"
 
 namespace OHOS {
 namespace UserIAM {

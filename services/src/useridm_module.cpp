@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "useridm_hilog_wrapper.h"
 #include "useridm_module.h"
+#include "useridm_hilog_wrapper.h"
 
 namespace OHOS {
 namespace UserIAM {

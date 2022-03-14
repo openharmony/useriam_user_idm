@@ -13,13 +13,11 @@
  * limitations under the License.
  */
 
-
 #ifndef USERIDM_STUB_H
 #define USERIDM_STUB_H
 
 #include <map>
 #include <iremote_stub.h>
-
 #include "iuser_idm.h"
 
 namespace OHOS {

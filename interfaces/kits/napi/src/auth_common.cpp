@@ -13,17 +13,16 @@
  * limitations under the License.
  */
 
+#include "auth_common.h"
 #include <cstdio>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <iremote_broker.h>
-
 #include "useridm_hilog_wrapper.h"
 #include "napi/native_api.h"
 #include "napi/native_common.h"
 #include "useridentity_manager.h"
-#include "auth_common.h"
 
 namespace OHOS {
 namespace UserIAM {
