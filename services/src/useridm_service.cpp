@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
+#include "useridm_service.h"
 #include "useriam_common.h"
 #include "accesstoken_kit.h"
-#include "useridm_service.h"
 
 namespace OHOS {
 namespace UserIAM {

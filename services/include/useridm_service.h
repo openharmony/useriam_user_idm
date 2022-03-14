@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 #ifndef USERIDM_SERVICE_H
 #define USERIDM_SERVICE_H
 
@@ -22,7 +21,6 @@
 #include <system_ability.h>
 #include <system_ability_definition.h>
 #include <string>
-
 #include "useridm_stub.h"
 #include "useridm_hilog_wrapper.h"
 #include "useridm_controller.h"

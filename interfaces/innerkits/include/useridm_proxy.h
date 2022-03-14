@@ -17,7 +17,6 @@
 #define USERIDM_PROXY_H
 
 #include <iremote_proxy.h>
-
 #include "iuser_idm.h"
 
 namespace OHOS {

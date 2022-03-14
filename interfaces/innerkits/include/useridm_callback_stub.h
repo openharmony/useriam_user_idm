@@ -17,7 +17,6 @@
 #define USERIDM_CALLBACK_STUB_H
 
 #include <iremote_stub.h>
-
 #include "iuseridm_callback.h"
 #include "useridm_info.h"
 #include "useridm_callback.h"
