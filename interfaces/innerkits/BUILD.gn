@@ -36,9 +36,7 @@ ohos_shared_library("useridm_framework") {
     "${useridm_frameworks_path}/src/useridm_proxy.cpp",
   ]
 
-  configs = [
-    ":useridm_private_config",
-  ]
+  configs = [ ":useridm_private_config" ]
 
   public_configs = [ ":useridm_public_config" ]
 

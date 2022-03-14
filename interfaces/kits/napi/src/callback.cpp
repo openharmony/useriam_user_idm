@@ -14,10 +14,6 @@
  */
 
 #include "callback.h"
-#include <cstdio>
-#include <iostream>
-#include <sstream>
-#include <string>
 #include <iremote_broker.h>
 #include <uv.h>
 #include "auth_common.h"

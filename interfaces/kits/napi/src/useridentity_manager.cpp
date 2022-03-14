@@ -14,10 +14,6 @@
  */
 
 #include "useridentity_manager.h"
-#include <cstdio>
-#include <string>
-#include <sstream>
-#include <iostream>
 #include <securec.h>
 #include <iremote_broker.h>
 #include "callback.h"
