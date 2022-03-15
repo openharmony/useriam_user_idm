@@ -12,19 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <cstdio>
-#include <iostream>
-#include <sstream>
-#include <string>
+
+#include "callback.h"
 #include <iremote_broker.h>
 #include <uv.h>
-
 #include "auth_common.h"
 #include "useridm_hilog_wrapper.h"
 #include "napi/native_api.h"
 #include "napi/native_common.h"
 #include "useridentity_manager.h"
-#include "callback.h"
 
 namespace OHOS {
 namespace UserIAM {

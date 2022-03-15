@@ -13,10 +13,9 @@
  * limitations under the License.
  */
 
-#include <message_parcel.h>
-
-#include "useridm_hilog_wrapper.h"
 #include "useridm_getinfo_callback_stub.h"
+#include <message_parcel.h>
+#include "useridm_hilog_wrapper.h"
 
 namespace OHOS {
 namespace UserIAM {

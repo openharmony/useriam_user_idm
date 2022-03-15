@@ -13,13 +13,11 @@
  * limitations under the License.
  */
 
-
 #ifndef USERIDM_CLIENT_H
 #define USERIDM_CLIENT_H
 
 #include <iremote_object.h>
 #include <singleton.h>
-
 #include "iuser_idm.h"
 #include "useridm_callback.h"
 

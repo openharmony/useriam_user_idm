@@ -21,7 +21,6 @@
 #include <string>
 #include <iostream>
 #include <securec.h>
-
 #include "useridm_info.h"
 #include "useridm_callback.h"
 #include "napi/native_api.h"
