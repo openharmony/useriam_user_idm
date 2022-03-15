@@ -114,6 +114,8 @@ static void OnResultWork(uv_work_t* work, int status)
         USERIDM_HILOGE(MODULE_JS_NAPI, "napi_call_function failed");
     }
 EXIT:
+    napi_delete_reference(env, asyncCallbackContext->callbackInfo.onResult);
+    napi_delete_reference(env, asyncCallbackContext->callbackInfo.onAcquireInfo);
     delete asyncCallbackContext;
     delete work;
 }
@@ -345,6 +347,7 @@ static void OnGetInfoWork(uv_work_t* work, int status)
         OnGetInfoPromiseWork(asyncGetAuthInfo);
     } else {
         OnGetInfoCallbackWork(asyncGetAuthInfo);
+        napi_delete_reference(asyncGetAuthInfo->env, asyncGetAuthInfo->callback);
     }
     delete asyncGetAuthInfo;
     delete work;

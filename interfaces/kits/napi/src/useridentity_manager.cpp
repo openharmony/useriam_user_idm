@@ -145,6 +145,7 @@ napi_value UserIdentityManager::OpenSessionCallback(napi_env env, napi_value *ar
                 napi_get_undefined(env, &undefined);
                 napi_get_reference_value(env, asyncInfo->callback, &callback);
                 napi_call_function(env, undefined, callback, 1, result, &callResult);
+                napi_delete_reference(env, asyncInfo->callback);
                 napi_delete_async_work(env, asyncInfo->asyncWork);
                 delete asyncInfo;
                 asyncInfo = nullptr;
