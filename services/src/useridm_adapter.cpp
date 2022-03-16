@@ -51,7 +51,7 @@ int32_t UserIDMAdapter::QueryCredential(int32_t userId, AuthType authType,
     std::vector<OHOS::UserIAM::UserIDM::Hal::CredentialInfo> taInfos;
     int32_t ret = OHOS::UserIAM::UserIDM::Hal::QueryCredential(userId, authType, taInfos);
     if (ret != SUCCESS) {
-        USERIDM_HILOGE(MODULE_SERVICE, "call ta info error: %{public}d", ret);
+        USERIDM_HILOGE(MODULE_SERVICE, "call TA info error: %{public}d", ret);
         return ret;
     }
 
@@ -117,7 +117,7 @@ int32_t UserIDMAdapter::DeleteCredential(int32_t userId, uint64_t credentialId, 
     OHOS::UserIAM::UserIDM::Hal::CredentialInfo taInfo;
     int32_t ret = OHOS::UserIAM::UserIDM::Hal::DeleteCredential(userId, credentialId, authToken, taInfo);
     if (ret != SUCCESS) {
-        USERIDM_HILOGE(MODULE_SERVICE, "get ta info error: %{public}d", ret);
+        USERIDM_HILOGE(MODULE_SERVICE, "get TA info error: %{public}d", ret);
         return ret;
     }
     credInfo.authSubType = OHOS::UserIAM::UserIDM::AuthSubType(taInfo.authSubType);

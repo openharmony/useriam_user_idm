@@ -27,7 +27,7 @@ void UserIDMCallbackProxy::OnResult(int32_t result, RequestResult reqRet)
     MessageParcel reply;
 
     if (!data.WriteInterfaceToken(UserIDMCallbackProxy::GetDescriptor())) {
-        USERIDM_HILOGE(MODULE_SERVICE, "write descriptor failed!");
+        USERIDM_HILOGE(MODULE_SERVICE, "failed to write descriptor.");
         return;
     }
 

@@ -74,7 +74,6 @@ int32_t UserIDMCoAuthHandler::OnFinishModify(uint32_t resultCode, std::vector<ui
         condition.SetUint32Value(AuthAttributeType::AUTH_TYPE, credentialInfo.authType);
         condition.SetUint64Value(AuthAttributeType::AUTH_TEMPLATE_ID, credentialInfo.templateId);
 
-        // Call the collaboration interface again to delete the template ID and password
         CoAuth::CoAuth::GetInstance().SetExecutorProp(condition, setPropCallback);
         return SUCCESS;
     } else {

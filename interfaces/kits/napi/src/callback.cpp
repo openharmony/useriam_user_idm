@@ -82,6 +82,7 @@ static void OnResultWork(uv_work_t* work, int status)
     if (asyncCallbackContext == nullptr) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "asyncCallbackContext is null");
         delete work;
+        work = nullptr;
         return;
     }
     napi_value global;
@@ -116,6 +117,7 @@ static void OnResultWork(uv_work_t* work, int status)
 EXIT:
     delete asyncCallbackContext;
     delete work;
+    work = nullptr;
 }
 
 void IIdmCallback::OnResult(int32_t result, RequestResult extraInfo)
@@ -162,6 +164,7 @@ static void OnAcquireInfoWork(uv_work_t* work, int status)
     if (asyncCallbackContext == nullptr) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "asyncCallbackContext is null");
         delete work;
+        work = nullptr;
         return;
     }
     napi_env env = asyncCallbackContext->callbackInfo.env;
@@ -201,6 +204,7 @@ static void OnAcquireInfoWork(uv_work_t* work, int status)
 EXIT:
     delete asyncCallbackContext;
     delete work;
+    work = nullptr;
 }
 
 void IIdmCallback::OnAcquireInfo(int32_t module, int32_t acquire, RequestResult extraInfo)
@@ -339,6 +343,7 @@ static void OnGetInfoWork(uv_work_t* work, int status)
     if (asyncGetAuthInfo == nullptr) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "asyncGetAuthInfo is null");
         delete work;
+        work = nullptr;
         return;
     }
     if (asyncGetAuthInfo->callback == nullptr) {
@@ -348,6 +353,7 @@ static void OnGetInfoWork(uv_work_t* work, int status)
     }
     delete asyncGetAuthInfo;
     delete work;
+    work = nullptr;
 }
 
 void GetInfoCallbackIDM::OnGetInfo(std::vector<CredentialInfo>& info)
