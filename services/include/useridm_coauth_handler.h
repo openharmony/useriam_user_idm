@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,11 +13,10 @@
  * limitations under the License.
  */
 
-
 #ifndef USERIDM_COAUTH_HANDLER_PROXY_H
 #define USERIDM_COAUTH_HANDLER_PROXY_H
 
-#include "useridm_moudle.h"
+#include "useridm_module.h"
 #include "coauth_callback.h"
 #include "useridm_setprop_handler.h"
 #include "auth_info.h"
@@ -29,22 +28,23 @@ namespace UserIAM {
 namespace UserIDM {
 class UserIDMCoAuthHandler : public CoAuth::CoAuthCallback {
 public:
-    explicit UserIDMCoAuthHandler(CoAuthType type, const uint64_t challenge,
-        const uint64_t sessionId, const std::shared_ptr<UserIDMMoudle>& data, const sptr<IIDMCallback>& callback);
+    explicit UserIDMCoAuthHandler(CoAuthType type, const uint64_t challenge, const uint64_t sessionId,
+                                  const std::shared_ptr<UserIDMModule>& data, const sptr<IIDMCallback>& callback);
     // param3: Function pointer passed in to the caller
     virtual ~UserIDMCoAuthHandler() = default;
 
-    void OnFinish(uint32_t resultCode, std::vector<uint8_t> &scheduleToken) override;
+    void OnFinish(uint32_t resultCode, std::vector<uint8_t>& scheduleToken) override;
     void OnAcquireInfo(uint32_t acquire) override;
+    void ResetCallback();
 
 private:
-    void OnFinishModify(uint32_t resultCode, std::vector<uint8_t> &scheduleToken,
-							uint64_t& credentialId, int32_t result);
+    int32_t OnFinishModify(uint32_t resultCode, std::vector<uint8_t>& scheduleToken, uint64_t& credentialId);
     uint64_t lastChallenge_;
-    uint64_t lastSessionId_;
-    std::shared_ptr<UserIDMMoudle> dataCallback_;
+    uint64_t lastScheduleId_;
+    std::shared_ptr<UserIDMModule> dataCallback_;
     sptr<IIDMCallback> innerCallback_;
-    CoAuthType type_;   // 0: add cred 1: modify cred
+    CoAuthType type_; // 0: add cred 1: modify cred
+    std::mutex mutex_;
 };
 }  // namespace UserIDM
 }  // namespace UserIAM

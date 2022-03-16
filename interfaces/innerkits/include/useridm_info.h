@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,12 +17,11 @@
 #define USERIDM_INFO_H
 
 #include <vector>
-#include "cstdint"
+#include <cstdint>
 
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
-// enum
 enum CoAuthType {
     ADD_PIN_CRED = 0,
     MODIFY_CRED,
@@ -30,40 +29,43 @@ enum CoAuthType {
 };
 
 enum AuthType {
-        /**
-         * Authentication type pin.
-         */
-        PIN = 1,
-        /**
-         * Authentication type face.
-         */
-        FACE = 2,
+    /**
+     * Authentication type all.
+     */
+    ALL = 0,
+    /**
+     * Authentication type pin.
+     */
+    PIN = 1,
+    /**
+     * Authentication type face.
+     */
+    FACE = 2,
 };
 
 enum AuthSubType {
-        /**
-         * Authentication sub type six number pin.
-         */
-        PIN_SIX = 10000,
-        /**
-         * Authentication sub type self defined number pin.
-         */
-        PIN_NUMBER = 10001,
-        /**
-         * Authentication sub type 2D face.
-         */
-        PIN_MIXED = 10002,
-        /**
-         * Authentication sub type 2D face.
-         */
-        FACE_2D = 20000,
-        /**
-         * Authentication sub type 3D face.
-         */
-        FACE_3D = 20001,
+    /**
+     * Authentication sub type six number pin.
+     */
+    PIN_SIX = 10000,
+    /**
+     * Authentication sub type self defined number pin.
+     */
+    PIN_NUMBER = 10001,
+    /**
+     * Authentication sub type mixed pin.
+     */
+    PIN_MIXED = 10002,
+    /**
+     * Authentication sub type 2D face.
+     */
+    FACE_2D = 20000,
+    /**
+     * Authentication sub type 3D face.
+     */
+    FACE_3D = 20001,
 };
 
-// enum
 enum IDMResultCode {
     SUCCESS = 0,
     FAIL = 1,
@@ -75,51 +77,46 @@ enum IDMResultCode {
     BUSY = 7,
     INVALID_PARAMETERS = 8,
     LOCKED = 9,
-    NOT_ENROLLED = 10
+    NOT_ENROLLED = 10,
+    CHECK_PERMISSION_FAILED = 11,
 };
 
-// struct
 struct CredentialInfo {
     uint64_t credentialId;
     AuthType authType;
     AuthSubType authSubType;
     uint64_t templateId;
-} ;
+};
 
-// struct
 struct EnrolledCredInfo {
-    uint64_t credentialId;      // Credential index
-    AuthType authType;          // Credential type
-    AuthSubType authSubType;       // Subclass
-    uint64_t templateId;        // Credential template ID
-} ;
+    uint64_t credentialId;
+    AuthType authType;
+    AuthSubType authSubType;
+    uint64_t templateId;
+};
 
-// struct
 struct EnrolledInfo {
-    AuthType authType;              // Credential type
-    uint64_t enrolledId;            // Registration ID
-} ;
+    AuthType authType;
+    uint64_t enrolledId;
+};
 
-// struct
 struct SecInfo {
-    uint64_t secureUid;                   // Security index value
-    uint32_t enrolledInfoLen;             // Credential type
+    uint64_t secureUid;
+    uint32_t enrolledInfoLen;
     std::vector<EnrolledInfo> enrolledInfo;
-} ;
+};
 
-// struct
 struct AddCredInfo {
-    AuthType authType;              // Credential type
-    AuthSubType authSubType;        // Subclass
-    std::vector<uint8_t> token;        // password authentication token
-} ;
+    AuthType authType;
+    AuthSubType authSubType;
+    std::vector<uint8_t> token;
+};
 
-// struct
 struct  RequestResult {
-    uint64_t credentialId;   // Credential index value
-} ;
+    uint64_t credentialId;
+};
 }  // namespace UserIDM
 }  // namespace UserIAM
 }  // namespace OHOS
 
-#endif  // USERIDM_INFO_H
+#endif // USERIDM_INFO_H

@@ -35,7 +35,7 @@
         "sub_component": [
             "//base/user_iam/user_idm/services:useridmservice",
             "//base/user_iam/user_idm/sa_profiles:useridm_sa_profile",
-            "//base/user_iam/user_idm/interfaces/kits/napi:useridm"	  
+            "//base/user_iam/user_idm/interfaces/kits/napi:useridm"
         ],
         "inner_kits": [
 		  {
@@ -52,11 +52,11 @@
                 "useridm_getsecinfo_callback_stub.h",
                 "useridm_hilog_wrapper.h",
                 "useridm_info.h",
-                "useridm_proxy.h"				
+                "useridm_proxy.h"
               ],
               "header_base": "//base/user_iam/user_idm/interfaces/innerkits/include"
             }
-          }  
+          }
         ],
         "test": [
             "//base/user_iam/user_idm/unittest:UserIDM_UT_test"

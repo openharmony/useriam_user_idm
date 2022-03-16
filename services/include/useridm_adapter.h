@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,21 +17,20 @@
 #define USERAUTH_ADAPTER_H
 
 #include "useridm_info.h"
-#include "singleton.h"
 #include "useridm_interface.h"
 
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
-class UserIDMAdapter : public Singleton<UserIDMAdapter> {
+class UserIDMAdapter {
 public:
     static UserIDMAdapter &GetInstance();
     void OpenEditSession(int32_t userId, uint64_t &challenge);
     void CloseEditSession();
     int32_t QueryCredential(int32_t userId, AuthType authType, std::vector<CredentialInfo>& credInfos);
-    int32_t GetSecureUid(int32_t userId, uint64_t& secureUid, std::vector<EnrolledInfo>& enroInfos);
+    int32_t GetSecureUid(int32_t userId, uint64_t& secureUid, std::vector<EnrolledInfo>& enrolledInfos);
     int32_t InitSchedulation(std::vector<uint8_t> autoToken, int32_t userId, AuthType authType,
-                             AuthSubType authSubType, uint64_t & sessionId);
+                             AuthSubType authSubType, uint64_t& sessionId);
     int32_t DeleteCredential(int32_t userId, uint64_t credentialId, std::vector<uint8_t> authToken,
                              CredentialInfo& credInfo);
     int32_t DeleteUser(int32_t userId, std::vector<uint8_t> authToken, std::vector<CredentialInfo>& credInfo);

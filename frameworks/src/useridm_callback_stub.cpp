@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,10 +13,9 @@
  * limitations under the License.
  */
 
-#include <message_parcel.h>
-
-#include "useridm_hilog_wrapper.h"
 #include "useridm_callback_stub.h"
+#include <message_parcel.h>
+#include "useridm_hilog_wrapper.h"
 
 namespace OHOS {
 namespace UserIAM {
@@ -29,13 +28,11 @@ UserIDMCallbackStub::UserIDMCallbackStub(const std::shared_ptr<IDMCallback>& imp
 int32_t UserIDMCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
                                              MessageParcel &reply, MessageOption &option)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, "UserIDMCallbackStub::OnRemoteRequest, cmd = %d, flags= %d", code,
+    USERIDM_HILOGD(MODULE_CLIENT, "UserIDMCallbackStub::OnRemoteRequest, cmd = %u, flags= %d", code,
                    option.GetFlags());
 
-    std::u16string descripter = UserIDMCallbackStub::GetDescriptor();
-    std::u16string remoteDescripter = data.ReadInterfaceToken();
-    if (descripter != remoteDescripter) {
-        USERIDM_HILOGE(MODULE_INNERKIT, "UserIDMCallbackStub::OnRemoteRequest failed, descriptor is not matched!");
+    if (UserIDMCallbackStub::GetDescriptor() != data.ReadInterfaceToken()) {
+        USERIDM_HILOGE(MODULE_CLIENT, "UserIDMCallbackStub::OnRemoteRequest failed, descriptor is not matched!");
         return FAIL;
     }
 
@@ -51,7 +48,7 @@ int32_t UserIDMCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
 
 int32_t UserIDMCallbackStub::OnResultStub(MessageParcel& data, MessageParcel& reply)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, "UserIDMCallbackStub OnResultStub enter ");
+    USERIDM_HILOGI(MODULE_CLIENT, "UserIDMCallbackStub OnResultStub enter");
 
     RequestResult reqRet;
 
@@ -65,7 +62,7 @@ int32_t UserIDMCallbackStub::OnResultStub(MessageParcel& data, MessageParcel& re
 
 int32_t UserIDMCallbackStub::OnAcquireInfoStub(MessageParcel& data, MessageParcel& reply)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, "UserIDMCallbackStub OnAcquireInfoStub enter ");
+    USERIDM_HILOGI(MODULE_CLIENT, "UserIDMCallbackStub OnAcquireInfoStub enter");
 
     int32_t ret = SUCCESS;
     RequestResult reqRet;
@@ -75,7 +72,7 @@ int32_t UserIDMCallbackStub::OnAcquireInfoStub(MessageParcel& data, MessageParce
 
     OnAcquireInfo(module, acquire, reqRet);
     if (!reply.WriteInt32(ret)) {
-        USERIDM_HILOGE(MODULE_INNERKIT, "failed to WriteInt32(ret)");
+        USERIDM_HILOGE(MODULE_CLIENT, "failed to WriteInt32(ret)");
         ret = FAIL;
     }
 
@@ -84,23 +81,21 @@ int32_t UserIDMCallbackStub::OnAcquireInfoStub(MessageParcel& data, MessageParce
 
 void UserIDMCallbackStub::OnResult(int32_t result, RequestResult reqRet)
 {
-    USERIDM_HILOGE(MODULE_INNERKIT, "UserIDMCallbackStub  OnResult enter");
+    USERIDM_HILOGD(MODULE_CLIENT, "UserIDMCallbackStub OnResult enter");
 
     if (callback_ == nullptr) {
-        USERIDM_HILOGE(MODULE_INNERKIT, "callback_ is nullptr");
+        USERIDM_HILOGE(MODULE_CLIENT, "callback_ is nullptr");
     } else {
-        USERIDM_HILOGE(MODULE_INNERKIT, "befor Call Napi callback~");
         callback_->OnResult(result, reqRet);
-        USERIDM_HILOGE(MODULE_INNERKIT, "after Call Napi callback~");
     }
 }
 
 void UserIDMCallbackStub::OnAcquireInfo(int32_t module, int32_t acquire, RequestResult reqRet)
 {
-    USERIDM_HILOGE(MODULE_INNERKIT, "UserIDMCallbackStub  OnAcquireInfo enter");
+    USERIDM_HILOGD(MODULE_CLIENT, "UserIDMCallbackStub OnAcquireInfo enter");
 
     if (callback_ == nullptr) {
-        USERIDM_HILOGE(MODULE_INNERKIT, "callback_ is nullptr");
+        USERIDM_HILOGE(MODULE_CLIENT, "callback_ is nullptr");
     } else {
         callback_->OnAcquireInfo(module, acquire, reqRet);
     }

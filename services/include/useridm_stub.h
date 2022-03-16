@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,13 +13,11 @@
  * limitations under the License.
  */
 
-
 #ifndef USERIDM_STUB_H
 #define USERIDM_STUB_H
 
 #include <map>
 #include <iremote_stub.h>
-
 #include "iuser_idm.h"
 
 namespace OHOS {
@@ -27,20 +25,22 @@ namespace UserIAM {
 namespace UserIDM {
 class UserIDMStub : public IRemoteStub<IUserIDM> {
 public:
+    explicit UserIDMStub();
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
-
 private:
-    uint64_t OpenSessionStub(MessageParcel& data, MessageParcel& reply);
-    void CloseSessionStub(MessageParcel& data, MessageParcel& reply);
+    int32_t OpenSessionStub(MessageParcel& data, MessageParcel& reply);
+    int32_t CloseSessionStub(MessageParcel& data, MessageParcel& reply);
     int32_t GetAuthInfoStub(MessageParcel& data, MessageParcel& reply);
     int32_t GetAuthInfoByIdStub(MessageParcel& data, MessageParcel& reply);
     int32_t GetSecInfoStub(MessageParcel& data, MessageParcel& reply);
-    void AddCredentialStub(MessageParcel& data, MessageParcel& reply);
-    void UpdateCredentialStub(MessageParcel& data, MessageParcel& reply);
+    int32_t AddCredentialStub(MessageParcel& data, MessageParcel& reply);
+    int32_t UpdateCredentialStub(MessageParcel& data, MessageParcel& reply);
     int32_t CancelSub(MessageParcel& data, MessageParcel& reply);
     int32_t EnforceDelUserStub(MessageParcel& data, MessageParcel& reply);
-    void DelUserStub(MessageParcel& data, MessageParcel& reply);
-    void DelCredStub(MessageParcel& data, MessageParcel& reply);
+    int32_t DelUserStub(MessageParcel& data, MessageParcel& reply);
+    int32_t DelCredStub(MessageParcel& data, MessageParcel& reply);
+    typedef int32_t (UserIDMStub::*PHandle)(MessageParcel& data, MessageParcel& reply);
+    std::map<int32_t, PHandle> m_handle_;
 };
 }  // namespace UserIDM
 }  // namespace UserIAM

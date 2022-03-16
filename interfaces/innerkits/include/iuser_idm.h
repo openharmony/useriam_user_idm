@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 #ifndef IUSERIDM_H
 #define IUSERIDM_H
 
@@ -25,7 +24,7 @@ namespace UserIDM {
 class IUserIDM : public IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.useridm.IUserIDM");
-    
+
     /**
      * @brief openSession before PIN or FACE handle
      *
@@ -59,26 +58,27 @@ public:
 
     /**
      * @brief get sec info
+     * @param userId user id.
      * @param callback The callback function provided for caller to handle response data.
      * @return void.
      */
-    virtual int32_t GetSecInfo(const sptr<IGetSecInfoCallback>& callback) = 0;
+    virtual int32_t GetSecInfo(int32_t userId, const sptr<IGetSecInfoCallback>& callback) = 0;
 
     /**
      * @brief add Credential info
-     * @param AddCredInfo credInfo to be add.
+     * @param AddCredInfo credInfo.
      * @param callback The callback function provided for caller to handle response data.
      * @return void.
      */
-    virtual void AddCredential(AddCredInfo & credInfo, const sptr<IIDMCallback>& callback) = 0;
+    virtual void AddCredential(AddCredInfo& credInfo, const sptr<IIDMCallback>& callback) = 0;
 
     /**
      * @brief update credential info
-     * @param AddCredInfo credInfo to be add.
+     * @param AddCredInfo credInfo.
      * @param callback The callback function provided for caller to handle response data.
      * @return void.
      */
-    virtual void UpdateCredential(AddCredInfo & credInfo, const sptr<IIDMCallback>& callback) = 0;
+    virtual void UpdateCredential(AddCredInfo& credInfo, const sptr<IIDMCallback>& callback) = 0;
 
     /**
      * @brief cancel credential info add or update handle
@@ -121,7 +121,7 @@ public:
         USERIDM_GET_SEC_INFO,           // get user security ID
         USERIDM_ADD_CREDENTIAL,         // add user credential information
         USERIDM_UPDATE_CREDENTIAL,      // update user credential information
-        USERIDM_CANCEL,                                 // cancel entry
+        USERIDM_CANCEL,                 // cancel entry
         USERIDM_ENFORCE_DELUSER,        // forcibly delete the user
         USERIDM_DELUSER,                // delete password
         USERIDM_DELCRED,                // face deletion

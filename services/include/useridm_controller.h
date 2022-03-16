@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,6 +25,7 @@
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
+const int64_t delay_time = 30 * 1000;
 class UserIDMController {
 public:
     explicit UserIDMController();
@@ -33,78 +34,45 @@ public:
     void OpenEditSessionCtrl(int32_t userId, uint64_t &challenge);
     void CloseEditSessionCtrl();
     int32_t GetAuthInfoCtrl(int32_t userId, AuthType authType, std::vector<CredentialInfo>& credInfos);
-    int32_t GetSecureInfoCtrl(int32_t userId, uint64_t& secureUid, std::vector<EnrolledInfo>& enroInfos);
-    int32_t CheckEnrollPermissionCtrl(std::vector<uint8_t> autoToken, int32_t userId,
-            AuthType authType, AuthSubType authSubType, uint64_t & sessionId);
+    int32_t GetSecureInfoCtrl(int32_t userId, uint64_t& secureUid, std::vector<EnrolledInfo>& enrolledInfos);
     int32_t DeleteCredentialCtrl(int32_t userId, uint64_t credentialId,
-            std::vector<uint8_t> authToken, CredentialInfo& credInfo);
+                                 std::vector<uint8_t> authToken, CredentialInfo& credInfo);
     int32_t DeleteUserCtrl(int32_t userId, std::vector<uint8_t> authToken, std::vector<CredentialInfo>& credInfo);
     int32_t DeleteUserByForceCtrl(int32_t userId, std::vector<CredentialInfo>& credInfo);
-    
-    int32_t AddCredentialCtrl(int32_t userId, uint64_t callerID, std::string callerName,
-        AddCredInfo & credInfo, const sptr<IIDMCallback>& innerCallback); // napi callback
-    void AddCredentialCallCoauth(uint64_t callerID, std::string callerName, AddCredInfo& credInfo,
-        const sptr<IIDMCallback>& innerkitsCallback,
-        uint64_t& challenge, uint64_t& scheduleId, int32_t& userId);
+    int32_t AddCredentialCtrl(int32_t userId, uint64_t callerID, AddCredInfo& credInfo,
+                              const sptr<IIDMCallback>& innerkitsCallback); // napi callback
+    int32_t AddCredentialCallCoauth(uint64_t callerID, AddCredInfo& credInfo,
+                                    const sptr<IIDMCallback>& innerkitsCallback, uint64_t& challenge,
+                                    uint64_t& scheduleId);
     int32_t UpdateCredentialCtrl(int32_t userId, uint64_t callerID, std::string callerName,
-        AddCredInfo & credInfo, const sptr<IIDMCallback>& innerCallback);   // napi callback
+                                 AddCredInfo& credInfo, const sptr<IIDMCallback>& innerCallback); // napi callback
     int32_t DelSchedleIdCtrl(uint64_t challenge);
     int32_t DelFaceCredentialCtrl(AuthType authType, AuthSubType authSubType,
-            uint64_t credentialId, uint64_t templateId, const sptr<IIDMCallback>&innerCallback);    // napi callback
-    int32_t DelExecutorPinInofCtrl(const sptr<IIDMCallback>& innerCallback, std::vector<CredentialInfo>& info);
-    // napi callback
+                                  uint64_t credentialId, uint64_t templateId, const sptr<IIDMCallback>& innerCallback);
+    int32_t DelExecutorPinInfoCtrl(const sptr<IIDMCallback>& innerCallback, std::vector<CredentialInfo>& info);
 
 private:
-    // add cred death recipient
-    class AddCredCallbackDeathRecipient : public IRemoteObject::DeathRecipient {
+    class CoAuthCallbackDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
-        AddCredCallbackDeathRecipient(UserIDMController* parent);
-        ~AddCredCallbackDeathRecipient() = default;
+        CoAuthCallbackDeathRecipient(std::shared_ptr<UserIDMCoAuthHandler> callback);
+        ~CoAuthCallbackDeathRecipient() = default;
         void OnRemoteDied(const wptr<IRemoteObject>& remote) override;
     private:
-        UserIDMController* parent_;
-        DISALLOW_COPY_AND_MOVE(AddCredCallbackDeathRecipient);
+        std::shared_ptr<UserIDMCoAuthHandler> callback_;
+        DISALLOW_COPY_AND_MOVE(CoAuthCallbackDeathRecipient);
     };
 
-    // update cred death recipient
-    class UpdateCredCallbackDeathRecipient : public IRemoteObject::DeathRecipient {
+    class SetPropCallbackDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
-        UpdateCredCallbackDeathRecipient(UserIDMController* parent);
-        ~UpdateCredCallbackDeathRecipient() = default;
+        SetPropCallbackDeathRecipient(std::shared_ptr<UserIDMSetPropHandler> callback);
+        ~SetPropCallbackDeathRecipient() = default;
         void OnRemoteDied(const wptr<IRemoteObject>& remote) override;
     private:
-        UserIDMController* parent_;
-        DISALLOW_COPY_AND_MOVE(UpdateCredCallbackDeathRecipient);
+        std::shared_ptr<UserIDMSetPropHandler> callback_;
+        DISALLOW_COPY_AND_MOVE(SetPropCallbackDeathRecipient);
     };
 
-    // delete face cred death recipient
-    class DelCredCallbackDeathRecipient : public IRemoteObject::DeathRecipient {
-    public:
-        DelCredCallbackDeathRecipient(UserIDMController* parent);
-        ~DelCredCallbackDeathRecipient() = default;
-        void OnRemoteDied(const wptr<IRemoteObject>& remote) override;
-    private:
-        UserIDMController* parent_;
-        DISALLOW_COPY_AND_MOVE(DelCredCallbackDeathRecipient);
-    };
-
-    // delete user death recipient
-    class DelUserCallbackDeathRecipient : public IRemoteObject::DeathRecipient {
-    public:
-        DelUserCallbackDeathRecipient(UserIDMController* parent);
-        ~DelUserCallbackDeathRecipient() = default;
-        void OnRemoteDied(const wptr<IRemoteObject>& remote) override;
-    private:
-        UserIDMController* parent_;
-        DISALLOW_COPY_AND_MOVE(DelUserCallbackDeathRecipient);
-    };
-
-private:
-    sptr<IIDMCallback> addCredCallback_;
-    sptr<IIDMCallback> updateCredCallback_;
-    sptr<IIDMCallback> delUserCallback_;
-    sptr<IIDMCallback> delCredCallback_;
-    std::shared_ptr<UserIDMMoudle> data_;
+    std::shared_ptr<UserIDMModule> data_;
 };
 }  // namespace UserIDM
 }  // namespace UserIAM

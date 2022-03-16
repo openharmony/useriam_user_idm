@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,25 +21,25 @@ namespace UserIAM {
 namespace UserIDM {
 void GetInfoCallbackUT::OnGetInfo(std::vector<CredentialInfo>& info)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, "GetInfoCallbackUT  OnGetInfo");
+    USERIDM_HILOGI(MODULE_CLIENT, "GetInfoCallbackUT  OnGetInfo");
     return;
 }
 
 void GetSecInfoCallbackUT::OnGetSecInfo(SecInfo &info)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, "GetSecInfoCallbackUT  OnGetSecInfo");
+    USERIDM_HILOGI(MODULE_CLIENT, "GetSecInfoCallbackUT  OnGetSecInfo");
     return;
 }
 
 void IDMCallbackUT::OnResult(int32_t result, RequestResult reqRet)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, "IDMCallbackUT  OnResult");
+    USERIDM_HILOGI(MODULE_CLIENT, "IDMCallbackUT  OnResult");
     return;
 }
 
 void IDMCallbackUT::OnAcquireInfo(int32_t module, int32_t acquire, RequestResult reqRet)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, "IDMCallbackUT  OnAcquireInfo");
+    USERIDM_HILOGI(MODULE_CLIENT, "IDMCallbackUT  OnAcquireInfo");
     return;
 }
 }  // namespace UserIDM

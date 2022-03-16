@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -36,7 +36,7 @@ ohos_shared_library("useridmservice") {
     "${useridm_services_path}/src/useridm_controller.cpp",
     "${useridm_services_path}/src/useridm_getinfo_callback_proxy.cpp",
     "${useridm_services_path}/src/useridm_getsecinfo_callback_proxy.cpp",
-    "${useridm_services_path}/src/useridm_moudle.cpp",
+    "${useridm_services_path}/src/useridm_module.cpp",
     "${useridm_services_path}/src/useridm_service.cpp",
     "${useridm_services_path}/src/useridm_setprop_handler.cpp",
     "${useridm_services_path}/src/useridm_stub.cpp",
@@ -49,10 +49,8 @@ ohos_shared_library("useridmservice") {
   deps = [
     "${useridm_innerkits_path}:useridm_framework",
     "//base/security/access_token/interfaces/innerkits/accesstoken:libaccesstoken_sdk",
-    "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
     "//base/user_iam/auth_executor_mgr/common:useriam_common_lib",
     "//base/user_iam/auth_executor_mgr/interfaces/innerkits:coauth_framework",
-    "//drivers/peripheral/display/hal:hdi_display_device",
     "//utils/native/base:utils",
   ]
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 #ifndef USERIDM_SERVICE_H
 #define USERIDM_SERVICE_H
 
@@ -21,7 +20,7 @@
 #include <iremote_stub.h>
 #include <system_ability.h>
 #include <system_ability_definition.h>
-
+#include <string>
 #include "useridm_stub.h"
 #include "useridm_hilog_wrapper.h"
 #include "useridm_controller.h"
@@ -41,17 +40,17 @@ public:
     void CloseSession() override;
     int32_t GetAuthInfo(AuthType authType, const sptr<IGetInfoCallback>& callback) override;
     int32_t GetAuthInfo(int32_t userId, AuthType authType, const sptr<IGetInfoCallback>& callback) override;
-    int32_t GetSecInfo(const sptr<IGetSecInfoCallback>& callback) override;
-    void AddCredential(AddCredInfo & credInfo, const sptr<IIDMCallback>& callback) override;
-    void UpdateCredential(AddCredInfo & credInfo, const sptr<IIDMCallback>& callback) override;
+    int32_t GetSecInfo(int32_t userId, const sptr<IGetSecInfoCallback>& callback) override;
+    void AddCredential(AddCredInfo& credInfo, const sptr<IIDMCallback>& callback) override;
+    void UpdateCredential(AddCredInfo& credInfo, const sptr<IIDMCallback>& callback) override;
     int32_t Cancel(uint64_t challenge) override;
-    int32_t EnforceDelUser(int32_t userId, const sptr<IIDMCallback>& callback) override;       // del user
-    void DelUser(std::vector<uint8_t> authToken, const sptr<IIDMCallback>& callback) override;           // del pin
+    int32_t EnforceDelUser(int32_t userId, const sptr<IIDMCallback>& callback) override; // del user
+    void DelUser(std::vector<uint8_t> authToken, const sptr<IIDMCallback>& callback) override; // del pin
     void DelCred(uint64_t credentialId, std::vector<uint8_t> authToken, const sptr<IIDMCallback>& callback) override;
-    // del face
 
 private:
     int32_t GetCallingUserID(int32_t &userID);
+    bool CheckPermission(const std::string &permission);
     // add controller point
     UserIDMController idmController_;
 };

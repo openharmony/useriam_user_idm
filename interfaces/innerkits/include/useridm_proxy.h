@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,12 +13,10 @@
  * limitations under the License.
  */
 
-
 #ifndef USERIDM_PROXY_H
 #define USERIDM_PROXY_H
 
 #include <iremote_proxy.h>
-
 #include "iuser_idm.h"
 
 namespace OHOS {
@@ -34,9 +32,9 @@ public:
     void CloseSession() override;
     int32_t GetAuthInfo(AuthType authType, const sptr<IGetInfoCallback>& callback) override;
     int32_t GetAuthInfo(int32_t userId, AuthType authType, const sptr<IGetInfoCallback>& callback) override;
-    int32_t GetSecInfo(const sptr<IGetSecInfoCallback>& callback) override;
-    void AddCredential(AddCredInfo & credInfo, const sptr<IIDMCallback>& callback) override;
-    void UpdateCredential(AddCredInfo & credInfo, const sptr<IIDMCallback>& callback) override;
+    int32_t GetSecInfo(int32_t userId, const sptr<IGetSecInfoCallback>& callback) override;
+    void AddCredential(AddCredInfo& credInfo, const sptr<IIDMCallback>& callback) override;
+    void UpdateCredential(AddCredInfo& credInfo, const sptr<IIDMCallback>& callback) override;
     int32_t Cancel(uint64_t challenge) override;
     int32_t EnforceDelUser(int32_t userId, const sptr<IIDMCallback>& callback) override;
     void DelUser(std::vector<uint8_t> authToken, const sptr<IIDMCallback>& callback) override;
@@ -53,4 +51,4 @@ private:
 }  // namespace OHOS
 
 
-#endif  // USERIDM_PROXY_H
+#endif // USERIDM_PROXY_H

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,50 +20,53 @@
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
-UserIDMCoAuthHandler::UserIDMCoAuthHandler(CoAuthType type, const uint64_t challenge, const uint64_t sessionId,
-                                           const std::shared_ptr<UserIDMMoudle>& data,
+UserIDMCoAuthHandler::UserIDMCoAuthHandler(CoAuthType type, const uint64_t challenge, const uint64_t scheduleId,
+                                           const std::shared_ptr<UserIDMModule>& data,
                                            const sptr<IIDMCallback>& callback)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, "UserIDMCoAuthHandler constructor enter ");
+    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMCoAuthHandler constructor enter");
 
     type_ = type;
     lastChallenge_ = challenge;
-    lastSessionId_ = sessionId;
+    lastScheduleId_ = scheduleId;
     dataCallback_ = data;
     innerCallback_ = callback;
+    if (innerCallback_ == nullptr) {
+        USERIDM_HILOGE(MODULE_SERVICE, "sorry: input callback is nullptr!");
+    }
 }
-void UserIDMCoAuthHandler::OnFinishModify(uint32_t resultCode, std::vector<uint8_t> &scheduleToken,
-                                          uint64_t& credentialId, int32_t result)
+
+int32_t UserIDMCoAuthHandler::OnFinishModify(uint32_t resultCode, std::vector<uint8_t>& scheduleToken,
+                                             uint64_t& credentialId)
 {
-    // success
-    // check sessionId:
-    // if have: session is still alive
-    // if not:  session has been canceled
+    if (innerCallback_ == nullptr) {
+        USERIDM_HILOGE(MODULE_SERVICE, "sorry: innerCallback_ is nullptr!");
+        return INVALID_PARAMETERS;
+    }
     uint64_t challenge = 0;
-    uint64_t sessionId = 0;
+    uint64_t scheduleId = 0;
+    if (dataCallback_ == nullptr) {
+        USERIDM_HILOGE(MODULE_SERVICE, "dataCallback error: no found!");
+        return FAIL;
+    }
     bool res = dataCallback_->CheckChallenge(challenge);
     if (!res) {
-        // challenge miss return error, need openSession()
-        USERIDM_HILOGE(MODULE_INNERKIT, "check challenge num error: no challenge!");
-        return;
+        USERIDM_HILOGE(MODULE_SERVICE, "check challenge num error: no challenge!");
+        return FAIL;
     }
 
-    res = dataCallback_->CheckSessionId(sessionId);    // todo check same sessionId
-    if (res && (sessionId == lastSessionId_)) {
+    res = dataCallback_->CheckScheduleIdIsActive(scheduleId); // check same scheduleId
+    if (res && (scheduleId == lastScheduleId_)) {
         // if have: session is still alive
         // call TA info
-        // UserIDMAdapter::GetInstance().AddCredential(scheduleToken, credentialId);
         CredentialInfo credentialInfo;
         UserIDMAdapter::GetInstance().UpdateCredential(scheduleToken, credentialId, credentialInfo);
 
         // callback: as set prop info param
         std::shared_ptr<UserIDMSetPropHandler> setPropCallback =
-                                                std::make_shared<UserIDMSetPropHandler>(PIN, challenge,
-                                                                                        sessionId,
-                                                                                        credentialId,
-                                                                                        dataCallback_,
-                                                                                        innerCallback_);
-            
+            std::make_shared<UserIDMSetPropHandler>(PIN, challenge, scheduleId, credentialId,
+                                                    dataCallback_, innerCallback_);
+
         AuthResPool::AuthAttributes condition;
         condition.SetUint32Value(AuthAttributeType::AUTH_PROPERTY_MODE, 0);
         condition.SetUint64Value(AuthAttributeType::AUTH_CALLER_UID, 0);
@@ -73,15 +76,22 @@ void UserIDMCoAuthHandler::OnFinishModify(uint32_t resultCode, std::vector<uint8
 
         // Call the collaboration interface again to delete the template ID and password
         CoAuth::CoAuth::GetInstance().SetExecutorProp(condition, setPropCallback);
+        return SUCCESS;
     } else {
-        USERIDM_HILOGE(MODULE_INNERKIT, "sessionId wrong!");
+        USERIDM_HILOGE(MODULE_SERVICE, "scheduleId wrong!");
+        return FAIL;
     }
 }
-void UserIDMCoAuthHandler::OnFinish(uint32_t resultCode, std::vector<uint8_t> &scheduleToken)
-{
-    USERIDM_HILOGI(MODULE_INNERKIT, "UserIDMCoAuthHandler OnFinish enter: %{public}d type_ is %{public}d",
-                   resultCode, type_);
 
+void UserIDMCoAuthHandler::OnFinish(uint32_t resultCode, std::vector<uint8_t>& scheduleToken)
+{
+    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMCoAuthHandler OnFinish enter: %{public}u type_ is %{public}d",
+        resultCode, type_);
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (innerCallback_ == nullptr) {
+        USERIDM_HILOGE(MODULE_SERVICE, "sorry: innerCallback_ is nullptr!");
+        return;
+    }
     int32_t result = FAIL;
     uint64_t credentialId = 0;
     if (resultCode != SUCCESS) {
@@ -91,16 +101,15 @@ void UserIDMCoAuthHandler::OnFinish(uint32_t resultCode, std::vector<uint8_t> &s
         innerCallback_->OnResult(result, reqRet);
         return;
     }
-    if ((ADD_PIN_CRED == type_) || (ADD_FACE_CRED == type_)) {
-        uint64_t sessionId = 0;
-        bool res = dataCallback_->CheckSessionId(sessionId);    // check same sessionId
-        if (res && (sessionId == lastSessionId_)) {
+    if ((type_ == ADD_PIN_CRED) || (type_ == ADD_FACE_CRED)) {
+        uint64_t scheduleId = 0;
+        bool res = dataCallback_->CheckScheduleIdIsActive(scheduleId); // check same scheduleId
+        if (res && (scheduleId == lastScheduleId_)) {
             // if have: session is still alive
             // call TA info
             result = UserIDMAdapter::GetInstance().AddCredential(scheduleToken, credentialId);
-            if (SUCCESS != result) {
-                // current session in active
-                USERIDM_HILOGE(MODULE_INNERKIT, "call TA info addCred failed!");
+            if (result != SUCCESS) {
+                USERIDM_HILOGE(MODULE_SERVICE, "call TA info addCred failed!");
             }
         }
         // clean session data
@@ -108,32 +117,39 @@ void UserIDMCoAuthHandler::OnFinish(uint32_t resultCode, std::vector<uint8_t> &s
         RequestResult reqRet;
         reqRet.credentialId = credentialId;
         innerCallback_->OnResult(result, reqRet);
-    } else if (MODIFY_CRED == type_) {
-        int32_t result = FAIL;
-        OnFinishModify(resultCode, scheduleToken, credentialId, result);
-
+    } else if (type_ == MODIFY_CRED) {
+        result = OnFinishModify(resultCode, scheduleToken, credentialId);
         // if not:  session has been canceled
         RequestResult reqRet;
         reqRet.credentialId = credentialId;
         innerCallback_->OnResult(result, reqRet);
         // clean session data
         dataCallback_->DeleteSessionId();
-        return;
     } else {
-        // do nothing
-        USERIDM_HILOGE(MODULE_INNERKIT, "callback type error: %d!", type_);
+        USERIDM_HILOGE(MODULE_SERVICE, "callback type error: %{public}d!", type_);
     }
 }
 
 void UserIDMCoAuthHandler::OnAcquireInfo(uint32_t acquire)
 {
-    USERIDM_HILOGI(MODULE_INNERKIT, "UserIDMCoAuthHandler OnAcquireInfo enter ");
-
-    if (ADD_FACE_CRED == type_) {
-        RequestResult reqRet;
-        reqRet.credentialId = 0;
-        innerCallback_->OnResult(acquire, reqRet);   // Prompt information is returned through callback
+    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMCoAuthHandler OnAcquireInfo enter");
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (innerCallback_ == nullptr) {
+        USERIDM_HILOGE(MODULE_SERVICE, "sorry: innerCallback_ is nullptr!");
+        return;
     }
+
+    if (type_ == ADD_FACE_CRED) {
+        RequestResult reqRet = {};
+        const int32_t faceModule = 1;
+        innerCallback_->OnAcquireInfo(faceModule, acquire, reqRet);
+    }
+}
+
+void UserIDMCoAuthHandler::ResetCallback()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    innerCallback_ = nullptr;
 }
 }  // namespace UserIDM
 }  // namespace UserIAM

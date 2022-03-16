@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,7 +17,6 @@
 #define USERIDM_GETINFO_CALLBACK_STUB_H
 
 #include <iremote_stub.h>
-
 #include "iuseridm_callback.h"
 #include "useridm_callback.h"
 
@@ -36,7 +35,7 @@ public:
 private:
     int32_t OnGetInfoStub(MessageParcel& data, MessageParcel& reply);
 
-    //  Callback defines a callback that accepts NaPi. When a callback is called,
+    // Callback defines a callback that accepts NaPi. When a callback is called,
     // it calls the recorded NaPi callback and returns the result
     std::shared_ptr<GetInfoCallback> callback_;
 };
