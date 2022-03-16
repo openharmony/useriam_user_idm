@@ -34,11 +34,11 @@ constexpr size_t TWO_PARAMETER = 2;
 constexpr size_t THREE_PARAMETER = 3;
 constexpr size_t ARGS_MAX_COUNT = 10;
 constexpr size_t RESULT = 0;
-constexpr std::string PROPERTY_KEY_NAME = "credType";
-constexpr std::string PROPERTY_KEY_ID = "credSubType";
-constexpr std::string PROPERTY_KEY_EVENT = "token";
-constexpr std::string FUNC_ONRESULT = "OnResult";
-constexpr std::string FUNC_ONACQUIREINFO = "OnAcquireInfo";
+constexpr char PROPERTY_KEY_NAME[] = "credType";
+constexpr char PROPERTY_KEY_ID[] = "credSubType";
+constexpr char PROPERTY_KEY_EVENT[] = "token";
+constexpr char FUNC_ONRESULT[] = "OnResult";
+constexpr char FUNC_ONACQUIREINFO[] = "OnAcquireInfo";
 
 typedef struct AsyncOpenSession {
     napi_env env;
