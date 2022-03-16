@@ -6,7 +6,7 @@
 
 As a basic component of the Identity & Access Management (IAM) subsystem, User Identity Management (useridm) provides a unified interface for managing user credential information in the system and invokes authentication resources through the authentication executor management module to implement lifecycle management and secure storage of user credentials.
 
-**Figure 1 User identity credential management architecture
+**Figure 1** User identity credential management architecture
 
 <img src="figures/useridm_architecture.png" alt="useridm_architecture" style="zoom:80%;" />
 
@@ -30,7 +30,7 @@ As a basic component of the Identity & Access Management (IAM) subsystem, User I
 
 ### Available APIs
 
-**Table 1 ** APIs for managing user credentials
+**Table 1** APIs for managing user credentials
 
 | API | Description                            |
 | ------ | -------------------------------- |
