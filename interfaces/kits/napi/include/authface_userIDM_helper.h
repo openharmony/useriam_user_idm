@@ -27,7 +27,6 @@ napi_value AuthSubTypeConstructor(napi_env env);
 napi_value AuthTypeConstructor(napi_env env);
 napi_value AuthFaceInit(napi_env env, napi_value exports);
 napi_value GetCtor(napi_env env);
-napi_value Constructor(napi_env env, napi_callback_info info);
 napi_value UserIdentityManagerConstructor(napi_env env, napi_callback_info info);
 napi_value OpenSession(napi_env env, napi_callback_info info);
 napi_value AddCredential(napi_env env, napi_callback_info info);
