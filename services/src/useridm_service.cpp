@@ -74,7 +74,7 @@ int32_t UserIDMService::GetCallingUserID(int32_t &userID)
         USERIDM_HILOGE(MODULE_SERVICE, "Get hap token info failed.");
         return TYPE_NOT_SUPPORT;
     }
-    userID = (int32_t)hapTokenInfo.userID;
+    userID = static_cast<int32_t>(hapTokenInfo.userID);
     return SUCCESS;
 }
 
@@ -184,7 +184,7 @@ void UserIDMService::AddCredential(AddCredInfo& credInfo, const sptr<IIDMCallbac
         callback->OnResult(CHECK_PERMISSION_FAILED, reqRet);
         return;
     }
-    uint64_t callerID = this->GetCallingUid();
+    uint64_t callerID = static_cast<uint64_t>(this->GetCallingUid());
 
     int32_t userId = 0;
     int32_t ret = this->GetCallingUserID(userId);
@@ -206,7 +206,7 @@ void UserIDMService::UpdateCredential(AddCredInfo& credInfo, const sptr<IIDMCall
         innerkitsCallback->OnResult(CHECK_PERMISSION_FAILED, reqRet);
         return;
     }
-    uint64_t callerID = this->GetCallingUid();
+    uint64_t callerID = static_cast<uint64_t>(this->GetCallingUid());
     std::string callerName = std::to_string(callerID);
     int32_t userId = 0;
     int32_t ret = this->GetCallingUserID(userId);
