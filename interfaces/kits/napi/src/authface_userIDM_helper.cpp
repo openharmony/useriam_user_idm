@@ -250,8 +250,7 @@ napi_value GetAuthInfo(napi_env env, napi_callback_info info)
 napi_value AuthFaceInit(napi_env env, napi_value exports)
 {
     USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
-    napi_status status;
-    status = napi_set_named_property(env, exports, "UserIdentityManager", GetCtor(env));
+    napi_status status = napi_set_named_property(env, exports, "UserIdentityManager", GetCtor(env));
     if (status != napi_ok) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "napi_set_named_property failed");
     }
