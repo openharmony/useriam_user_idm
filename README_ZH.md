@@ -67,4 +67,3 @@
 [useriam_pin_auth](https://gitee.com/openharmony/useriam_pin_auth)
 
 [useriam_faceauth](https://gitee.com/openharmony/useriam_faceauth)
-
