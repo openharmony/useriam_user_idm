@@ -251,13 +251,6 @@ napi_value AuthFaceInit(napi_env env, napi_value exports)
 {
     USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
     napi_status status;
-    napi_property_descriptor exportFuncs[] = {
-        DECLARE_NAPI_FUNCTION("constructor", OHOS::UserIAM::UserIDM::Constructor),
-    };
-    status = napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
-    if (status != napi_ok) {
-        USERIDM_HILOGE(MODULE_JS_NAPI, "napi_define_properties failed");
-    }
     status = napi_set_named_property(env, exports, "UserIdentityManager", GetCtor(env));
     if (status != napi_ok) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "napi_set_named_property failed");
@@ -308,16 +301,6 @@ napi_value EnumExport(napi_env env, napi_value exports)
     };
     napi_define_properties(env, exports, sizeof(descriptors) / sizeof(*descriptors), descriptors);
     return exports;
-}
-
-napi_value Constructor(napi_env env, napi_callback_info info)
-{
-    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
-    napi_value thisVar;
-    napi_value UserIdentityManager;
-    NAPI_CALL(env, napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr));
-    NAPI_CALL(env, napi_new_instance(env, GetCtor(env), 0, nullptr, &UserIdentityManager));
-    return UserIdentityManager;
 }
 
 napi_value GetCtor(napi_env env)
