@@ -32,10 +32,9 @@ const int PARAMTHREE = 3;
 napi_value GetAuthInfoRet(napi_env env, uint64_t ret)
 {
     USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
-    size_t length = sizeof(ret);
     void* data = nullptr;
     napi_value arrayBuffer = nullptr;
-    size_t bufferSize = length;
+    size_t bufferSize = sizeof(ret);
     NAPI_CALL(env, napi_create_arraybuffer(env, bufferSize, &data, &arrayBuffer));
     if (memcpy_s(data, bufferSize, reinterpret_cast<const void*>(&ret), bufferSize) != EOK) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "memcpy_s failed");
@@ -266,6 +265,7 @@ static napi_value CreateCredentialInfo(AsyncGetAuthInfo *asyncGetAuthInfo)
         napi_value templateId = GetAuthInfoRet(env, (asyncGetAuthInfo->info[Vect].templateId));
         if (templateId == nullptr) {
             USERIDM_HILOGE(MODULE_JS_NAPI, "GetAuthInfo failed");
+            return nullptr;
         }
         NAPI_CALL(env, napi_set_named_property(env, obj, "credentialId", credentialId));
         NAPI_CALL(env, napi_set_named_property(env, obj, "authType", authType));
