@@ -228,8 +228,8 @@ int32_t UserIDMController::DelSchedleIdCtrl(uint64_t challenge)
     uint64_t lastChallenge = 0;
     data_->CheckChallenge(lastChallenge);
     if (lastChallenge != challenge) {
-         USERIDM_HILOGE(MODULE_SERVICE, "Not same challenge num");
-         return result;
+        USERIDM_HILOGE(MODULE_SERVICE, "Not same challenge num");
+        return result;
     }
     if (!data_->CheckScheduleIdIsActive(sessionId)) {
         USERIDM_HILOGE(MODULE_SERVICE, "CheckScheduleIdIsActive fail");
