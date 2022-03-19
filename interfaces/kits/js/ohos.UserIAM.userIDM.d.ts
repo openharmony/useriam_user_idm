@@ -16,22 +16,20 @@
 import{AsyncCallback} from './basic';
 declare namespace userIDM {
     /**
-     * js @calss UserIdentityManager
+     * js @calss UserIdentityManager.
      */
     class UserIdentityManager {
     /**
      * constructor.
      *
-     * @return Constructor to get the userauth class instance
+     * @return Constructor to get the userauth class instance.
      */
     constructor();
     /**
-     * openSession.
-     *
-     * <p>Permissions required: {@code ohos.permission.MANAGE_USER_IDM}
-     *
      * Start an IDM operation to obtain challenge value
      * A challenge value of 0 indicates that opensession failed.
+     *
+     * <p>Permissions required: {@code ohos.permission.MANAGE_USER_IDM}.
      *
      * @return Uint8Array is success or fail.
      */
@@ -39,13 +37,11 @@ declare namespace userIDM {
     openSession(callback : AsyncCallback<Uint8Array>) : void;
 
     /**
-     * getAvailabeStatus.
-     *
-     * <p>Permissions required: {@code ohos.permission.MANAGE_USER_IDM}
-     *
      * Add user credential information, pass in credential addition method and credential information
      * (credential type, subclass, if adding user's non password credentials, pass in password authentication token),
-     * and get the result / acquireinfo callback
+     * and get the result / acquireinfo callback.
+     *
+     * <p>Permissions required: {@code ohos.permission.MANAGE_USER_IDM}.
      *
      * @param credentialInfo Incoming credential addition method and credential information
      * (credential type, subclass, password authentication token).
@@ -56,7 +52,7 @@ declare namespace userIDM {
     /**
      * updateCredential.
      *
-     * <p>Permissions required: {@code ohos.permission.MANAGE_USER_IDM}
+     * <p>Permissions required: {@code ohos.permission.MANAGE_USER_IDM}.
      *
      * @param credentialInfo Incoming credential addition method and credential information
      * (credential type, subclass, password authentication token).
@@ -65,18 +61,16 @@ declare namespace userIDM {
     updateCredential(credentialInfo:CredentialInfo, callback:IIdmCallback) : void;
 
     /**
-     * closeSession.
-     *
      * End an IDM operation.
      *
-     * <p>Permissions required: {@code ohos.permission.MANAGE_USER_IDM}
+     * <p>Permissions required: {@code ohos.permission.MANAGE_USER_IDM}.
      */
     closeSession() : void;
 
     /**
      * cancel.
      *
-     * <p>Permissions required: {@code ohos.permission.MANAGE_USER_IDM}
+     * <p>Permissions required: {@code ohos.permission.MANAGE_USER_IDM}.
      *
      * Cancel entry and pass in challenge value.
      *
@@ -85,12 +79,10 @@ declare namespace userIDM {
     cancel(challenge : Uint8Array) : number;
 
     /**
-     * delUser.
-     *
-     * <p>Permissions required: {@code ohos.permission.MANAGE_USER_IDM}
-     *
      * Delete the user credential information, pass in the user password authentication token and callback,
      * and obtain the deletion result through the callback.
+     *
+     * <p>Permissions required: {@code ohos.permission.MANAGE_USER_IDM}.
      *
      * @param token User password authentication token.
      * @param callback Get deletion result through callback.
@@ -98,12 +90,10 @@ declare namespace userIDM {
     delUser(token : Uint8Array, callback : IIdmCallback) : void;
 
     /**
-     * delCred.
-     *
-     * <p>Permissions required: {@code ohos.permission.MANAGE_USER_IDM}
-     *
      * Delete the user credential information, pass in the credential index, password authentication token and callback,
      * and obtain the deletion result through the callback Only deleting non password credentials is supported.
+     *
+     * <p>Permissions required: {@code ohos.permission.MANAGE_USER_IDM}.
      *
      * @param credentialId Credential index.
      * @param token Password authentication token.
@@ -112,19 +102,19 @@ declare namespace userIDM {
     delCred(credentialId : Uint8Array, token : Uint8Array, callback : IIdmCallback) : void;
 
     /**
-     * getAuthInfo
+     * getAuthInfo.
      *
-     * <p>Permissions required: {@code ohos.permission.ACCESS_USER_IDM}
+     * <p>Permissions required: {@code ohos.permission.ACCESS_USER_IDM}.
      *
      * @param authType Credential type.
-     * @param callback Returns all registered credential information of this type for the current user
+     * @param callback Returns all registered credential information of this type for the current user.
      */
     getAuthInfo(callback : AsyncCallback<Array<EnrolledCredInfo>>,authType? : AuthType) : void;
     getAuthInfo(authType? : AuthType) : Promise<Array<EnrolledCredInfo>>;
     }
 
     /**
-     * Credential information: credential type, subclass, device ID, password authentication token
+     * Credential information: credential type, subclass, device ID, password authentication token.
      */
     interface CredentialInfo {
         credType : AuthType;
@@ -133,7 +123,7 @@ declare namespace userIDM {
     }
 
     /**
-     * Return result code and additional information through callback / acquireinfo
+     * Return result code and additional information through callback / acquireinfo.
      */
     interface IIdmCallback {
         onResult:(result : number, extraInfo : RequestResult)=>void;
@@ -141,7 +131,7 @@ declare namespace userIDM {
     }
 
     /**
-     * Add credential result: credential index value
+     * Add credential result: credential index value.
      */
     interface RequestResult {
         credentialId?:Uint8Array;
@@ -149,7 +139,7 @@ declare namespace userIDM {
 
     /**
      * Registered credential information: credential index,
-     * credential type, subclass, credential template ID
+     * credential type, subclass, credential template ID.
      */
     interface EnrolledCredInfo {
         credentialId:Uint8Array;
@@ -159,7 +149,7 @@ declare namespace userIDM {
     }
 
     /**
-     * Credential type for authentication
+     * Credential type for authentication.
      */
     enum AuthType{
         /**
@@ -174,7 +164,7 @@ declare namespace userIDM {
 
     /**
      * Credential subtype: 6-digit digital password, user-defined digital password,
-     * user-defined mixed password, 2D face, 3D face
+     * user-defined mixed password, 2D face, 3D face.
      */
     enum AuthSubType {
         /**

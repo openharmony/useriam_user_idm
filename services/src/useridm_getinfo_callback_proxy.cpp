@@ -27,7 +27,7 @@ void UserIDMGetInfoCallbackProxy::OnGetInfo(std::vector<CredentialInfo>& credInf
     MessageParcel reply;
 
     if (!data.WriteInterfaceToken(UserIDMGetInfoCallbackProxy::GetDescriptor())) {
-        USERIDM_HILOGE(MODULE_SERVICE, "write descriptor failed!");
+        USERIDM_HILOGE(MODULE_SERVICE, "failed to write descriptor.");
         return;
     }
     // Write container size first

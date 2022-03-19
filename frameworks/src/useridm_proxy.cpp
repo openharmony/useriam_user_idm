@@ -163,12 +163,12 @@ void UserIDMProxy::AddCredential(AddCredInfo& credInfo, const sptr<IIDMCallback>
     }
 
     if (!data.WriteUint64(credInfo.authSubType)) {
-        USERIDM_HILOGE(MODULE_CLIENT, "failed to WriteUint32(credInfo.authSubType).");
+        USERIDM_HILOGE(MODULE_CLIENT, "failed to WriteUint64(credInfo.authSubType).");
         return;
     }
 
     if (!data.WriteUInt8Vector(credInfo.token)) {
-        USERIDM_HILOGE(MODULE_CLIENT, "failed to WriteUint32(credInfo.token).");
+        USERIDM_HILOGE(MODULE_CLIENT, "failed to WriteUInt8Vector(credInfo.token).");
         return;
     }
 
@@ -196,12 +196,12 @@ void UserIDMProxy::UpdateCredential(AddCredInfo& credInfo, const sptr<IIDMCallba
     }
 
     if (!data.WriteUint64(credInfo.authSubType)) {
-        USERIDM_HILOGE(MODULE_CLIENT, "failed to WriteUint32(credInfo.authSubType).");
+        USERIDM_HILOGE(MODULE_CLIENT, "failed to WriteUint64(credInfo.authSubType).");
         return;
     }
 
     if (!data.WriteUInt8Vector(credInfo.token)) {
-        USERIDM_HILOGE(MODULE_CLIENT, "failed to WriteBuffer(credInfo.token).");
+        USERIDM_HILOGE(MODULE_CLIENT, "failed to WriteUInt8Vector(credInfo.token).");
         return;
     }
 
@@ -224,7 +224,7 @@ int32_t UserIDMProxy::Cancel(uint64_t challenge)
     }
 
     if (!data.WriteUint64(challenge)) {
-        USERIDM_HILOGE(MODULE_CLIENT, "failed to WriteUint32(challenge).");
+        USERIDM_HILOGE(MODULE_CLIENT, "failed to WriteUint64(challenge).");
         return FAIL;
     }
 
@@ -277,7 +277,7 @@ void UserIDMProxy::DelUser(std::vector<uint8_t> authToken, const sptr<IIDMCallba
     }
 
     if (!data.WriteUInt8Vector(authToken)) {
-        USERIDM_HILOGE(MODULE_CLIENT, "failed to WriteBuffer(authToken).");
+        USERIDM_HILOGE(MODULE_CLIENT, "failed to WriteUInt8Vector(authToken).");
         return;
     }
 
@@ -300,12 +300,12 @@ void UserIDMProxy::DelCred(uint64_t credentialId, std::vector<uint8_t> authToken
     }
 
     if (!data.WriteUint64(credentialId)) {
-        USERIDM_HILOGE(MODULE_CLIENT, "failed to WriteUint32(credentialId).");
+        USERIDM_HILOGE(MODULE_CLIENT, "failed to WriteUint64(credentialId).");
         return;
     }
 
     if (!data.WriteUInt8Vector(authToken)) {
-        USERIDM_HILOGE(MODULE_CLIENT, "failed to WriteBuffer(authToken).");
+        USERIDM_HILOGE(MODULE_CLIENT, "failed to WriteUInt8Vector(authToken).");
         return;
     }
 

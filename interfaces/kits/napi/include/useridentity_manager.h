@@ -28,17 +28,17 @@
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
-#define ZERO_PARAMETER 0
-#define ONE_PARAMETER 1
-#define TWO_PARAMETER 2
-#define THREE_PARAMETER 3
-#define ARGS_MAX_COUNT 10
-#define RESULT 0
-const std::string PROPERTY_KEY_NAME = "credType";
-const std::string PROPERTY_KEY_ID = "credSubType";
-const std::string PROPERTY_KEY_EVENT = "token";
-const std::string FUNC_ONRESULT = "OnResult";
-const std::string FUNC_ONACQUIREINFO = "OnAcquireInfo";
+constexpr size_t ZERO_PARAMETER = 0;
+constexpr size_t ONE_PARAMETER = 1;
+constexpr size_t TWO_PARAMETER = 2;
+constexpr size_t THREE_PARAMETER = 3;
+constexpr size_t ARGS_MAX_COUNT = 10;
+constexpr size_t RESULT = 0;
+constexpr char PROPERTY_KEY_NAME[] = "credType";
+constexpr char PROPERTY_KEY_ID[] = "credSubType";
+constexpr char PROPERTY_KEY_EVENT[] = "token";
+constexpr char FUNC_ONRESULT[] = "OnResult";
+constexpr char FUNC_ONACQUIREINFO[] = "OnAcquireInfo";
 
 typedef struct AsyncOpenSession {
     napi_env env;

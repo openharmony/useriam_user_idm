@@ -97,7 +97,7 @@ std::vector<uint8_t> AuthCommon::GetNamedAttribute(napi_env env, napi_value obj)
     USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
     std::vector<uint8_t> retNull = {0};
     napi_value token;
-    napi_status status = napi_get_named_property(env, obj, PROPERTY_KEY_EVENT.c_str(), &token);
+    napi_status status = napi_get_named_property(env, obj, PROPERTY_KEY_EVENT, &token);
     if (status != napi_ok) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "napi_get_named_property failed");
         return retNull;

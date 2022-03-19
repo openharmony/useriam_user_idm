@@ -27,7 +27,7 @@ void UserIDMGetSecInfoCallbackProxy::OnGetSecInfo(SecInfo &info)
     MessageParcel reply;
 
     if (!data.WriteInterfaceToken(UserIDMGetSecInfoCallbackProxy::GetDescriptor())) {
-        USERIDM_HILOGE(MODULE_SERVICE, "write descriptor failed!");
+        USERIDM_HILOGE(MODULE_SERVICE, "failed to write descriptor.");
         return;
     }
 
