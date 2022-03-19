@@ -129,9 +129,9 @@ private:
     static void DelCredComplete(napi_env env, napi_status status, void *data);
 };
 
-AsyncGetAuthInfo* GCreateAsyncInfo(napi_env env);
-AsyncOpenSession* OCreateAsyncInfo(napi_env env);
-napi_value OpenSessionRet(napi_env env, AsyncOpenSession* asyncOpenSession);
+AsyncGetAuthInfo *GCreateAsyncInfo(napi_env env);
+AsyncOpenSession *OCreateAsyncInfo(napi_env env);
+napi_value OpenSessionRet(napi_env env, AsyncOpenSession *asyncOpenSession);
 } // namespace UserIDM
 } // namespace UserIAM
 } // namespace OHOS

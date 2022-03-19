@@ -21,23 +21,23 @@ namespace UserIAM {
 namespace UserIDM {
 void UserIDMCallbackProxy::OnResult(int32_t result, RequestResult reqRet)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMCallbackProxy OnResult enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMCallbackProxy OnResult start");
 
     MessageParcel data;
     MessageParcel reply;
 
     if (!data.WriteInterfaceToken(UserIDMCallbackProxy::GetDescriptor())) {
-        USERIDM_HILOGE(MODULE_SERVICE, "failed to write descriptor.");
+        USERIDM_HILOGE(MODULE_SERVICE, "failed to write descriptor");
         return;
     }
 
     if (!data.WriteInt32(result)) {
-        USERIDM_HILOGE(MODULE_SERVICE, "failed to WriteInt32(result).");
+        USERIDM_HILOGE(MODULE_SERVICE, "failed to WriteInt32(result)");
         return;
     }
 
     if (!data.WriteUint64(reqRet.credentialId)) {
-        USERIDM_HILOGE(MODULE_SERVICE, "failed to WriteUint64(reqRet.credentialId).");
+        USERIDM_HILOGE(MODULE_SERVICE, "failed to WriteUint64(reqRet.credentialId)");
         return;
     }
 
@@ -50,28 +50,28 @@ void UserIDMCallbackProxy::OnResult(int32_t result, RequestResult reqRet)
 
 void UserIDMCallbackProxy::OnAcquireInfo(int32_t module, int32_t acquire, RequestResult reqRet)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMCallbackProxy OnAcquireInfo enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMCallbackProxy OnAcquireInfo start");
 
     MessageParcel data;
     MessageParcel reply;
 
     if (!data.WriteInterfaceToken(UserIDMCallbackProxy::GetDescriptor())) {
-        USERIDM_HILOGE(MODULE_SERVICE, "write descriptor failed!");
+        USERIDM_HILOGE(MODULE_SERVICE, "failed to write descriptor");
         return;
     }
 
     if (!data.WriteInt32(module)) {
-        USERIDM_HILOGE(MODULE_SERVICE, "failed to WriteInt32(module).");
+        USERIDM_HILOGE(MODULE_SERVICE, "failed to WriteInt32(module)");
         return;
     }
 
     if (!data.WriteInt32(acquire)) {
-        USERIDM_HILOGE(MODULE_SERVICE, "failed to WriteInt32(acquire).");
+        USERIDM_HILOGE(MODULE_SERVICE, "failed to WriteInt32(acquire)");
         return;
     }
 
     if (!data.WriteUint64(reqRet.credentialId)) {
-        USERIDM_HILOGE(MODULE_SERVICE, "failed to WriteUint64(reqRet.credentialId).");
+        USERIDM_HILOGE(MODULE_SERVICE, "failed to WriteUint64(reqRet.credentialId)");
         return;
     }
 
@@ -84,11 +84,11 @@ void UserIDMCallbackProxy::OnAcquireInfo(int32_t module, int32_t acquire, Reques
 
 bool UserIDMCallbackProxy::SendRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, bool isSync)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMCallbackProxy SendRequest enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMCallbackProxy SendRequest start");
 
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
-        USERIDM_HILOGE(MODULE_SERVICE, "failed to get remote.");
+        USERIDM_HILOGE(MODULE_SERVICE, "failed to get remote");
         return false;
     }
     MessageOption option(MessageOption::TF_SYNC);

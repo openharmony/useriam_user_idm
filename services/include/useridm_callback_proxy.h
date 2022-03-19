@@ -34,7 +34,6 @@ public:
 private:
     bool SendRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, bool isSync = true);
 
-private:
     static inline BrokerDelegator<UserIDMCallbackProxy> delegator_;
 };
 }  // namespace UserIDM

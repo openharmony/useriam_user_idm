@@ -26,14 +26,14 @@ UserIDMGetInfoCallbackStub::UserIDMGetInfoCallbackStub(const std::shared_ptr<Get
 }
 
 int32_t UserIDMGetInfoCallbackStub::OnRemoteRequest(uint32_t code,
-                                                    MessageParcel &data, MessageParcel &reply, MessageOption &option)
+    MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     USERIDM_HILOGI(MODULE_CLIENT, "UserIDMGetInfoCallbackStub::OnRemoteRequest, cmd = %{public}u, flags= %d",
-                   code, option.GetFlags());
+        code, option.GetFlags());
 
     if (UserIDMGetInfoCallbackStub::GetDescriptor() != data.ReadInterfaceToken()) {
         USERIDM_HILOGE(MODULE_CLIENT,
-                       "UserIDMGetInfoCallbackStub::OnRemoteRequest failed, descriptor is not matched!");
+            "UserIDMGetInfoCallbackStub::OnRemoteRequest failed, descriptor is not matched!");
         return FAIL;
     }
 
@@ -47,7 +47,7 @@ int32_t UserIDMGetInfoCallbackStub::OnRemoteRequest(uint32_t code,
 
 int32_t UserIDMGetInfoCallbackStub::OnGetInfoStub(MessageParcel& data, MessageParcel& reply)
 {
-    USERIDM_HILOGI(MODULE_CLIENT, "UserIDMGetInfoCallbackStub OnResultStub enter");
+    USERIDM_HILOGI(MODULE_CLIENT, "UserIDMGetInfoCallbackStub OnGetInfoStub start");
     uint32_t vectorSize = 0;
     std::vector<CredentialInfo> credInfos;
     if (!data.ReadUint32(vectorSize)) {
@@ -93,7 +93,7 @@ int32_t UserIDMGetInfoCallbackStub::OnGetInfoStub(MessageParcel& data, MessagePa
 
 void UserIDMGetInfoCallbackStub::OnGetInfo(std::vector<CredentialInfo>& infos)
 {
-    USERIDM_HILOGI(MODULE_CLIENT, "UserIDMGetInfoCallbackStub OnGetInfo enter");
+    USERIDM_HILOGI(MODULE_CLIENT, "UserIDMGetInfoCallbackStub OnGetInfo start");
 
     if (callback_ == nullptr) {
         USERIDM_HILOGE(MODULE_CLIENT, "UserIDMGetInfoCallbackStub OnGetInfo callback_ is nullptr");

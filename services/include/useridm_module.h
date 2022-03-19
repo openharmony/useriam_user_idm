@@ -28,13 +28,11 @@ public:
     void DeleteChallenge();
     void DeleteSessionId();
     void CleanData();
-    // if have challenge num ? true: yes false: no
     bool CheckChallenge(uint64_t& challenge);
-    // check if have sessionId in active status, yes: return true & Id; no: return false
     bool CheckScheduleIdIsActive(uint64_t& scheduleId);
 
 private:
-    std::pair<uint64_t, uint64_t> challengeAndScheduleId_; // challenge & sessionId
+    std::pair<uint64_t, uint64_t> challengeAndScheduleId_;
     std::mutex mutex_;
 };
 }  // namespace UserIDM
