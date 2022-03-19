@@ -24,107 +24,30 @@ namespace UserIDM {
 class IUserIDM : public IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.useridm.IUserIDM");
-
-    /**
-     * @brief openSession before PIN or FACE handle
-     *
-     * @return challengeID.
-     */
     virtual uint64_t OpenSession() = 0;
-
-    /**
-     * @brief closeSession after PIN or FACE handle
-     *
-     * @return void.
-     */
     virtual void CloseSession() = 0;
-
-    /**
-     * @brief get auth info
-     * @param authType credential type.
-     * @param callback The callback function provided for caller to handle response data.
-     * @return void.
-     */
     virtual int32_t GetAuthInfo(AuthType authType, const sptr<IGetInfoCallback>& callback) = 0;
-
-    /**
-     * @brief get auth info by user id
-     * @param userId user id.
-     * @param authType credential type.
-     * @param callback The callback function provided for caller to handle response data.
-     * @return void.
-     */
     virtual int32_t GetAuthInfo(int32_t userId, AuthType authType, const sptr<IGetInfoCallback>& callback) = 0;
-
-    /**
-     * @brief get sec info
-     * @param userId user id.
-     * @param callback The callback function provided for caller to handle response data.
-     * @return void.
-     */
     virtual int32_t GetSecInfo(int32_t userId, const sptr<IGetSecInfoCallback>& callback) = 0;
-
-    /**
-     * @brief add Credential info
-     * @param AddCredInfo credInfo.
-     * @param callback The callback function provided for caller to handle response data.
-     * @return void.
-     */
     virtual void AddCredential(AddCredInfo& credInfo, const sptr<IIDMCallback>& callback) = 0;
-
-    /**
-     * @brief update credential info
-     * @param AddCredInfo credInfo.
-     * @param callback The callback function provided for caller to handle response data.
-     * @return void.
-     */
     virtual void UpdateCredential(AddCredInfo& credInfo, const sptr<IIDMCallback>& callback) = 0;
-
-    /**
-     * @brief cancel credential info add or update handle
-     * @param challenge value set by app.
-     * @param callback The callback function provided for caller to handle response data.
-     * @return result.
-     */
     virtual int32_t Cancel(uint64_t challenge) = 0;
-
-    /**
-     * @brief del user and user info
-     * @param userId value of user Id.
-     * @param callback The callback function provided for caller to handle response data.
-     * @return result.
-     */
     virtual int32_t EnforceDelUser(int32_t userId, const sptr<IIDMCallback>& callback) = 0;
-
-    /**
-     * @brief del user and user info
-     * @param authToken value of token.
-     * @param callback The callback function provided for caller to handle response data.
-     * @return result.
-     */
     virtual void DelUser(std::vector<uint8_t> authToken, const sptr<IIDMCallback>& callback) = 0;
-
-    /**
-     * @brief del credential info
-     * @param credentialId the id of credential.
-     * @param authToken value of token.
-     * @param callback The callback function provided for caller to handle response data.
-     * @return result.
-     */
     virtual void DelCred(uint64_t credentialId, std::vector<uint8_t> authToken, const sptr<IIDMCallback>& callback) = 0;
 
     enum {
-        USERIDM_OPEN_SESSION = 0,        // open the IDM editing session
-        USERIDM_CLOSE_SESSION,          // close the IDM editing session
-        USERIDM_GET_AUTH_INFO,          // query credential information
-        USERIDM_GET_AUTH_INFO_BY_ID,    // query credential information by user id
-        USERIDM_GET_SEC_INFO,           // get user security ID
-        USERIDM_ADD_CREDENTIAL,         // add user credential information
-        USERIDM_UPDATE_CREDENTIAL,      // update user credential information
-        USERIDM_CANCEL,                 // cancel entry
-        USERIDM_ENFORCE_DELUSER,        // forcibly delete the user
-        USERIDM_DELUSER,                // delete password
-        USERIDM_DELCRED,                // face deletion
+        USERIDM_OPEN_SESSION = 0,
+        USERIDM_CLOSE_SESSION,
+        USERIDM_GET_AUTH_INFO,
+        USERIDM_GET_AUTH_INFO_BY_ID,
+        USERIDM_GET_SEC_INFO,
+        USERIDM_ADD_CREDENTIAL,
+        USERIDM_UPDATE_CREDENTIAL,
+        USERIDM_CANCEL,
+        USERIDM_ENFORCE_DELUSER,
+        USERIDM_DELUSER,
+        USERIDM_DELCRED,
     };
 };
 }  // namespace UserIDM

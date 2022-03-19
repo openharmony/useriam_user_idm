@@ -44,14 +44,14 @@ public:
     void AddCredential(AddCredInfo& credInfo, const sptr<IIDMCallback>& callback) override;
     void UpdateCredential(AddCredInfo& credInfo, const sptr<IIDMCallback>& callback) override;
     int32_t Cancel(uint64_t challenge) override;
-    int32_t EnforceDelUser(int32_t userId, const sptr<IIDMCallback>& callback) override; // del user
-    void DelUser(std::vector<uint8_t> authToken, const sptr<IIDMCallback>& callback) override; // del pin
+    int32_t EnforceDelUser(int32_t userId, const sptr<IIDMCallback>& callback) override;
+    void DelUser(std::vector<uint8_t> authToken, const sptr<IIDMCallback>& callback) override;
     void DelCred(uint64_t credentialId, std::vector<uint8_t> authToken, const sptr<IIDMCallback>& callback) override;
 
 private:
-    int32_t GetCallingUserID(int32_t &userID);
+    int32_t GetCallingUserId(int32_t &userId);
     bool CheckPermission(const std::string &permission);
-    // add controller point
+
     UserIDMController idmController_;
 };
 }  // namespace UserIDM

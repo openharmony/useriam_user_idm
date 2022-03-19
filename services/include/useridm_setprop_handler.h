@@ -27,10 +27,9 @@ class UserIDMSetPropHandler : public CoAuth::SetPropCallback {
 public:
     UserIDMSetPropHandler(AuthType type, const uint64_t challenge, const  uint64_t sessionId, uint64_t credentialId,
         const std::shared_ptr<UserIDMModule>& data, const sptr<IIDMCallback>& callback);
-    // Param3: function pointer passed in to the caller
     virtual ~UserIDMSetPropHandler() = default;
 
-    void OnResult(uint32_t result, std::vector<uint8_t> &extraInfo) override;
+    void OnResult(uint32_t result, std::vector<uint8_t>& extraInfo) override;
     void ResetCallback();
 
 private:

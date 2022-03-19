@@ -26,7 +26,7 @@ namespace UserIAM {
 namespace UserIDM {
 class UserIDMCallbackStub : public IRemoteStub<IIDMCallback> {
 public:
-    explicit UserIDMCallbackStub(const std::shared_ptr<IDMCallback>& impl);
+    explicit UserIDMCallbackStub(const std::shared_ptr<IDMCallback> &impl);
     ~UserIDMCallbackStub() override = default;
 
     void OnResult(int32_t result, RequestResult reqRet) override;
@@ -34,11 +34,9 @@ public:
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
-    int32_t OnResultStub(MessageParcel& data, MessageParcel& reply);
-    int32_t OnAcquireInfoStub(MessageParcel& data, MessageParcel& reply);
+    int32_t OnResultStub(MessageParcel &data, MessageParcel &reply);
+    int32_t OnAcquireInfoStub(MessageParcel &data, MessageParcel &reply);
 
-    // Callback defines a callback that accepts NaPi. When a callback is called,
-    // it calls the recorded NaPi callback and returns the result
     std::shared_ptr<IDMCallback> callback_;
 };
 }  // namespace UserIDM

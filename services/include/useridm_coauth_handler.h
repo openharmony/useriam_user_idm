@@ -29,8 +29,7 @@ namespace UserIDM {
 class UserIDMCoAuthHandler : public CoAuth::CoAuthCallback {
 public:
     explicit UserIDMCoAuthHandler(CoAuthType type, const uint64_t challenge, const uint64_t sessionId,
-                                  const std::shared_ptr<UserIDMModule>& data, const sptr<IIDMCallback>& callback);
-    // param3: Function pointer passed in to the caller
+        const std::shared_ptr<UserIDMModule>& data, const sptr<IIDMCallback>& callback);
     virtual ~UserIDMCoAuthHandler() = default;
 
     void OnFinish(uint32_t resultCode, std::vector<uint8_t>& scheduleToken) override;

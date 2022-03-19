@@ -49,7 +49,7 @@ public:
     void OnGetInfo(std::vector<CredentialInfo>& info) override;
 };
 
-napi_value GetAuthInfoRet(napi_env env, AsyncGetAuthInfo* asyncGetAuthInfo);
+napi_value GetAuthInfoRet(napi_env env, AsyncGetAuthInfo *asyncGetAuthInfo);
 } // namespace UserIDM
 } // namespace UserIAM
 } // namespace ohos

@@ -26,10 +26,10 @@ UserIDMCallbackStub::UserIDMCallbackStub(const std::shared_ptr<IDMCallback>& imp
 }
 
 int32_t UserIDMCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
-                                             MessageParcel &reply, MessageOption &option)
+    MessageParcel &reply, MessageOption &option)
 {
     USERIDM_HILOGD(MODULE_CLIENT, "UserIDMCallbackStub::OnRemoteRequest, cmd = %u, flags= %d", code,
-                   option.GetFlags());
+        option.GetFlags());
 
     if (UserIDMCallbackStub::GetDescriptor() != data.ReadInterfaceToken()) {
         USERIDM_HILOGE(MODULE_CLIENT, "UserIDMCallbackStub::OnRemoteRequest failed, descriptor is not matched!");
@@ -48,7 +48,7 @@ int32_t UserIDMCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
 
 int32_t UserIDMCallbackStub::OnResultStub(MessageParcel& data, MessageParcel& reply)
 {
-    USERIDM_HILOGI(MODULE_CLIENT, "UserIDMCallbackStub OnResultStub enter");
+    USERIDM_HILOGI(MODULE_CLIENT, "UserIDMCallbackStub OnResultStub start");
 
     RequestResult reqRet;
 
@@ -62,7 +62,7 @@ int32_t UserIDMCallbackStub::OnResultStub(MessageParcel& data, MessageParcel& re
 
 int32_t UserIDMCallbackStub::OnAcquireInfoStub(MessageParcel& data, MessageParcel& reply)
 {
-    USERIDM_HILOGI(MODULE_CLIENT, "UserIDMCallbackStub OnAcquireInfoStub enter");
+    USERIDM_HILOGI(MODULE_CLIENT, "UserIDMCallbackStub OnAcquireInfoStub start");
 
     int32_t ret = SUCCESS;
     RequestResult reqRet;
@@ -81,7 +81,7 @@ int32_t UserIDMCallbackStub::OnAcquireInfoStub(MessageParcel& data, MessageParce
 
 void UserIDMCallbackStub::OnResult(int32_t result, RequestResult reqRet)
 {
-    USERIDM_HILOGD(MODULE_CLIENT, "UserIDMCallbackStub OnResult enter");
+    USERIDM_HILOGD(MODULE_CLIENT, "UserIDMCallbackStub OnResult start");
 
     if (callback_ == nullptr) {
         USERIDM_HILOGE(MODULE_CLIENT, "callback_ is nullptr");
@@ -92,7 +92,7 @@ void UserIDMCallbackStub::OnResult(int32_t result, RequestResult reqRet)
 
 void UserIDMCallbackStub::OnAcquireInfo(int32_t module, int32_t acquire, RequestResult reqRet)
 {
-    USERIDM_HILOGD(MODULE_CLIENT, "UserIDMCallbackStub OnAcquireInfo enter");
+    USERIDM_HILOGD(MODULE_CLIENT, "UserIDMCallbackStub OnAcquireInfo start");
 
     if (callback_ == nullptr) {
         USERIDM_HILOGE(MODULE_CLIENT, "callback_ is nullptr");

@@ -34,32 +34,28 @@ UserIDMController::~UserIDMController()
 
 void UserIDMController::OpenEditSessionCtrl(int32_t userId, uint64_t &challenge)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "OpenEditSessionCtrl enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "OpenEditSessionCtrl start");
 
     uint64_t sessionId = 0;
     uint64_t temp = 0;
     bool res = data_->CheckScheduleIdIsActive(sessionId);
     if (res && (data_->CheckChallenge(temp))) {
-        // call coauth::cancel(): cancel current active session
         CoAuth::CoAuth::GetInstance().Cancel(sessionId);
     }
     data_->CleanData();
 
-    // call TA info
     UserIDMAdapter::GetInstance().OpenEditSession(userId, challenge);
-
-    data_->InsertChallenge(challenge); // add challenge num
+    data_->InsertChallenge(challenge);
 }
 
 void UserIDMController::CloseEditSessionCtrl()
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "CloseEditSessionCtrl enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "CloseEditSessionCtrl start");
 
     uint64_t sessionId = 0;
     uint64_t temp = 0;
     bool res = data_->CheckScheduleIdIsActive(sessionId);
     if (res && (data_->CheckChallenge(temp))) {
-        // call coauth::cancel(): cancel current active session
         CoAuth::CoAuth::GetInstance().Cancel(sessionId);
     }
     data_->CleanData();
@@ -69,55 +65,54 @@ void UserIDMController::CloseEditSessionCtrl()
 
 int32_t UserIDMController::GetAuthInfoCtrl(int32_t userId, AuthType authType, std::vector<CredentialInfo>& credInfos)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "GetAuthInfoCtrl enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "GetAuthInfoCtrl start");
     return UserIDMAdapter::GetInstance().QueryCredential(userId, authType, credInfos);
 }
 
 int32_t UserIDMController::GetSecureInfoCtrl(int32_t userId, uint64_t& secureUid,
     std::vector<EnrolledInfo>& enrolledInfos)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "GetSecureInfoCtrl enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "GetSecureInfoCtrl start");
     return UserIDMAdapter::GetInstance().GetSecureUid(userId, secureUid, enrolledInfos);
 }
 
 int32_t UserIDMController::DeleteCredentialCtrl(int32_t userId, uint64_t credentialId, std::vector<uint8_t> authToken,
-                                                CredentialInfo& credInfo)
+    CredentialInfo& credInfo)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "DeleteCredentialCtrl enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "DeleteCredentialCtrl start");
     return UserIDMAdapter::GetInstance().DeleteCredential(userId, credentialId, authToken, credInfo);
 }
 
 int32_t UserIDMController::DeleteUserCtrl(int32_t userId, std::vector<uint8_t> authToken,
     std::vector<CredentialInfo>& credInfo)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "DeleteUserCtrl enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "DeleteUserCtrl start");
     return UserIDMAdapter::GetInstance().DeleteUser(userId, authToken, credInfo);
 }
 
 int32_t UserIDMController::DeleteUserByForceCtrl(int32_t userId, std::vector<CredentialInfo>& credInfo)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "DeleteUserByForceCtrl enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "DeleteUserByForceCtrl start");
     return UserIDMAdapter::GetInstance().DeleteUserEnforce(userId, credInfo);
 }
 
 int32_t UserIDMController::AddCredentialCallCoauth(uint64_t callerID, AddCredInfo& credInfo,
     const sptr<IIDMCallback>& innerkitsCallback, uint64_t& challenge, uint64_t& scheduleId)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "AddCredentialCallCoauth enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "AddCredentialCallCoauth start");
     if (innerkitsCallback == nullptr) {
-        USERIDM_HILOGE(MODULE_SERVICE, "sorry: innerkitsCallback is nullptr!");
+        USERIDM_HILOGE(MODULE_SERVICE, "sorry: innerkitsCallback is nullptr");
         return INVALID_PARAMETERS;
     }
 
     std::string callerName = std::to_string(callerID);
     data_->InsertScheduleId(scheduleId);
-    // callback: as coauth info param
     CoAuth::AuthInfo paramInfo;
     paramInfo.SetPkgName(callerName);
     paramInfo.SetCallerUid(callerID);
     std::shared_ptr<UserIDMCoAuthHandler> coAuthCallback;
 
-    USERIDM_HILOGI(MODULE_SERVICE, "credInfo.authType is [%{public}d]!", credInfo.authType);
+    USERIDM_HILOGI(MODULE_SERVICE, "credInfo.authType is %{public}d", credInfo.authType);
     if (credInfo.authType == PIN) {
         coAuthCallback = std::make_shared<UserIDMCoAuthHandler>(ADD_PIN_CRED, challenge, scheduleId, data_,
             innerkitsCallback);
@@ -125,16 +120,15 @@ int32_t UserIDMController::AddCredentialCallCoauth(uint64_t callerID, AddCredInf
         coAuthCallback = std::make_shared<UserIDMCoAuthHandler>(ADD_FACE_CRED, challenge, scheduleId, data_,
             innerkitsCallback);
     } else {
-        USERIDM_HILOGE(MODULE_SERVICE, "credInfo.authType error: %{public}d!", credInfo.authType);
+        USERIDM_HILOGE(MODULE_SERVICE, "credInfo.authType error: %{public}d", credInfo.authType);
         coAuthCallback = std::make_shared<UserIDMCoAuthHandler>(ADD_PIN_CRED, challenge, scheduleId, data_,
             innerkitsCallback);
     }
 
     if (coAuthCallback == nullptr) {
-        USERIDM_HILOGE(MODULE_SERVICE, "sorry: coAuthCallback is nullptr!");
+        USERIDM_HILOGE(MODULE_SERVICE, "sorry: coAuthCallback is nullptr");
         return FAIL;
     } else {
-        // call coauth
         CoAuth::CoAuth::GetInstance().BeginSchedule(scheduleId, paramInfo, coAuthCallback);
     }
     return SUCCESS;
@@ -143,10 +137,10 @@ int32_t UserIDMController::AddCredentialCallCoauth(uint64_t callerID, AddCredInf
 int32_t UserIDMController::AddCredentialCtrl(int32_t userId, uint64_t callerID, AddCredInfo& credInfo,
     const sptr<IIDMCallback>& innerkitsCallback)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "AddCredentialCtrl enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "AddCredentialCtrl start");
 
     if (innerkitsCallback == nullptr) {
-        USERIDM_HILOGE(MODULE_SERVICE, "sorry: innerkitsCallback is nullptr!");
+        USERIDM_HILOGE(MODULE_SERVICE, "sorry: innerkitsCallback is nullptr");
         return INVALID_PARAMETERS;
     }
     uint64_t scheduleId = 0;
@@ -154,16 +148,14 @@ int32_t UserIDMController::AddCredentialCtrl(int32_t userId, uint64_t callerID, 
 
     bool result = data_->CheckChallenge(challenge);
     if (!result) {
-        // challenge miss return error, need openSession()
-        USERIDM_HILOGE(MODULE_SERVICE, "check challenge num error: no challenge!");
+        USERIDM_HILOGE(MODULE_SERVICE, "check challenge num error: no challenge");
         RequestResult reqRet;
         innerkitsCallback->OnResult(FAIL, reqRet);
         return FAIL;
     }
     result = data_->CheckScheduleIdIsActive(scheduleId);
     if (result) {
-        // current session in active
-        USERIDM_HILOGE(MODULE_SERVICE, "current session in active: busy!");
+        USERIDM_HILOGE(MODULE_SERVICE, "current session in active: busy");
         RequestResult reqRet;
         innerkitsCallback->OnResult(BUSY, reqRet);
         return BUSY;
@@ -173,8 +165,7 @@ int32_t UserIDMController::AddCredentialCtrl(int32_t userId, uint64_t callerID, 
     if (ret == SUCCESS) {
         ret = AddCredentialCallCoauth(callerID, credInfo, innerkitsCallback, challenge, scheduleId);
     } else {
-        // get sessionId failed
-        USERIDM_HILOGE(MODULE_SERVICE, "call TA info: InitSchedulation failed!");
+        USERIDM_HILOGE(MODULE_SERVICE, "call TA info: InitSchedulation failed");
         RequestResult reqRet;
         innerkitsCallback->OnResult(FAIL, reqRet);
     }
@@ -184,9 +175,9 @@ int32_t UserIDMController::AddCredentialCtrl(int32_t userId, uint64_t callerID, 
 int32_t UserIDMController::UpdateCredentialCtrl(int32_t userId, uint64_t callerID, std::string callerName,
     AddCredInfo& credInfo, const sptr<IIDMCallback>& innerkitsCallback)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "UpdateCredentialCtrl enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "UpdateCredentialCtrl start");
     if (innerkitsCallback == nullptr) {
-        USERIDM_HILOGE(MODULE_SERVICE, "sorry: innerkitsCallback is nullptr!");
+        USERIDM_HILOGE(MODULE_SERVICE, "sorry: innerkitsCallback is nullptr");
         return INVALID_PARAMETERS;
     }
 
@@ -194,15 +185,14 @@ int32_t UserIDMController::UpdateCredentialCtrl(int32_t userId, uint64_t callerI
     uint64_t challenge = 0;
     bool result = data_->CheckChallenge(challenge);
     if (!result) {
-        // challenge miss return error, need openSession()
-        USERIDM_HILOGE(MODULE_SERVICE, "check challenge num error: no challenge!");
+        USERIDM_HILOGE(MODULE_SERVICE, "check challenge num error: no challenge");
         RequestResult reqRet;
         innerkitsCallback->OnResult(FAIL, reqRet);
         return FAIL;
     }
     result = data_->CheckScheduleIdIsActive(scheduleId);
-    if (result) { // current session in active
-        USERIDM_HILOGE(MODULE_SERVICE, "current session in active: busy!");
+    if (result) {
+        USERIDM_HILOGE(MODULE_SERVICE, "current session in active: busy");
         RequestResult reqRet;
         innerkitsCallback->OnResult(BUSY, reqRet);
         return BUSY;
@@ -211,7 +201,6 @@ int32_t UserIDMController::UpdateCredentialCtrl(int32_t userId, uint64_t callerI
         credInfo.authSubType, scheduleId);
     if (ret == SUCCESS) {
         USERIDM_HILOGI(MODULE_SERVICE, "InitSchedulation SUCCESS");
-        // success
         data_->InsertScheduleId(scheduleId);
         std::shared_ptr<UserIDMCoAuthHandler> coAuthCallback =
             std::make_shared<UserIDMCoAuthHandler>(MODIFY_CRED, challenge, scheduleId, data_, innerkitsCallback);
@@ -224,7 +213,7 @@ int32_t UserIDMController::UpdateCredentialCtrl(int32_t userId, uint64_t callerI
         paramInfo.SetCallerUid(callerID);
         CoAuth::CoAuth::GetInstance().BeginSchedule(scheduleId, paramInfo, coAuthCallback);
     } else {
-        USERIDM_HILOGE(MODULE_SERVICE, "call TA info: InitSchedulation failed!");
+        USERIDM_HILOGE(MODULE_SERVICE, "call TA info: InitSchedulation failed");
         RequestResult reqRet;
         innerkitsCallback->OnResult(FAIL, reqRet);
     }
@@ -233,22 +222,22 @@ int32_t UserIDMController::UpdateCredentialCtrl(int32_t userId, uint64_t callerI
 
 int32_t UserIDMController::DelSchedleIdCtrl(uint64_t challenge)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "DelSchedleIdCtrl enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "DelSchedleIdCtrl start");
     int32_t result = FAIL;
     uint64_t sessionId = 0;
     uint64_t lastChallenge = 0;
     data_->CheckChallenge(lastChallenge);
     if (lastChallenge != challenge) {
-         USERIDM_HILOGE(MODULE_SERVICE, "Not same challenge num!");
+         USERIDM_HILOGE(MODULE_SERVICE, "Not same challenge num");
          return result;
     }
     if (!data_->CheckScheduleIdIsActive(sessionId)) {
-        USERIDM_HILOGE(MODULE_SERVICE, "CheckScheduleIdIsActive fail!");
+        USERIDM_HILOGE(MODULE_SERVICE, "CheckScheduleIdIsActive fail");
         return result;
     }
     result = CoAuth::CoAuth::GetInstance().Cancel(sessionId);
     if (result != SUCCESS) {
-        USERIDM_HILOGE(MODULE_SERVICE, "Cancel fail!");
+        USERIDM_HILOGE(MODULE_SERVICE, "Cancel fail");
         return result;
     }
     data_->DeleteSessionId();
@@ -258,9 +247,9 @@ int32_t UserIDMController::DelSchedleIdCtrl(uint64_t challenge)
 int32_t UserIDMController::DelFaceCredentialCtrl(AuthType authType, AuthSubType authSubType, uint64_t credentialId,
     uint64_t templateId, const sptr<IIDMCallback>& innerCallback)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "DelFaceCredentialCtrl enter authType: %{public}d", authType);
+    USERIDM_HILOGD(MODULE_SERVICE, "DelFaceCredentialCtrl start authType: %{public}d", authType);
     if (authType != FACE) {
-        USERIDM_HILOGE(MODULE_SERVICE, "authType error !");
+        USERIDM_HILOGE(MODULE_SERVICE, "authType error");
         return FAIL;
     }
     std::shared_ptr<UserIDMSetPropHandler> setPropCallback =
@@ -281,13 +270,13 @@ int32_t UserIDMController::DelFaceCredentialCtrl(AuthType authType, AuthSubType 
 }
 
 int32_t UserIDMController::DelExecutorPinInfoCtrl(const sptr<IIDMCallback>& innerCallback,
-                                                  std::vector<CredentialInfo>& info)
+    std::vector<CredentialInfo>& info)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "DelExecutorPinInfoCtrl enter: info.size(): %{public}zu.", info.size());
+    USERIDM_HILOGD(MODULE_SERVICE, "DelExecutorPinInfoCtrl start: info.size(): %{public}zu", info.size());
 
     const size_t minDelSize = 1;
     if (info.size() < minDelSize) {
-        USERIDM_HILOGE(MODULE_SERVICE, "info size error!: %{public}zu.", info.size());
+        USERIDM_HILOGE(MODULE_SERVICE, "info size error!: %{public}zu", info.size());
         RequestResult reqRet;
         innerCallback->OnResult(FAIL, reqRet);
         return FAIL;
@@ -317,7 +306,7 @@ int32_t UserIDMController::DelExecutorPinInfoCtrl(const sptr<IIDMCallback>& inne
             condition.SetUint64Value(AuthAttributeType::AUTH_TEMPLATE_ID, info[i].templateId);
             CoAuth::CoAuth::GetInstance().SetExecutorProp(condition, setPropCallback);
         }
-    }   // end for
+    }
     return SUCCESS;
 }
 

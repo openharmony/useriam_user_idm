@@ -25,19 +25,19 @@ namespace UserIDM {
 class UserIDMAdapter {
 public:
     static UserIDMAdapter &GetInstance();
-    void OpenEditSession(int32_t userId, uint64_t &challenge);
+    void OpenEditSession(int32_t userId, uint64_t& challenge);
     void CloseEditSession();
     int32_t QueryCredential(int32_t userId, AuthType authType, std::vector<CredentialInfo>& credInfos);
     int32_t GetSecureUid(int32_t userId, uint64_t& secureUid, std::vector<EnrolledInfo>& enrolledInfos);
     int32_t InitSchedulation(std::vector<uint8_t> autoToken, int32_t userId, AuthType authType,
-                             AuthSubType authSubType, uint64_t& sessionId);
+        AuthSubType authSubType, uint64_t& sessionId);
     int32_t DeleteCredential(int32_t userId, uint64_t credentialId, std::vector<uint8_t> authToken,
-                             CredentialInfo& credInfo);
+        CredentialInfo& credInfo);
     int32_t DeleteUser(int32_t userId, std::vector<uint8_t> authToken, std::vector<CredentialInfo>& credInfo);
     int32_t DeleteUserEnforce(int32_t userId, std::vector<CredentialInfo>& credInfo);
     int32_t AddCredential(std::vector<uint8_t>& enrollToken, uint64_t& credentialId);
     int32_t UpdateCredential(std::vector<uint8_t> enrollToken, uint64_t &credentialId,
-                             CredentialInfo &deletedCredential);
+        CredentialInfo &deletedCredential);
 
 private:
     UserIDMAdapter() = default;

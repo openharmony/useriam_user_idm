@@ -47,7 +47,6 @@ namespace UserIDM {
 #undef USERIDM_HILOGD
 #endif
 
-// param of log interface, such as USERIDM_HILOGF.
 enum UserIDMSubModule {
     MODULE_CLIENT = 0,
     MODULE_SERVICE,
@@ -56,7 +55,6 @@ enum UserIDMSubModule {
     USERIDM_MODULE_BUTT,
 };
 
-// 0xD002900: subsystem:distributeddatamgr module:distributedgallery, 8 bits reserved.
 static constexpr unsigned int BASE_USERIDM_DOMAIN_ID = 0xD002910;
 
 enum UserIDMDomainId {

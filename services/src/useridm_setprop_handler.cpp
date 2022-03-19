@@ -19,12 +19,10 @@
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
-UserIDMSetPropHandler::UserIDMSetPropHandler(AuthType type, const uint64_t challenge,
-                                             const uint64_t sessionId, uint64_t credentialId,
-                                             const std::shared_ptr<UserIDMModule>& data,
-                                             const sptr<IIDMCallback>& callback)
+UserIDMSetPropHandler::UserIDMSetPropHandler(AuthType type, const uint64_t challenge, const uint64_t sessionId,
+    uint64_t credentialId, const std::shared_ptr<UserIDMModule>& data, const sptr<IIDMCallback>& callback)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMSetPropHandler constructor enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMSetPropHandler constructor start");
 
     type_ = type;
     lastChallenge_ = challenge;
@@ -34,13 +32,13 @@ UserIDMSetPropHandler::UserIDMSetPropHandler(AuthType type, const uint64_t chall
     propInnerCallback_ = callback;
 
     if (propInnerCallback_ == nullptr) {
-        USERIDM_HILOGE(MODULE_SERVICE, "sorry: input callback is nullptr!");
+        USERIDM_HILOGE(MODULE_SERVICE, "sorry: input callback is nullptr");
     }
 }
 
 void UserIDMSetPropHandler::OnResult(uint32_t result, std::vector<uint8_t> &extraInfo)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMSetPropHandler OnResult enter: %{public}u, %{public}d", result, type_);
+    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMSetPropHandler OnResult start: %{public}u, %{public}d", result, type_);
     std::lock_guard<std::mutex> lock(mutex_);
     if ((type_ == PIN) || (type_ == FACE)) {
         if (propInnerCallback_ != nullptr) {

@@ -19,27 +19,27 @@
 namespace OHOS {
 namespace UserIAM {
 namespace UserIDM {
-void GetInfoCallbackUT::OnGetInfo(std::vector<CredentialInfo>& info)
+void GetInfoCallbackUT::OnGetInfo(std::vector<CredentialInfo> &info)
 {
-    USERIDM_HILOGI(MODULE_CLIENT, "GetInfoCallbackUT  OnGetInfo");
+    USERIDM_HILOGI(MODULE_CLIENT, "GetInfoCallbackUT OnGetInfo");
     return;
 }
 
 void GetSecInfoCallbackUT::OnGetSecInfo(SecInfo &info)
 {
-    USERIDM_HILOGI(MODULE_CLIENT, "GetSecInfoCallbackUT  OnGetSecInfo");
+    USERIDM_HILOGI(MODULE_CLIENT, "GetSecInfoCallbackUT OnGetSecInfo");
     return;
 }
 
 void IDMCallbackUT::OnResult(int32_t result, RequestResult reqRet)
 {
-    USERIDM_HILOGI(MODULE_CLIENT, "IDMCallbackUT  OnResult");
+    USERIDM_HILOGI(MODULE_CLIENT, "IDMCallbackUT OnResult");
     return;
 }
 
 void IDMCallbackUT::OnAcquireInfo(int32_t module, int32_t acquire, RequestResult reqRet)
 {
-    USERIDM_HILOGI(MODULE_CLIENT, "IDMCallbackUT  OnAcquireInfo");
+    USERIDM_HILOGI(MODULE_CLIENT, "IDMCallbackUT OnAcquireInfo");
     return;
 }
 }  // namespace UserIDM
