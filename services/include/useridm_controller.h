@@ -31,24 +31,23 @@ public:
     explicit UserIDMController();
     ~UserIDMController();
 
-    void OpenEditSessionCtrl(int32_t userId, uint64_t &challenge);
+    void OpenEditSessionCtrl(int32_t userId, uint64_t& challenge);
     void CloseEditSessionCtrl();
     int32_t GetAuthInfoCtrl(int32_t userId, AuthType authType, std::vector<CredentialInfo>& credInfos);
     int32_t GetSecureInfoCtrl(int32_t userId, uint64_t& secureUid, std::vector<EnrolledInfo>& enrolledInfos);
     int32_t DeleteCredentialCtrl(int32_t userId, uint64_t credentialId,
-                                 std::vector<uint8_t> authToken, CredentialInfo& credInfo);
+        std::vector<uint8_t> authToken, CredentialInfo& credInfo);
     int32_t DeleteUserCtrl(int32_t userId, std::vector<uint8_t> authToken, std::vector<CredentialInfo>& credInfo);
     int32_t DeleteUserByForceCtrl(int32_t userId, std::vector<CredentialInfo>& credInfo);
     int32_t AddCredentialCtrl(int32_t userId, uint64_t callerID, AddCredInfo& credInfo,
-                              const sptr<IIDMCallback>& innerkitsCallback); // napi callback
+        const sptr<IIDMCallback>& innerkitsCallback);
     int32_t AddCredentialCallCoauth(uint64_t callerID, AddCredInfo& credInfo,
-                                    const sptr<IIDMCallback>& innerkitsCallback, uint64_t& challenge,
-                                    uint64_t& scheduleId);
+        const sptr<IIDMCallback>& innerkitsCallback, uint64_t& challenge, uint64_t& scheduleId);
     int32_t UpdateCredentialCtrl(int32_t userId, uint64_t callerID, std::string callerName,
-                                 AddCredInfo& credInfo, const sptr<IIDMCallback>& innerCallback); // napi callback
+        AddCredInfo& credInfo, const sptr<IIDMCallback>& innerCallback);
     int32_t DelSchedleIdCtrl(uint64_t challenge);
     int32_t DelFaceCredentialCtrl(AuthType authType, AuthSubType authSubType,
-                                  uint64_t credentialId, uint64_t templateId, const sptr<IIDMCallback>& innerCallback);
+        uint64_t credentialId, uint64_t templateId, const sptr<IIDMCallback>& innerCallback);
     int32_t DelExecutorPinInfoCtrl(const sptr<IIDMCallback>& innerCallback, std::vector<CredentialInfo>& info);
 
 private:

@@ -25,33 +25,28 @@ UserIDMAdapter &UserIDMAdapter::GetInstance()
     return instance;
 }
 
-void UserIDMAdapter::OpenEditSession(int32_t userId, uint64_t &challenge)
+void UserIDMAdapter::OpenEditSession(int32_t userId, uint64_t& challenge)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMAdapter OpenEditSession enter");
-
-    // call TA interface OpenEditSession()
+    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMAdapter OpenEditSession start");
     int32_t ret = OHOS::UserIAM::UserIDM::Hal::OpenSession(userId, challenge);
     USERIDM_HILOGD(MODULE_SERVICE, "Call TA info: OpenSession: %{public}d", ret);
 }
 
 void UserIDMAdapter::CloseEditSession()
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMAdapter CloseEditSession enter");
-
-    // call TA interface CloseEditSession()
+    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMAdapter CloseEditSession start");
     int32_t ret = OHOS::UserIAM::UserIDM::Hal::CloseSession();
     USERIDM_HILOGD(MODULE_SERVICE, "Call TA info: CloseSession: %{public}d", ret);
 }
 
 int32_t UserIDMAdapter::QueryCredential(int32_t userId, AuthType authType,
-                                        std::vector<OHOS::UserIAM::UserIDM::CredentialInfo>& credInfos)
+    std::vector<OHOS::UserIAM::UserIDM::CredentialInfo>& credInfos)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMAdapter QueryCredential enter");
-
+    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMAdapter QueryCredential start");
     std::vector<OHOS::UserIAM::UserIDM::Hal::CredentialInfo> taInfos;
     int32_t ret = OHOS::UserIAM::UserIDM::Hal::QueryCredential(userId, authType, taInfos);
     if (ret != SUCCESS) {
-        USERIDM_HILOGE(MODULE_SERVICE, "call ta info error: %{public}d", ret);
+        USERIDM_HILOGE(MODULE_SERVICE, "call TA info error: %{public}d", ret);
         return ret;
     }
 
@@ -73,9 +68,9 @@ int32_t UserIDMAdapter::QueryCredential(int32_t userId, AuthType authType,
 }
 
 int32_t UserIDMAdapter::GetSecureUid(int32_t userId, uint64_t& secureUid,
-                                     std::vector<OHOS::UserIAM::UserIDM::EnrolledInfo>& enrolledInfos)
+    std::vector<OHOS::UserIAM::UserIDM::EnrolledInfo>& enrolledInfos)
 {
-    USERIDM_HILOGI(MODULE_SERVICE, "UserIDMAdapter GetSecureUid enter");
+    USERIDM_HILOGI(MODULE_SERVICE, "UserIDMAdapter GetSecureUid start");
 
     std::vector<OHOS::UserIAM::UserIDM::Hal::EnrolledInfo> taInfos;
     int32_t ret = OHOS::UserIAM::UserIDM::Hal::GetSecureUid(userId, secureUid, taInfos);
@@ -98,26 +93,23 @@ int32_t UserIDMAdapter::GetSecureUid(int32_t userId, uint64_t& secureUid,
 }
 
 int32_t UserIDMAdapter::InitSchedulation(std::vector<uint8_t> autoToken, int32_t userId, AuthType authType,
-                                         AuthSubType authSubType, uint64_t& sessionId)
+    AuthSubType authSubType, uint64_t& sessionId)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMAdapter InitSchedulation enter");
-
-    // call TA interface InitSchedulation()
+    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMAdapter InitSchedulation start");
     int32_t ret = OHOS::UserIAM::UserIDM::Hal::InitSchedulation(autoToken, userId, authType, authSubType, sessionId);
     USERIDM_HILOGI(MODULE_SERVICE, "Call TA info: GetScheduleId: %{public}d", ret);
-
     return ret;
 }
 
 int32_t UserIDMAdapter::DeleteCredential(int32_t userId, uint64_t credentialId, std::vector<uint8_t> authToken,
-                                         OHOS::UserIAM::UserIDM::CredentialInfo& credInfo)
+    OHOS::UserIAM::UserIDM::CredentialInfo& credInfo)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMAdapter DeleteCredential enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMAdapter DeleteCredential start");
 
     OHOS::UserIAM::UserIDM::Hal::CredentialInfo taInfo;
     int32_t ret = OHOS::UserIAM::UserIDM::Hal::DeleteCredential(userId, credentialId, authToken, taInfo);
     if (ret != SUCCESS) {
-        USERIDM_HILOGE(MODULE_SERVICE, "get ta info error: %{public}d", ret);
+        USERIDM_HILOGE(MODULE_SERVICE, "get TA info error: %{public}d", ret);
         return ret;
     }
     credInfo.authSubType = OHOS::UserIAM::UserIDM::AuthSubType(taInfo.authSubType);
@@ -130,14 +122,14 @@ int32_t UserIDMAdapter::DeleteCredential(int32_t userId, uint64_t credentialId, 
 }
 
 int32_t UserIDMAdapter::DeleteUser(int32_t userId, std::vector<uint8_t> authToken,
-                                   std::vector<OHOS::UserIAM::UserIDM::CredentialInfo>& credInfos)
+    std::vector<OHOS::UserIAM::UserIDM::CredentialInfo>& credInfos)
 {
-    USERIDM_HILOGI(MODULE_SERVICE, "UserIDMAdapter DeleteUser enter");
+    USERIDM_HILOGI(MODULE_SERVICE, "UserIDMAdapter DeleteUser start");
 
     std::vector<OHOS::UserIAM::UserIDM::Hal::CredentialInfo> taInfos;
     int32_t ret = OHOS::UserIAM::UserIDM::Hal::DeleteUser(userId, authToken, taInfos);
     if (ret != SUCCESS) {
-        USERIDM_HILOGE(MODULE_SERVICE, "get ta info error: %{public}d", ret);
+        USERIDM_HILOGE(MODULE_SERVICE, "get TA info error: %{public}d", ret);
         return ret;
     }
     size_t vectorSize = taInfos.size();
@@ -159,9 +151,9 @@ int32_t UserIDMAdapter::DeleteUser(int32_t userId, std::vector<uint8_t> authToke
 }
 
 int32_t UserIDMAdapter::DeleteUserEnforce(int32_t userId,
-                                          std::vector<OHOS::UserIAM::UserIDM::CredentialInfo>& credInfos)
+    std::vector<OHOS::UserIAM::UserIDM::CredentialInfo>& credInfos)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMAdapter DeleteUserEnforce enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMAdapter DeleteUserEnforce start");
 
     std::vector<OHOS::UserIAM::UserIDM::Hal::CredentialInfo> taInfos;
     int32_t ret = OHOS::UserIAM::UserIDM::Hal::DeleteUserEnforce(userId, taInfos);
@@ -187,7 +179,7 @@ int32_t UserIDMAdapter::DeleteUserEnforce(int32_t userId,
 
 int32_t UserIDMAdapter::AddCredential(std::vector<uint8_t>& enrollToken, uint64_t& credentialId)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMAdapter AddCredential enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMAdapter AddCredential start");
 
     int32_t ret = OHOS::UserIAM::UserIDM::Hal::AddCredential(enrollToken, credentialId);
     USERIDM_HILOGI(MODULE_SERVICE, "Call TA info: AddCredential: %{public}d", ret);
@@ -196,9 +188,9 @@ int32_t UserIDMAdapter::AddCredential(std::vector<uint8_t>& enrollToken, uint64_
 }
 
 int32_t UserIDMAdapter::UpdateCredential(std::vector<uint8_t> enrollToken, uint64_t &credentialId,
-                                         CredentialInfo &deletedCredential)
+    CredentialInfo &deletedCredential)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMAdapter UpdateCredential enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMAdapter UpdateCredential start");
 
     OHOS::UserIAM::UserIDM::Hal::CredentialInfo taInfo;
     int32_t ret = OHOS::UserIAM::UserIDM::Hal::UpdateCredential(enrollToken, credentialId, taInfo);

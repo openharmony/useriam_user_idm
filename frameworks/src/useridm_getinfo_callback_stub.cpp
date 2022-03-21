@@ -26,14 +26,14 @@ UserIDMGetInfoCallbackStub::UserIDMGetInfoCallbackStub(const std::shared_ptr<Get
 }
 
 int32_t UserIDMGetInfoCallbackStub::OnRemoteRequest(uint32_t code,
-                                                    MessageParcel &data, MessageParcel &reply, MessageOption &option)
+    MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     USERIDM_HILOGI(MODULE_CLIENT, "UserIDMGetInfoCallbackStub::OnRemoteRequest, cmd = %{public}u, flags= %d",
-                   code, option.GetFlags());
+        code, option.GetFlags());
 
     if (UserIDMGetInfoCallbackStub::GetDescriptor() != data.ReadInterfaceToken()) {
         USERIDM_HILOGE(MODULE_CLIENT,
-                       "UserIDMGetInfoCallbackStub::OnRemoteRequest failed, descriptor is not matched!");
+            "UserIDMGetInfoCallbackStub::OnRemoteRequest failed, descriptor is not matched!");
         return FAIL;
     }
 
@@ -47,35 +47,53 @@ int32_t UserIDMGetInfoCallbackStub::OnRemoteRequest(uint32_t code,
 
 int32_t UserIDMGetInfoCallbackStub::OnGetInfoStub(MessageParcel& data, MessageParcel& reply)
 {
-    USERIDM_HILOGI(MODULE_CLIENT, "UserIDMGetInfoCallbackStub OnResultStub enter");
-
-    int32_t ret = SUCCESS;
-    uint32_t vectorSize = data.ReadUint32(); // vector size
+    USERIDM_HILOGI(MODULE_CLIENT, "UserIDMGetInfoCallbackStub OnGetInfoStub start");
+    uint32_t vectorSize = 0;
     std::vector<CredentialInfo> credInfos;
-
-    if (vectorSize > 0) {
-        for (uint32_t i = 0; i < vectorSize; i++) {
-            CredentialInfo info;
-            info.credentialId = data.ReadUint64(); // credentialId
-            info.authType = static_cast<AuthType>(data.ReadUint32()); // authType
-            info.authSubType = static_cast<AuthSubType>(data.ReadUint64()); // authSubType
-            info.templateId = data.ReadUint64(); // templateId
-            credInfos.push_back(info);
+    if (!data.ReadUint32(vectorSize)) {
+        USERIDM_HILOGE(MODULE_CLIENT, "read size fail");
+        OnGetInfo(credInfos);
+        return FAIL;
+    }
+    for (uint32_t i = 0; i < vectorSize; i++) {
+        CredentialInfo info;
+        if (!data.ReadUint64(info.credentialId)) {
+            USERIDM_HILOGE(MODULE_CLIENT, "read credential id fail");
+            OnGetInfo(credInfos);
+            return FAIL;
         }
+        uint32_t authType = 0;
+        if (!data.ReadUint32(authType)) {
+            USERIDM_HILOGE(MODULE_CLIENT, "read type fail");
+            OnGetInfo(credInfos);
+            return FAIL;
+        }
+        info.authType = static_cast<AuthType>(authType);
+        uint64_t authSubType = 0;
+        if (!data.ReadUint64(authSubType)) {
+            USERIDM_HILOGE(MODULE_CLIENT, "read subtype fail");
+            OnGetInfo(credInfos);
+            return FAIL;
+        }
+        info.authSubType = static_cast<AuthSubType>(authSubType);
+        if (!data.ReadUint64(info.templateId)) {
+            USERIDM_HILOGE(MODULE_CLIENT, "read template id fail");
+            OnGetInfo(credInfos);
+            return FAIL;
+        }
+        credInfos.push_back(info);
     }
-
-    this->OnGetInfo(credInfos);
-    if (!reply.WriteInt32(ret)) {
-        USERIDM_HILOGE(MODULE_CLIENT, "failed to WriteInt32(ret)");
-        ret = FAIL;
+    OnGetInfo(credInfos);
+    if (!reply.WriteInt32(SUCCESS)) {
+        USERIDM_HILOGE(MODULE_CLIENT, "write result fail");
+        return FAIL;
     }
-
-    return ret;
+    return SUCCESS;
 }
 
 void UserIDMGetInfoCallbackStub::OnGetInfo(std::vector<CredentialInfo>& infos)
 {
-    USERIDM_HILOGI(MODULE_CLIENT, "UserIDMGetInfoCallbackStub OnGetInfo enter");
+    USERIDM_HILOGI(MODULE_CLIENT, "UserIDMGetInfoCallbackStub OnGetInfo start");
 
     if (callback_ == nullptr) {
         USERIDM_HILOGE(MODULE_CLIENT, "UserIDMGetInfoCallbackStub OnGetInfo callback_ is nullptr");

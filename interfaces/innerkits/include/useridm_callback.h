@@ -23,41 +23,17 @@ namespace UserIAM {
 namespace UserIDM {
 class GetInfoCallback {
 public:
-    /**
-     * @brief
-     * @param info.
-     * @return void.
-     */
-    virtual void OnGetInfo(std::vector<CredentialInfo>& info) = 0;
+    virtual void OnGetInfo(std::vector<CredentialInfo> &info) = 0;
 };
 
 class GetSecInfoCallback {
 public:
-    /**
-     * @brief
-     * @param info .
-     * @return void.
-     */
     virtual void OnGetSecInfo(SecInfo &info) = 0;
 };
 
 class IDMCallback {
 public:
-    /**
-     * @brief
-     * @param result .
-     * @param strcut reqRet .
-     * @return void.
-     */
     virtual void OnResult(int32_t result, RequestResult reqRet) = 0;
-
-    /**
-     * @brief
-     * @param module .
-     * @param acquire .
-     * @param reqRet .
-     * @return void.
-     */
     virtual void OnAcquireInfo(int32_t module, int32_t acquire, RequestResult reqRet) = 0;
 };
 }  // namespace UserIDM

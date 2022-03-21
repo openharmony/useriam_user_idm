@@ -22,7 +22,7 @@ namespace UserIDM {
 bool UserIDMModule::InsertChallenge(uint64_t challenge)
 {
     std::lock_guard<std::mutex> idmMutexGuard(mutex_);
-    USERIDM_HILOGI(MODULE_SERVICE, "Data module InsertChallenge enter");
+    USERIDM_HILOGI(MODULE_SERVICE, "Data module InsertChallenge start");
 
     challengeAndScheduleId_.first = challenge;
 
@@ -32,7 +32,7 @@ bool UserIDMModule::InsertChallenge(uint64_t challenge)
 bool UserIDMModule::InsertScheduleId(uint64_t scheduleId)
 {
     std::lock_guard<std::mutex> idmMutexGuard(mutex_);
-    USERIDM_HILOGI(MODULE_SERVICE, "Data module InsertScheduleId enter");
+    USERIDM_HILOGI(MODULE_SERVICE, "Data module InsertScheduleId start");
 
     challengeAndScheduleId_.second = scheduleId;
 
@@ -42,7 +42,7 @@ bool UserIDMModule::InsertScheduleId(uint64_t scheduleId)
 void UserIDMModule::DeleteChallenge()
 {
     std::lock_guard<std::mutex> idmMutexGuard(mutex_);
-    USERIDM_HILOGI(MODULE_SERVICE, "Data module DeleteChallenge enter");
+    USERIDM_HILOGI(MODULE_SERVICE, "Data module DeleteChallenge start");
 
     challengeAndScheduleId_.first = 0;
 }
@@ -50,7 +50,7 @@ void UserIDMModule::DeleteChallenge()
 void UserIDMModule::DeleteSessionId()
 {
     std::lock_guard<std::mutex> idmMutexGuard(mutex_);
-    USERIDM_HILOGI(MODULE_SERVICE, "Data module DeleteSessionId enter");
+    USERIDM_HILOGI(MODULE_SERVICE, "Data module DeleteSessionId start");
 
     challengeAndScheduleId_.second = 0;
 }
@@ -58,9 +58,8 @@ void UserIDMModule::DeleteSessionId()
 void UserIDMModule::CleanData()
 {
     std::lock_guard<std::mutex> idmMutexGuard(mutex_);
-    USERIDM_HILOGI(MODULE_SERVICE, "Data module CleanData enter");
+    USERIDM_HILOGI(MODULE_SERVICE, "Data module CleanData start");
 
-    // clean pair
     challengeAndScheduleId_.first = 0;
     challengeAndScheduleId_.second = 0;
 }
@@ -68,9 +67,9 @@ void UserIDMModule::CleanData()
 bool UserIDMModule::CheckChallenge(uint64_t& challenge)
 {
     std::lock_guard<std::mutex> idmMutexGuard(mutex_);
-    USERIDM_HILOGI(MODULE_SERVICE, "Data module CheckChallenge enter");
+    USERIDM_HILOGI(MODULE_SERVICE, "Data module CheckChallenge start");
     if (challengeAndScheduleId_.first == 0) {
-        USERIDM_HILOGE(MODULE_SERVICE, "no session num!");
+        USERIDM_HILOGE(MODULE_SERVICE, "no session num");
         return false;
     }
     challenge = challengeAndScheduleId_.first;
@@ -80,11 +79,11 @@ bool UserIDMModule::CheckChallenge(uint64_t& challenge)
 bool UserIDMModule::CheckScheduleIdIsActive(uint64_t& scheduleId)
 {
     std::lock_guard<std::mutex> idmMutexGuard(mutex_);
-    USERIDM_HILOGI(MODULE_SERVICE, "Data module CheckScheduleIdIsActive enter");
+    USERIDM_HILOGI(MODULE_SERVICE, "Data module CheckScheduleIdIsActive start");
     bool res = false;
 
     if (challengeAndScheduleId_.second == 0) {
-        USERIDM_HILOGE(MODULE_SERVICE, "no session num!");
+        USERIDM_HILOGE(MODULE_SERVICE, "no session num");
     } else {
         res = true;
         scheduleId = challengeAndScheduleId_.second;

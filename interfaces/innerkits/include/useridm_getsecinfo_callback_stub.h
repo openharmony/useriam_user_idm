@@ -25,7 +25,7 @@ namespace UserIAM {
 namespace UserIDM {
 class UserIDMGetSecInfoCallbackStub : public IRemoteStub<IGetSecInfoCallback> {
 public:
-    explicit UserIDMGetSecInfoCallbackStub(const std::shared_ptr<GetSecInfoCallback>& impl);
+    explicit UserIDMGetSecInfoCallbackStub(const std::shared_ptr<GetSecInfoCallback> &impl);
     ~UserIDMGetSecInfoCallbackStub() override = default;
 
     void OnGetSecInfo(SecInfo &info) override;
@@ -33,10 +33,8 @@ public:
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
-    int32_t OnGetSecInfoStub(MessageParcel& data, MessageParcel& reply);
+    int32_t OnGetSecInfoStub(MessageParcel &data, MessageParcel &reply);
 
-    // Callback defines a callback that accepts NaPi. When a callback is called,
-    // it calls the recorded NaPi callback and returns the result
     std::shared_ptr<GetSecInfoCallback> callback_;
 };
 }  // namespace UserIDM

@@ -26,7 +26,7 @@ UserIDMGetSecInfoCallbackStub::UserIDMGetSecInfoCallbackStub(const std::shared_p
 }
 
 int32_t UserIDMGetSecInfoCallbackStub::OnRemoteRequest(uint32_t code,
-                                                       MessageParcel &data, MessageParcel &reply, MessageOption &option)
+    MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     USERIDM_HILOGI(MODULE_CLIENT,
         "UserIDMGetSecInfoCallbackStub::OnRemoteRequest, code:%{public}u, flags:%{public}d", code, option.GetFlags());
@@ -47,7 +47,7 @@ int32_t UserIDMGetSecInfoCallbackStub::OnRemoteRequest(uint32_t code,
 
 int32_t UserIDMGetSecInfoCallbackStub::OnGetSecInfoStub(MessageParcel& data, MessageParcel& reply)
 {
-    USERIDM_HILOGI(MODULE_CLIENT, "UserIDMGetSecInfoCallbackStub OnResultStub enter");
+    USERIDM_HILOGI(MODULE_CLIENT, "UserIDMGetSecInfoCallbackStub OnGetSecInfoStub start");
 
     int32_t ret = SUCCESS;
     SecInfo info = {};
@@ -65,13 +65,12 @@ int32_t UserIDMGetSecInfoCallbackStub::OnGetSecInfoStub(MessageParcel& data, Mes
 
 void UserIDMGetSecInfoCallbackStub::OnGetSecInfo(SecInfo &info)
 {
-    USERIDM_HILOGI(MODULE_CLIENT, "UserIDMGetSecInfoCallbackStub OnGetSecInfo enter");
+    USERIDM_HILOGI(MODULE_CLIENT, "UserIDMGetSecInfoCallbackStub OnGetSecInfo start");
 
     if (callback_ == nullptr) {
         USERIDM_HILOGE(MODULE_CLIENT, "UserIDMGetSecInfoCallbackStub callback_ is nullptr");
         return;
     } else {
-        // Call the NaPi interface and return the data to JS
         callback_->OnGetSecInfo(info);
     }
 }

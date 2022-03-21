@@ -29,11 +29,12 @@ UserIDMStub::UserIDMStub()
     m_handle_[static_cast<int32_t>(IUserIDM::USERIDM_GET_SEC_INFO)]  = &UserIDMStub::GetSecInfoStub;
     m_handle_[static_cast<int32_t>(IUserIDM::USERIDM_ADD_CREDENTIAL)] = &UserIDMStub::AddCredentialStub;
     m_handle_[static_cast<int32_t>(IUserIDM::USERIDM_UPDATE_CREDENTIAL)] = &UserIDMStub::UpdateCredentialStub;
-    m_handle_[static_cast<int32_t>(IUserIDM::USERIDM_CANCEL)]  = &UserIDMStub::CancelSub;
+    m_handle_[static_cast<int32_t>(IUserIDM::USERIDM_CANCEL)]  = &UserIDMStub::CancelStub;
     m_handle_[static_cast<int32_t>(IUserIDM::USERIDM_ENFORCE_DELUSER)]  = &UserIDMStub::EnforceDelUserStub;
     m_handle_[static_cast<int32_t>(IUserIDM::USERIDM_DELUSER)]  = &UserIDMStub::DelUserStub;
     m_handle_[static_cast<int32_t>(IUserIDM::USERIDM_DELCRED)]  = &UserIDMStub::DelCredStub;
 }
+
 int32_t UserIDMStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     USERIDM_HILOGI(MODULE_SERVICE,
@@ -42,7 +43,7 @@ int32_t UserIDMStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Message
     std::u16string descripter = UserIDMStub::GetDescriptor();
     std::u16string remoteDescripter = data.ReadInterfaceToken();
     if (descripter != remoteDescripter) {
-        USERIDM_HILOGE(MODULE_SERVICE, "UserIDMStub::OnRemoteRequest failed, descriptor is not matched!");
+        USERIDM_HILOGE(MODULE_SERVICE, "UserIDMStub::OnRemoteRequest failed, descriptor is not matched");
         return FAIL;
     }
     std::map<int32_t, PHandle>::const_iterator iter = m_handle_.find(code);
@@ -55,7 +56,7 @@ int32_t UserIDMStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Message
 
 int32_t UserIDMStub::OpenSessionStub(MessageParcel& data, MessageParcel& reply)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "OpenSessionStub enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "OpenSessionStub start");
 
     uint64_t ret = OpenSession();
     if (!reply.WriteUint64(ret)) {
@@ -68,7 +69,7 @@ int32_t UserIDMStub::OpenSessionStub(MessageParcel& data, MessageParcel& reply)
 
 int32_t UserIDMStub::CloseSessionStub(MessageParcel& data, MessageParcel& reply)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "CloseSessionStub enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "CloseSessionStub start");
 
     CloseSession();
 
@@ -77,7 +78,7 @@ int32_t UserIDMStub::CloseSessionStub(MessageParcel& data, MessageParcel& reply)
 
 int32_t UserIDMStub::GetAuthInfoStub(MessageParcel& data, MessageParcel& reply)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "GetAuthInfoStub enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "GetAuthInfoStub start");
 
     AuthType authType = static_cast<AuthType>(data.ReadUint32());
 
@@ -98,7 +99,7 @@ int32_t UserIDMStub::GetAuthInfoStub(MessageParcel& data, MessageParcel& reply)
 
 int32_t UserIDMStub::GetAuthInfoByIdStub(MessageParcel& data, MessageParcel& reply)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "GetAuthInfoByIdStub enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "GetAuthInfoByIdStub start");
 
     int32_t userId = data.ReadInt32();
     AuthType authType = static_cast<AuthType>(data.ReadUint32());
@@ -119,7 +120,7 @@ int32_t UserIDMStub::GetAuthInfoByIdStub(MessageParcel& data, MessageParcel& rep
 
 int32_t UserIDMStub::GetSecInfoStub(MessageParcel& data, MessageParcel& reply)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "GetSecInfoStub enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "GetSecInfoStub start");
 
     int32_t userId = data.ReadInt32();
     sptr<IGetSecInfoCallback> callback = iface_cast<IGetSecInfoCallback>(data.ReadRemoteObject());
@@ -128,7 +129,7 @@ int32_t UserIDMStub::GetSecInfoStub(MessageParcel& data, MessageParcel& reply)
         return ERR_INVALID_VALUE;
     }
 
-    int32_t ret = GetSecInfo(userId, callback); // Get user security ID [to service]
+    int32_t ret = GetSecInfo(userId, callback);
     if (!reply.WriteInt32(ret)) {
         USERIDM_HILOGE(MODULE_SERVICE, "failed to WriteInt32(ret)");
         return FAIL;
@@ -139,7 +140,7 @@ int32_t UserIDMStub::GetSecInfoStub(MessageParcel& data, MessageParcel& reply)
 
 int32_t UserIDMStub::AddCredentialStub(MessageParcel& data, MessageParcel& reply)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "AddCredentialStub enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "AddCredentialStub start");
 
     AddCredInfo credInfo;
     credInfo.authType = static_cast<AuthType>(data.ReadUint32());
@@ -153,14 +154,12 @@ int32_t UserIDMStub::AddCredentialStub(MessageParcel& data, MessageParcel& reply
     }
 
     AddCredential(credInfo, callback);
-    // Obtain the user security ID, add the user credential information, and return the result code and additional
-    // information acquireinfo through callback
     return SUCCESS;
 }
 
 int32_t UserIDMStub::UpdateCredentialStub(MessageParcel& data, MessageParcel& reply)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "UpdateCredentialStub enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "UpdateCredentialStub start");
 
     AddCredInfo credInfo;
     credInfo.authType = static_cast<AuthType>(data.ReadUint32());
@@ -174,18 +173,16 @@ int32_t UserIDMStub::UpdateCredentialStub(MessageParcel& data, MessageParcel& re
     }
 
     UpdateCredential(credInfo, callback);
-    // Update user credential information and return result code and additional information acquireinfo by callback
     return SUCCESS;
 }
 
-int32_t UserIDMStub::CancelSub(MessageParcel& data, MessageParcel& reply)
+int32_t UserIDMStub::CancelStub(MessageParcel& data, MessageParcel& reply)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "CancelSub enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "CancelStub start");
 
     uint64_t challenge = data.ReadUint64();
 
     int32_t ret = Cancel(challenge);
-    // Cancel the entry, pass in the challenge value, and the result is returned through ret
     if (!reply.WriteInt32(ret)) {
         USERIDM_HILOGE(MODULE_SERVICE, "failed to WriteInt32(ret)");
         return FAIL;
@@ -196,7 +193,7 @@ int32_t UserIDMStub::CancelSub(MessageParcel& data, MessageParcel& reply)
 
 int32_t UserIDMStub::EnforceDelUserStub(MessageParcel& data, MessageParcel& reply)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "EnforceDelUserStub enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "EnforceDelUserStub start");
 
     int32_t userId = data.ReadInt32();
 
@@ -207,8 +204,6 @@ int32_t UserIDMStub::EnforceDelUserStub(MessageParcel& data, MessageParcel& repl
     }
 
     int32_t ret = EnforceDelUser(userId, callback);
-    // Forcibly delete the user ※ judge that accountmgr is done in the service. After the request,
-    // data analysis and circular call deletion are all done in the service
     if (!reply.WriteInt32(ret)) {
         USERIDM_HILOGE(MODULE_SERVICE, "failed to WriteInt32(ret)");
         return FAIL;
@@ -218,7 +213,7 @@ int32_t UserIDMStub::EnforceDelUserStub(MessageParcel& data, MessageParcel& repl
 
 int32_t UserIDMStub::DelUserStub(MessageParcel& data, MessageParcel& reply)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "DelUserStub enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "DelUserStub start");
 
     std::vector<uint8_t> authToken;
     data.ReadUInt8Vector(&authToken);
@@ -230,14 +225,12 @@ int32_t UserIDMStub::DelUserStub(MessageParcel& data, MessageParcel& reply)
     }
 
     DelUser(authToken, callback);
-    // Delete the user credential information, pass in the user password authentication token and callback,
-    // and obtain the deletion result through the callback
     return SUCCESS;
 }
 
 int32_t UserIDMStub::DelCredStub(MessageParcel& data, MessageParcel& reply)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "DelCredStub enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "DelCredStub start");
 
     uint64_t credentialId = data.ReadUint64();
     std::vector<uint8_t> authToken;

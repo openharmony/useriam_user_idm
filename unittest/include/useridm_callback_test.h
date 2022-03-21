@@ -24,8 +24,8 @@ namespace UserIAM {
 namespace UserIDM {
 class GetInfoCallbackUT : public GetInfoCallback {
 public:
-    virtual ~GetInfoCallbackUT() =default;
-    void OnGetInfo(std::vector<CredentialInfo>& info)override;
+    virtual ~GetInfoCallbackUT() = default;
+    void OnGetInfo(std::vector<CredentialInfo> &info) override;
 };
 
 class GetSecInfoCallbackUT : public GetSecInfoCallback {

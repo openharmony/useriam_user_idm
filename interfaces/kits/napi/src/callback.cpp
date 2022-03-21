@@ -29,13 +29,13 @@ namespace {
 const int PARAMTWO = 2;
 const int PARAMTHREE = 3;
 }
+
 napi_value GetAuthInfoRet(napi_env env, uint64_t ret)
 {
-    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
-    size_t length = sizeof(ret);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "%{public}s, start", __func__);
     void* data = nullptr;
     napi_value arrayBuffer = nullptr;
-    size_t bufferSize = length;
+    size_t bufferSize = sizeof(ret);
     NAPI_CALL(env, napi_create_arraybuffer(env, bufferSize, &data, &arrayBuffer));
     if (memcpy_s(data, bufferSize, reinterpret_cast<const void*>(&ret), bufferSize) != EOK) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "memcpy_s failed");
@@ -70,7 +70,7 @@ static AsyncCallbackContext *CopyAsyncCallbackContext(AsyncCallbackContext *asyn
 
 IIdmCallback::IIdmCallback(AsyncCallbackContext* asyncCallbackContext)
 {
-    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "%{public}s, start", __func__);
     std::lock_guard<std::mutex> idmMutexGuard(mutex_);
     asyncCallbackContext_ = asyncCallbackContext;
 }
@@ -122,7 +122,7 @@ EXIT:
 
 void IIdmCallback::OnResult(int32_t result, RequestResult extraInfo)
 {
-    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "%{public}s, start", __func__);
     std::lock_guard<std::mutex> idmMutexGuard(mutex_);
     if (asyncCallbackContext_ == nullptr) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "asyncCallbackContext_ is nullptr");
@@ -159,7 +159,7 @@ void IIdmCallback::OnResult(int32_t result, RequestResult extraInfo)
 
 static void OnAcquireInfoWork(uv_work_t* work, int status)
 {
-    USERIDM_HILOGI(MODULE_JS_NAPI, "Do OnAcquireInfoWork start");
+    USERIDM_HILOGI(MODULE_JS_NAPI, "OnAcquireInfoWork start");
     AsyncCallbackContext *asyncCallbackContext = reinterpret_cast<AsyncCallbackContext *>(work->data);
     if (asyncCallbackContext == nullptr) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "asyncCallbackContext is null");
@@ -207,7 +207,7 @@ EXIT:
 
 void IIdmCallback::OnAcquireInfo(int32_t module, int32_t acquire, RequestResult extraInfo)
 {
-    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "%{public}s, start", __func__);
     std::lock_guard<std::mutex> idmMutexGuard(mutex_);
     if (asyncCallbackContext_ == nullptr) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "napi_call_function is nullptr");
@@ -239,13 +239,13 @@ void IIdmCallback::OnAcquireInfo(int32_t module, int32_t acquire, RequestResult 
 
 GetInfoCallbackIDM::GetInfoCallbackIDM(AsyncGetAuthInfo *asyncGetAuthInfo)
 {
-    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "%{public}s, start", __func__);
     asyncGetAuthInfo_ = asyncGetAuthInfo;
 }
 
 static napi_value CreateCredentialInfo(AsyncGetAuthInfo *asyncGetAuthInfo)
 {
-    USERIDM_HILOGI(MODULE_JS_NAPI, "%{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "%{public}s, start", __func__);
     napi_value array;
     napi_env env = asyncGetAuthInfo->env;
     NAPI_CALL(env, napi_create_array_with_length(env, asyncGetAuthInfo->info.size(), &array));
@@ -266,6 +266,7 @@ static napi_value CreateCredentialInfo(AsyncGetAuthInfo *asyncGetAuthInfo)
         napi_value templateId = GetAuthInfoRet(env, (asyncGetAuthInfo->info[Vect].templateId));
         if (templateId == nullptr) {
             USERIDM_HILOGE(MODULE_JS_NAPI, "GetAuthInfo failed");
+            return nullptr;
         }
         NAPI_CALL(env, napi_set_named_property(env, obj, "credentialId", credentialId));
         NAPI_CALL(env, napi_set_named_property(env, obj, "authType", authType));
@@ -336,7 +337,7 @@ static void OnGetInfoCallbackWork(AsyncGetAuthInfo *asyncGetAuthInfo)
 
 static void OnGetInfoWork(uv_work_t* work, int status)
 {
-    USERIDM_HILOGI(MODULE_JS_NAPI, "Do OnGetInfoWork start");
+    USERIDM_HILOGI(MODULE_JS_NAPI, "OnGetInfoWork start");
     AsyncGetAuthInfo *asyncGetAuthInfo = reinterpret_cast<AsyncGetAuthInfo *>(work->data);
     if (asyncGetAuthInfo == nullptr) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "asyncGetAuthInfo is null");
@@ -355,7 +356,7 @@ static void OnGetInfoWork(uv_work_t* work, int status)
 
 void GetInfoCallbackIDM::OnGetInfo(std::vector<CredentialInfo>& info)
 {
-    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "%{public}s, start", __func__);
     if (asyncGetAuthInfo_ == nullptr) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "asyncGetAuthInfo_ is nullptr");
         return;

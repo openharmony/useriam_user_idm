@@ -21,23 +21,23 @@ namespace UserIAM {
 namespace UserIDM {
 void UserIDMGetSecInfoCallbackProxy::OnGetSecInfo(SecInfo &info)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMGetSecInfoCallbackProxy OnGetSecInfo enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMGetSecInfoCallbackProxy OnGetSecInfo start");
 
     MessageParcel data;
     MessageParcel reply;
 
     if (!data.WriteInterfaceToken(UserIDMGetSecInfoCallbackProxy::GetDescriptor())) {
-        USERIDM_HILOGE(MODULE_SERVICE, "write descriptor failed!");
+        USERIDM_HILOGE(MODULE_SERVICE, "failed to write descriptor");
         return;
     }
 
     if (!data.WriteUint64(info.secureUid)) {
-        USERIDM_HILOGE(MODULE_SERVICE, "failed to WriteUint64(info.secureUid).");
+        USERIDM_HILOGE(MODULE_SERVICE, "failed to WriteUint64(info.secureUid)");
         return;
     }
 
     if (!data.WriteUint32(info.enrolledInfoLen)) {
-        USERIDM_HILOGE(MODULE_SERVICE, "failed to WriteUint32(info.authType).");
+        USERIDM_HILOGE(MODULE_SERVICE, "failed to WriteUint32(info.enrolledInfoLen)");
         return;
     }
 
@@ -50,11 +50,11 @@ void UserIDMGetSecInfoCallbackProxy::OnGetSecInfo(SecInfo &info)
 
 bool UserIDMGetSecInfoCallbackProxy::SendRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, bool isSync)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMGetSecInfoCallbackProxy SendRequest enter");
+    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMGetSecInfoCallbackProxy SendRequest start");
 
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
-        USERIDM_HILOGE(MODULE_SERVICE, "failed to get remote.");
+        USERIDM_HILOGE(MODULE_SERVICE, "failed to get remote");
         return false;
     }
 

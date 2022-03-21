@@ -26,7 +26,7 @@ namespace UserIDM {
 void AuthCommon::SaveCallback(napi_env env, size_t argc, napi_value* argv,
     AsyncCallbackContext* asyncCallbackContext)
 {
-    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "%{public}s, start", __func__);
     napi_valuetype valueType;
     napi_status status = napi_typeof(env, argv[argc], &valueType);
     if (status != napi_ok) {
@@ -66,7 +66,7 @@ void AuthCommon::SaveCallback(napi_env env, size_t argc, napi_value* argv,
 
 int32_t AuthCommon::GetNamedProperty(napi_env env, napi_value obj, const std::string &keyStr)
 {
-    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "%{public}s, start", __func__);
     napi_value value = nullptr;
     napi_status status = napi_get_named_property(env, obj, keyStr.c_str(), &value);
     if (status != napi_ok) {
@@ -94,10 +94,10 @@ int32_t AuthCommon::GetNamedProperty(napi_env env, napi_value obj, const std::st
 
 std::vector<uint8_t> AuthCommon::GetNamedAttribute(napi_env env, napi_value obj)
 {
-    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "%{public}s, start", __func__);
     std::vector<uint8_t> retNull = {0};
     napi_value token;
-    napi_status status = napi_get_named_property(env, obj, PROPERTY_KEY_EVENT.c_str(), &token);
+    napi_status status = napi_get_named_property(env, obj, PROPERTY_KEY_EVENT, &token);
     if (status != napi_ok) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "napi_get_named_property failed");
         return retNull;
@@ -132,11 +132,11 @@ std::vector<uint8_t> AuthCommon::GetNamedAttribute(napi_env env, napi_value obj)
 
 napi_value AuthCommon::CreateObject(napi_env env, const std::string& keyStr, uint64_t credentialId)
 {
-    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "%{public}s, start", __func__);
     napi_value obj;
     napi_value napiCredentialId = nullptr;
     NAPI_CALL(env, napi_create_object(env, &obj));
-    if (keyStr.c_str() == FUNC_ONRESULT || keyStr.c_str() == FUNC_ONACQUIREINFO) {
+    if (keyStr.compare(FUNC_ONRESULT) == 0 || keyStr.compare(FUNC_ONACQUIREINFO) == 0) {
         void* data = nullptr;
         napi_value arrayBuffer = nullptr;
         size_t length = sizeof(credentialId);
@@ -155,7 +155,7 @@ napi_value AuthCommon::CreateObject(napi_env env, const std::string& keyStr, uin
 napi_status AuthCommon::JudgeObjectType (
     napi_env env, napi_callback_info info, AsyncCallbackContext* asyncCallbackContext)
 {
-    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "%{public}s, start", __func__);
     size_t argc = TWO_PARAMETER;
     napi_value argv[TWO_PARAMETER] = {0};
     napi_status status = napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
@@ -188,7 +188,7 @@ napi_status AuthCommon::JudgeObjectType (
 
 void AuthCommon::JudgeDelUserType(napi_env env, napi_callback_info info, AsyncCallbackContext* asyncCallbackContext)
 {
-    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "%{public}s, start", __func__);
     napi_status status;
     size_t argc = TWO_PARAMETER;
     napi_value argv[TWO_PARAMETER] = {0};
@@ -207,7 +207,7 @@ void AuthCommon::JudgeDelUserType(napi_env env, napi_callback_info info, AsyncCa
 
 void AuthCommon::JudgeDelCredType(napi_env env, napi_callback_info info, AsyncCallbackContext* asyncCallbackContext)
 {
-    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "%{public}s, start", __func__);
     napi_status status;
     size_t argc = THREE_PARAMETER;
     napi_value argv[THREE_PARAMETER] = {0};
@@ -231,7 +231,7 @@ void AuthCommon::JudgeDelCredType(napi_env env, napi_callback_info info, AsyncCa
 
 std::vector<uint8_t> AuthCommon::JudgeArryType(napi_env env, size_t argc, napi_value* argv)
 {
-    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "%{public}s, start", __func__);
     std::vector<uint8_t> retNull = {0};
     napi_typedarray_type arraytype;
     size_t length = 0;
@@ -263,7 +263,7 @@ std::vector<uint8_t> AuthCommon::JudgeArryType(napi_env env, size_t argc, napi_v
 
 AsyncGetAuthInfo* GCreateAsyncInfo(napi_env env)
 {
-    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "%{public}s, start", __func__);
     return new (std::nothrow) AsyncGetAuthInfo {
         .env = env,
         .deferred = nullptr,
@@ -272,7 +272,7 @@ AsyncGetAuthInfo* GCreateAsyncInfo(napi_env env)
 
 AsyncOpenSession* OCreateAsyncInfo(napi_env env)
 {
-    USERIDM_HILOGI(MODULE_JS_NAPI, "authFace : %{public}s, start.", __func__);
+    USERIDM_HILOGI(MODULE_JS_NAPI, "%{public}s, start", __func__);
     return new (std::nothrow) AsyncOpenSession {
         .env = env,
         .asyncWork = nullptr,

@@ -26,7 +26,7 @@ namespace UserIDM {
 class UserIDMStub : public IRemoteStub<IUserIDM> {
 public:
     explicit UserIDMStub();
-    int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+    int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option) override;
 private:
     int32_t OpenSessionStub(MessageParcel& data, MessageParcel& reply);
     int32_t CloseSessionStub(MessageParcel& data, MessageParcel& reply);
@@ -35,7 +35,7 @@ private:
     int32_t GetSecInfoStub(MessageParcel& data, MessageParcel& reply);
     int32_t AddCredentialStub(MessageParcel& data, MessageParcel& reply);
     int32_t UpdateCredentialStub(MessageParcel& data, MessageParcel& reply);
-    int32_t CancelSub(MessageParcel& data, MessageParcel& reply);
+    int32_t CancelStub(MessageParcel& data, MessageParcel& reply);
     int32_t EnforceDelUserStub(MessageParcel& data, MessageParcel& reply);
     int32_t DelUserStub(MessageParcel& data, MessageParcel& reply);
     int32_t DelCredStub(MessageParcel& data, MessageParcel& reply);
