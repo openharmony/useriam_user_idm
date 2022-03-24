@@ -145,7 +145,7 @@ napi_value UserIdentityManager::OpenSessionCallback(napi_env env, napi_value *ar
                 asyncInfo = nullptr;
             }
         },
-        (void *)asyncInfo, &asyncInfo->asyncWork));
+        reinterpret_cast<void *>(asyncInfo), &asyncInfo->asyncWork));
     NAPI_CALL(env, napi_queue_async_work(env, asyncInfo->asyncWork));
     return result;
 }
@@ -181,7 +181,7 @@ napi_value UserIdentityManager::OpenSessionPromise(napi_env env, napi_value *arg
                 asyncInfo = nullptr;
             }
         },
-        (void *)asyncInfo, &asyncInfo->asyncWork));
+        reinterpret_cast<void *>(asyncInfo), &asyncInfo->asyncWork));
     NAPI_CALL(env,  napi_queue_async_work(env, asyncInfo->asyncWork));
     return asyncInfo->promise;
 }
@@ -235,7 +235,7 @@ napi_value UserIdentityManager::BuildAddCredentialInfo(napi_env env, napi_callba
     napi_value resourceName = nullptr;
     NAPI_CALL(env, napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName));
     NAPI_CALL(env, napi_create_async_work(env, nullptr, resourceName, AddCredentialExecute, AddCredentialComplete,
-        (void *)asyncHolder, &asyncHolder->asyncWork));
+        reinterpret_cast<void *>(asyncHolder), &asyncHolder->asyncWork));
     NAPI_CALL(env, napi_queue_async_work(env, asyncHolder->asyncWork));
     return result;
 }
@@ -320,7 +320,7 @@ napi_value UserIdentityManager::BuildUpdateCredentialInfo(
     NAPI_CALL(env, napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName));
     NAPI_CALL(env, napi_create_async_work(
         env, nullptr, resourceName, UpdateCredentialExecute, UpdateCredentialComplete,
-        (void *)asyncHolder, &asyncHolder->asyncWork));
+        reinterpret_cast<void *>(asyncHolder), &asyncHolder->asyncWork));
     NAPI_CALL(env, napi_queue_async_work(env, asyncHolder->asyncWork));
     return result;
 }
@@ -438,7 +438,7 @@ napi_value UserIdentityManager::DoDelUser(napi_env env, napi_callback_info info,
     napi_value resourceName = nullptr;
     NAPI_CALL(env, napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName));
     NAPI_CALL(env, napi_create_async_work(env, nullptr, resourceName, DelUserExecute, DelUserComplete,
-                                          (void *)asyncHolder, &asyncHolder->asyncWork));
+        reinterpret_cast<void *>(asyncHolder), &asyncHolder->asyncWork));
     NAPI_CALL(env, napi_queue_async_work(env, asyncHolder->asyncWork));
     return result;
 }
@@ -514,7 +514,7 @@ napi_value UserIdentityManager::DoDelCred(napi_env env, napi_callback_info info,
     napi_value resourceName = nullptr;
     NAPI_CALL(env, napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName));
     NAPI_CALL(env, napi_create_async_work(env, nullptr, resourceName, DelCredExecute, DelCredComplete,
-                                          (void *)asyncHolder, &asyncHolder->asyncWork));
+        reinterpret_cast<void *>(asyncHolder), &asyncHolder->asyncWork));
     NAPI_CALL(env, napi_queue_async_work(env, asyncHolder->asyncWork));
     return result;
 }
@@ -661,7 +661,7 @@ napi_value UserIdentityManager::GetAuthInfoCallback(napi_env env, napi_value *ar
     NAPI_CALL(env, napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName));
     NAPI_CALL(env, napi_create_async_work(
         env, nullptr, resourceName, GetAuthInfoExecute, GetAuthInfoComplete,
-        (void *)asyncHolder, &asyncHolder->asyncWork));
+        reinterpret_cast<void *>(asyncHolder), &asyncHolder->asyncWork));
     NAPI_CALL(env, napi_queue_async_work(env, asyncHolder->asyncWork));
     return result;
 }
@@ -690,7 +690,7 @@ napi_value UserIdentityManager::GetAuthInfoPromise(napi_env env, napi_value *arg
     NAPI_CALL(env, napi_create_async_work(
         env, nullptr, resourceName,
         GetAuthInfoExecute, GetAuthInfoComplete,
-        (void *)asyncHolder, &asyncHolder->asyncWork));
+        reinterpret_cast<void *>(asyncHolder), &asyncHolder->asyncWork));
     NAPI_CALL(env, napi_queue_async_work(env, asyncHolder->asyncWork));
     return asyncGetAuthInfo->promise;
 }
@@ -710,7 +710,7 @@ extern "C" __attribute__((constructor)) void RegisterModule(void)
         .nm_filename = nullptr,
         .nm_register_func = Init,
         .nm_modname = "UserIDM",
-        .nm_priv = ((void *)0),
+        .nm_priv = (reinterpret_cast<void *>(0)),
         .reserved = {0}
     };
     napi_module_register(&module);

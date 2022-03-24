@@ -55,7 +55,7 @@ napi_value OpenSession(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_MAX_COUNT] = {nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argcAsync, argv, &thisVar, nullptr));
     UserIdentityManager *userIdentityManager = nullptr;
-    NAPI_CALL(env, napi_unwrap(env, thisVar, (void **)&userIdentityManager));
+    NAPI_CALL(env, napi_unwrap(env, thisVar, reinterpret_cast<void **>(&userIdentityManager)));
     if (userIdentityManager == nullptr) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "userIDM_helper OpenSession error");
         return nullptr;
@@ -72,7 +72,7 @@ napi_value AddCredential(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_MAX_COUNT] = {nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argcAsync, argv, &thisVar, nullptr));
     UserIdentityManager *userIdentityManager = nullptr;
-    NAPI_CALL(env, napi_unwrap(env, thisVar, (void **)&userIdentityManager));
+    NAPI_CALL(env, napi_unwrap(env, thisVar, reinterpret_cast<void **>(&userIdentityManager)));
     if (userIdentityManager == nullptr) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "userIDM_helper AddCredential error");
         return nullptr;
@@ -89,7 +89,7 @@ napi_value UpdateCredential(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_MAX_COUNT] = {nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argcAsync, argv, &thisVar, nullptr));
     UserIdentityManager *userIdentityManager = nullptr;
-    NAPI_CALL(env, napi_unwrap(env, thisVar, (void **)&userIdentityManager));
+    NAPI_CALL(env, napi_unwrap(env, thisVar, reinterpret_cast<void **>(&userIdentityManager)));
     if (userIdentityManager == nullptr) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "userIDM_helper UpdateCredential error");
         return nullptr;
@@ -106,7 +106,7 @@ napi_value CloseSession(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_MAX_COUNT] = {nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argcAsync, argv, &thisVar, nullptr));
     UserIdentityManager *userIdentityManager = nullptr;
-    NAPI_CALL(env, napi_unwrap(env, thisVar, (void **)&userIdentityManager));
+    NAPI_CALL(env, napi_unwrap(env, thisVar, reinterpret_cast<void **>(&userIdentityManager)));
     if (userIdentityManager == nullptr) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "userIDM_helper CloseSession error");
         return nullptr;
@@ -123,7 +123,7 @@ napi_value Cancel(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_MAX_COUNT] = {nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argcAsync, argv, &thisVar, nullptr));
     UserIdentityManager *userIdentityManager = nullptr;
-    NAPI_CALL(env, napi_unwrap(env, thisVar, (void **)&userIdentityManager));
+    NAPI_CALL(env, napi_unwrap(env, thisVar, reinterpret_cast<void **>(&userIdentityManager)));
     if (userIdentityManager == nullptr) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "userIDM_helper Cancel error");
         return nullptr;
@@ -140,7 +140,7 @@ napi_value DelUser(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_MAX_COUNT] = {nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argcAsync, argv, &thisVar, nullptr));
     UserIdentityManager *userIdentityManager = nullptr;
-    NAPI_CALL(env, napi_unwrap(env, thisVar, (void **)&userIdentityManager));
+    NAPI_CALL(env, napi_unwrap(env, thisVar, reinterpret_cast<void **>(&userIdentityManager)));
     if (userIdentityManager == nullptr) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "userIDM_helper DelUser error");
         return nullptr;
@@ -157,7 +157,7 @@ napi_value DelCred(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_MAX_COUNT] = {nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argcAsync, argv, &thisVar, nullptr));
     UserIdentityManager *userIdentityManager = nullptr;
-    NAPI_CALL(env, napi_unwrap(env, thisVar, (void **)&userIdentityManager));
+    NAPI_CALL(env, napi_unwrap(env, thisVar, reinterpret_cast<void **>(&userIdentityManager)));
     if (userIdentityManager == nullptr) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "userIDM_helper DelCred error");
         return nullptr;
@@ -174,7 +174,7 @@ napi_value GetAuthInfo(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_MAX_COUNT] = {nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argcAsync, argv, &thisVar, nullptr));
     UserIdentityManager *userIdentityManager = nullptr;
-    NAPI_CALL(env, napi_unwrap(env, thisVar, (void **)&userIdentityManager));
+    NAPI_CALL(env, napi_unwrap(env, thisVar, reinterpret_cast<void **>(&userIdentityManager)));
     if (userIdentityManager == nullptr) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "userIDM_helper GetAuthInfo error");
         return nullptr;

@@ -110,9 +110,9 @@ std::vector<uint8_t> AuthCommon::GetNamedAttribute(napi_env env, napi_value obj)
     bool isTypedArray = false;
     napi_is_typedarray(env, token, &isTypedArray);
     if (isTypedArray) {
-        USERIDM_HILOGI(MODULE_JS_NAPI, "token is a array");
+        USERIDM_HILOGI(MODULE_JS_NAPI, "token is an array");
     } else {
-        USERIDM_HILOGE(MODULE_JS_NAPI, "token is not a array");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "token is not an array");
         return retNull;
     }
     napi_get_typedarray_info(env, token, &arraytype, &length, reinterpret_cast<void **>(&data), &buffer, &offset);
@@ -241,9 +241,9 @@ std::vector<uint8_t> AuthCommon::JudgeArryType(napi_env env, size_t argc, napi_v
     bool isTypedArray = false;
     napi_is_typedarray(env, argv[argc], &isTypedArray);
     if (isTypedArray) {
-        USERIDM_HILOGI(MODULE_JS_NAPI, "this is a array");
+        USERIDM_HILOGI(MODULE_JS_NAPI, "this is an array");
     } else {
-        USERIDM_HILOGE(MODULE_JS_NAPI, "this is not a array");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "this is not an array");
         return retNull;
     }
     napi_get_typedarray_info(env, argv[argc], &arraytype, &length, reinterpret_cast<void **>(&data), &buffer, &offset);
