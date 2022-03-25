@@ -26,6 +26,7 @@ namespace UserIAM {
 namespace UserIDM {
 class UserIDMClient : public DelayedRefSingleton<UserIDM::UserIDMClient> {
     DECLARE_DELAYED_REF_SINGLETON(UserIDMClient);
+
 public:
     DISALLOW_COPY_AND_MOVE(UserIDMClient);
 

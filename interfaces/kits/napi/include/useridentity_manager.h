@@ -103,6 +103,7 @@ public:
     napi_value NAPI_DelUser(napi_env env, napi_callback_info info);
     napi_value NAPI_DelCred(napi_env env, napi_callback_info info);
     napi_value NAPI_GetAuthInfo(napi_env env, napi_callback_info info);
+
 private:
     napi_value OpenSessionWrap(napi_env env, napi_callback_info info, AsyncOpenSession *asyncInfo);
     napi_value OpenSessionCallback(napi_env env, napi_value *args, size_t argcAsync, AsyncOpenSession *asyncInfo);

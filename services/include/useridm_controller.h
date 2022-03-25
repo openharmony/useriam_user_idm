@@ -53,7 +53,7 @@ public:
 private:
     class CoAuthCallbackDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
-        CoAuthCallbackDeathRecipient(std::shared_ptr<UserIDMCoAuthHandler> callback);
+        explicit CoAuthCallbackDeathRecipient(std::shared_ptr<UserIDMCoAuthHandler> callback);
         ~CoAuthCallbackDeathRecipient() = default;
         void OnRemoteDied(const wptr<IRemoteObject>& remote) override;
     private:
@@ -63,7 +63,7 @@ private:
 
     class SetPropCallbackDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
-        SetPropCallbackDeathRecipient(std::shared_ptr<UserIDMSetPropHandler> callback);
+        explicit SetPropCallbackDeathRecipient(std::shared_ptr<UserIDMSetPropHandler> callback);
         ~SetPropCallbackDeathRecipient() = default;
         void OnRemoteDied(const wptr<IRemoteObject>& remote) override;
     private:
