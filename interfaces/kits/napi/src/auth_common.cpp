@@ -197,9 +197,9 @@ void AuthCommon::JudgeDelUserType(napi_env env, napi_callback_info info, AsyncCa
         USERIDM_HILOGE(MODULE_JS_NAPI, "napi_get_cb_info failed");
         return;
     }
-    asyncCallbackContext->token = JudgeArryType(env, ZERO_PARAMETER, argv);
+    asyncCallbackContext->token = JudgeArrayType(env, ZERO_PARAMETER, argv);
     if (asyncCallbackContext->token.empty()) {
-        USERIDM_HILOGE(MODULE_JS_NAPI, "JudgeArryType token failed");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "JudgeArrayType token failed");
         asyncCallbackContext->token.push_back(0);
     }
     SaveCallback(env, ONE_PARAMETER, argv, asyncCallbackContext);
@@ -216,20 +216,20 @@ void AuthCommon::JudgeDelCredType(napi_env env, napi_callback_info info, AsyncCa
         USERIDM_HILOGE(MODULE_JS_NAPI, "napi_get_cb_info failed");
         return;
     }
-    asyncCallbackContext->credentialId = JudgeArryType(env, ZERO_PARAMETER, argv);
+    asyncCallbackContext->credentialId = JudgeArrayType(env, ZERO_PARAMETER, argv);
     if (asyncCallbackContext->credentialId.empty()) {
-        USERIDM_HILOGE(MODULE_JS_NAPI, "JudgeArryType credentialId failed");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "JudgeArrayType credentialId failed");
         return;
     }
-    asyncCallbackContext->token = JudgeArryType(env, ONE_PARAMETER, argv);
+    asyncCallbackContext->token = JudgeArrayType(env, ONE_PARAMETER, argv);
     if (asyncCallbackContext->token.empty()) {
-        USERIDM_HILOGE(MODULE_JS_NAPI, "JudgeArryType token failed");
+        USERIDM_HILOGE(MODULE_JS_NAPI, "JudgeArrayType token failed");
         return;
     }
     SaveCallback(env, TWO_PARAMETER, argv, asyncCallbackContext);
 }
 
-std::vector<uint8_t> AuthCommon::JudgeArryType(napi_env env, size_t argc, napi_value* argv)
+std::vector<uint8_t> AuthCommon::JudgeArrayType(napi_env env, size_t argc, napi_value* argv)
 {
     USERIDM_HILOGI(MODULE_JS_NAPI, "%{public}s, start", __func__);
     std::vector<uint8_t> retNull = {0};

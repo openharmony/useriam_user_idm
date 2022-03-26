@@ -29,7 +29,7 @@ public:
     void CloseEditSession();
     int32_t QueryCredential(int32_t userId, AuthType authType, std::vector<CredentialInfo>& credInfos);
     int32_t GetSecureUid(int32_t userId, uint64_t& secureUid, std::vector<EnrolledInfo>& enrolledInfos);
-    int32_t InitSchedulation(std::vector<uint8_t> autoToken, int32_t userId, AuthType authType,
+    int32_t InitSchedule(std::vector<uint8_t> autoToken, int32_t userId, AuthType authType,
         AuthSubType authSubType, uint64_t& sessionId);
     int32_t DeleteCredential(int32_t userId, uint64_t credentialId, std::vector<uint8_t> authToken,
         CredentialInfo& credInfo);

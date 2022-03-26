@@ -24,6 +24,9 @@ namespace UserIAM {
 namespace UserIDM {
 class IGetInfoCallback : public IRemoteBroker {
 public:
+    /*
+     * return all registered credential information.
+     */
     virtual void OnGetInfo(std::vector<CredentialInfo> &info) = 0;
 
     enum {
@@ -35,6 +38,9 @@ public:
 
 class IGetSecInfoCallback : public IRemoteBroker {
 public:
+    /*
+     * return all registered security information.
+     */
     virtual void OnGetSecInfo(SecInfo &info) = 0;
 
     enum {
@@ -46,7 +52,15 @@ public:
 
 class IIDMCallback : public IRemoteBroker {
 public:
+
+    /*
+     * return result code and additional information through callback.
+     */
     virtual void OnResult(int32_t result, RequestResult reqRet) = 0;
+
+    /*
+     * return result code and additional information through acquireinfo.
+     */
     virtual void OnAcquireInfo(int32_t module, int32_t acquire, RequestResult reqRet) = 0;
 
     enum {

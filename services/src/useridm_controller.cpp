@@ -160,12 +160,12 @@ int32_t UserIDMController::AddCredentialCtrl(int32_t userId, uint64_t callerID, 
         innerkitsCallback->OnResult(BUSY, reqRet);
         return BUSY;
     }
-    int32_t ret = UserIDMAdapter::GetInstance().InitSchedulation(credInfo.token, userId, credInfo.authType,
+    int32_t ret = UserIDMAdapter::GetInstance().InitSchedule(credInfo.token, userId, credInfo.authType,
         credInfo.authSubType, scheduleId);
     if (ret == SUCCESS) {
         ret = AddCredentialCallCoauth(callerID, credInfo, innerkitsCallback, challenge, scheduleId);
     } else {
-        USERIDM_HILOGE(MODULE_SERVICE, "call TA info: InitSchedulation failed");
+        USERIDM_HILOGE(MODULE_SERVICE, "call TA info: InitSchedule failed");
         RequestResult reqRet;
         innerkitsCallback->OnResult(FAIL, reqRet);
     }
@@ -197,10 +197,10 @@ int32_t UserIDMController::UpdateCredentialCtrl(int32_t userId, uint64_t callerI
         innerkitsCallback->OnResult(BUSY, reqRet);
         return BUSY;
     }
-    int32_t ret = UserIDMAdapter::GetInstance().InitSchedulation(credInfo.token, userId, credInfo.authType,
+    int32_t ret = UserIDMAdapter::GetInstance().InitSchedule(credInfo.token, userId, credInfo.authType,
         credInfo.authSubType, scheduleId);
     if (ret == SUCCESS) {
-        USERIDM_HILOGI(MODULE_SERVICE, "InitSchedulation SUCCESS");
+        USERIDM_HILOGI(MODULE_SERVICE, "InitSchedule SUCCESS");
         data_->InsertScheduleId(scheduleId);
         std::shared_ptr<UserIDMCoAuthHandler> coAuthCallback =
             std::make_shared<UserIDMCoAuthHandler>(MODIFY_CRED, challenge, scheduleId, data_, innerkitsCallback);
@@ -213,7 +213,7 @@ int32_t UserIDMController::UpdateCredentialCtrl(int32_t userId, uint64_t callerI
         paramInfo.SetCallerUid(callerID);
         CoAuth::CoAuth::GetInstance().BeginSchedule(scheduleId, paramInfo, coAuthCallback);
     } else {
-        USERIDM_HILOGE(MODULE_SERVICE, "call TA info: InitSchedulation failed");
+        USERIDM_HILOGE(MODULE_SERVICE, "call TA info: BeginSchedule failed");
         RequestResult reqRet;
         innerkitsCallback->OnResult(FAIL, reqRet);
     }

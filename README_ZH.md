@@ -49,7 +49,7 @@
 
 | 接口名 | 描述                       |
 | ------ | -------------------------------- |
-| getAuthInfo(callback : AsyncCallback<Array<EnrolledCredInfo>>,authType? : AuthType) : void; | 信息查询 接口，支持查询用户录入的一类或全部类型认证凭据 |
+| getAuthInfo(callback : AsyncCallback<Array<EnrolledCredInfo>>,authType? : AuthType) : void; | 信息查询接口，支持查询用户录入的一类或全部类型认证凭据 |
 
 ### 使用说明
 
