@@ -92,10 +92,10 @@ int32_t UserIDMAdapter::GetSecureUid(int32_t userId, uint64_t& secureUid,
     return ret;
 }
 
-int32_t UserIDMAdapter::InitSchedulation(std::vector<uint8_t> autoToken, int32_t userId, AuthType authType,
+int32_t UserIDMAdapter::InitSchedule(std::vector<uint8_t> autoToken, int32_t userId, AuthType authType,
     AuthSubType authSubType, uint64_t& sessionId)
 {
-    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMAdapter InitSchedulation start");
+    USERIDM_HILOGD(MODULE_SERVICE, "UserIDMAdapter InitSchedule start");
     int32_t ret = OHOS::UserIAM::UserIDM::Hal::InitSchedulation(autoToken, userId, authType, authSubType, sessionId);
     USERIDM_HILOGI(MODULE_SERVICE, "Call TA info: GetScheduleId: %{public}d", ret);
     return ret;

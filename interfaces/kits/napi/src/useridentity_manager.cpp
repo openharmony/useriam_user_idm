@@ -47,6 +47,9 @@ napi_value UserIdentityManager::NAPI_OpenSession(napi_env env, napi_callback_inf
     }
     napi_value ret = OpenSessionWrap(env, info, asyncInfo);
     if (ret == nullptr) {
+        if (asyncInfo->callback != nullptr) {
+            napi_delete_reference(env, asyncInfo->callback);
+        }
         if (asyncInfo != nullptr) {
             delete asyncInfo;
             asyncInfo = nullptr;
@@ -377,7 +380,7 @@ napi_value UserIdentityManager::NAPI_Cancel(napi_env env, napi_callback_info inf
 
     syncCancelContext->env = env;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
-    syncCancelContext->challenge = AuthCommon::JudgeArryType(env, ZERO_PARAMETER, argv);
+    syncCancelContext->challenge = AuthCommon::JudgeArrayType(env, ZERO_PARAMETER, argv);
     if (syncCancelContext->challenge.empty() || syncCancelContext->challenge.size() < sizeof(uint64_t)) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "syncCancelContext->challenge is null or size is wrong!");
         delete syncCancelContext;
@@ -565,6 +568,9 @@ napi_value UserIdentityManager::NAPI_GetAuthInfo(napi_env env, napi_callback_inf
     napi_value ret = GetAuthInfoWrap(env, info, asyncHolder);
     if (ret == nullptr) {
         USERIDM_HILOGE(MODULE_JS_NAPI, "NAPI_GetAuthInfo GetAuthInfoWrap fail");
+        if (asyncGetAuthInfo->callback != nullptr) {
+            napi_delete_reference(env, asyncGetAuthInfo->callback);
+        }
         delete asyncGetAuthInfo;
         if (asyncHolder->asyncWork != nullptr) {
             napi_delete_async_work(env, asyncHolder->asyncWork);
@@ -710,7 +716,7 @@ extern "C" __attribute__((constructor)) void RegisterModule(void)
         .nm_filename = nullptr,
         .nm_register_func = Init,
         .nm_modname = "UserIDM",
-        .nm_priv = (reinterpret_cast<void *>(0)),
+        .nm_priv = nullptr,
         .reserved = {0}
     };
     napi_module_register(&module);
