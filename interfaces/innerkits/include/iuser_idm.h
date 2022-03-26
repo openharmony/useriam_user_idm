@@ -28,7 +28,7 @@ public:
     /*
      * start an IDM operation to obtain challenge value, a challenge value of 0 indicates that opensession failed.
      *
-     * return uint8Array is success or fail.
+     * return challenge value.
      */
     virtual uint64_t OpenSession() = 0;
 
@@ -41,7 +41,7 @@ public:
      * get authentication information.
      *
      * param authType credential type.
-     * param callback returns all registered credential information of this type for the current user.
+     * param callback returns all registered credential information of this type for the specific user.
      */
     virtual int32_t GetAuthInfo(AuthType authType, const sptr<IGetInfoCallback>& callback) = 0;
 
@@ -50,7 +50,7 @@ public:
      *
      * param userId current user id.
      * param authType credential type.
-     * param callback returns all registered credential information of this type for the current user.
+     * param callback returns all registered credential information of this type for the specific user.
      */
     virtual int32_t GetAuthInfo(int32_t userId, AuthType authType, const sptr<IGetInfoCallback>& callback) = 0;
 
@@ -58,7 +58,7 @@ public:
      * get user security ID.
      *
      * param userId current user id.
-     * param callback returns all registered security information for the current user.
+     * param callback returns all registered security information for the specific user.
      */
     virtual int32_t GetSecInfo(int32_t userId, const sptr<IGetSecInfoCallback>& callback) = 0;
 
@@ -90,7 +90,7 @@ public:
     virtual int32_t Cancel(uint64_t challenge) = 0;
 
     /*
-     * enforce delete the user credential information, pass in the user password authentication token and callback,
+     * enforce delete the user credential information, pass in the callback,
      * and obtain the deletion result through the callback.
      *
      * param authToken user password authentication token.
@@ -99,7 +99,7 @@ public:
     virtual int32_t EnforceDelUser(int32_t userId, const sptr<IIDMCallback>& callback) = 0;
 
     /*
-     * delete the user credential information, pass in the user password authentication token and callback,
+     * delete all users credential information, pass in the user password authentication token and callback,
      * and obtain the deletion result through the callback.
      *
      * param authToken user password authentication token.
