@@ -30,13 +30,13 @@ uint64_t UserIDMProxy::OpenSession()
         return FAIL;
     }
 
-    uint64_t result = 0; // as result: challenge num
+    uint64_t challenge = 0;
     bool ret = SendRequest(USERIDM_OPEN_SESSION, data, reply);
     if (ret) {
-        result = reply.ReadUint64();
-        USERIDM_HILOGI(MODULE_CLIENT, "result = XXXX%{public}04" PRIx64, result);
+        challenge = reply.ReadUint64();
+        USERIDM_HILOGI(MODULE_CLIENT, "challenge = 0xXXXX%{public}04" PRIx64, MASK & challenge);
     }
-    return result;
+    return challenge;
 }
 
 void UserIDMProxy::CloseSession()

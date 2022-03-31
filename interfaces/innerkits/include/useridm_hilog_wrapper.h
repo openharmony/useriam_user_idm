@@ -16,9 +16,6 @@
 #ifndef USERIDM_HILOG_WRAPPER_H
 #define USERIDM_HILOG_WRAPPER_H
 
-#define CONFIG_HILOG
-#ifdef CONFIG_HILOG
-
 #include "hilog/log.h"
 
 namespace OHOS {
@@ -79,18 +76,10 @@ static constexpr OHOS::HiviewDFX::HiLogLabel USERIDM_LABEL[USERIDM_MODULE_BUTT] 
 #define USERIDM_HILOGW(module, ...) (void)OHOS::HiviewDFX::HiLog::Warn(USERIDM_LABEL[module], formated__(__VA_ARGS__))
 #define USERIDM_HILOGI(module, ...) (void)OHOS::HiviewDFX::HiLog::Info(USERIDM_LABEL[module], formated__(__VA_ARGS__))
 #define USERIDM_HILOGD(module, ...) (void)OHOS::HiviewDFX::HiLog::Debug(USERIDM_LABEL[module], formated__(__VA_ARGS__))
+
+constexpr uint64_t MASK = 0x0000FFFF;
 } // namespace UserIDM
 } // namespace UserIAM
 } // namespace OHOS
-
-#else
-
-#define USERIDM_HILOGF(...)
-#define USERIDM_HILOGE(...)
-#define USERIDM_HILOGW(...)
-#define USERIDM_HILOGI(...)
-#define USERIDM_HILOGD(...)
-
-#endif // CONFIG_HILOG
 
 #endif // USERIDM_HILOG_WRAPPER_H
