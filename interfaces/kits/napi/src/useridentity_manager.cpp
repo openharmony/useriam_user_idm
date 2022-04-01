@@ -489,7 +489,7 @@ void UserIdentityManager::DelCredExecute(napi_env env, void *data)
     }
     uint8_t tmp[sizeof(uint64_t)];
     for (uint32_t i = 0; i < sizeof(uint64_t); i++) {
-    tmp[i] = asyncCallbackContext->credentialId[i];
+        tmp[i] = asyncCallbackContext->credentialId[i];
     }
     uint64_t *tempCredentialId = static_cast<uint64_t *>(static_cast<void *>(tmp));
     std::shared_ptr<IDMCallback> iidmCallback = std::make_shared<IIdmCallback>(asyncCallbackContext);
