@@ -62,7 +62,7 @@ int32_t UserIDMService::GetCallingUserId(int32_t &userId)
     if (tokenId == 0) {
         tokenId = this->GetCallingTokenID();
     }
-    ATokenTypeEnum callingType = AccessTokenKit::GetTokenType(tokenId);
+    ATokenTypeEnum callingType = AccessTokenKit::GetTokenTypeFlag(tokenId);
     if (callingType != TOKEN_HAP) {
         USERIDM_HILOGE(MODULE_SERVICE, "CallingType is not hap");
         return TYPE_NOT_SUPPORT;
