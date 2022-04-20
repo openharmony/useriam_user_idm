@@ -18,7 +18,7 @@ config("useridm_private_config") {
   include_dirs = [
     "${useridm_interfaces_path}/include",
     "${useridm_services_path}/include",
-    "${useriam_path}/auth_executor_mgr/interfaces/innerkits/include",
+    "//base/user_auth/interfaces/inner_api/co_auth",
     "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
   ]
 }
