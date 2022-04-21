@@ -39,7 +39,7 @@ ohos_shared_library("useridm") {
 
   deps = [
     "//base/user_iam/user_idm/interfaces/innerkits:useridm_framework",
-    "//foundation/ace/napi:ace_napi",
+    "//foundation/arkui/napi:ace_napi",
     "//utils/native/base:utils",
   ]
 
