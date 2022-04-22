@@ -16,7 +16,7 @@ import("//build/ohos.gni")
 
 config("useridm_private_config") {
   include_dirs = [
-    "//base/user_iam/auth_executor_mgr/common/interface",
+    "//base/user_iam/user_auth/services/co_auth/common/interface",
     "${useridm_interfaces_path}/include",
     "${useridm_services_path}/include",
     "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
@@ -49,8 +49,8 @@ ohos_shared_library("useridmservice") {
   deps = [
     "${useridm_innerkits_path}:useridm_framework",
     "//base/security/access_token/interfaces/innerkits/accesstoken:libaccesstoken_sdk",
-    "//base/user_iam/auth_executor_mgr/common:useriam_common_lib",
-    "//base/user_iam/auth_executor_mgr/interfaces/innerkits:coauth_framework",
+    "//base/user_iam/user_auth/frameworks/co_auth:coauth_framework",
+    "//base/user_iam/user_auth/services/co_auth/common:useriam_common_lib",
     "//utils/native/base:utils",
   ]
 
