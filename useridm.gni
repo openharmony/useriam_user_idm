@@ -30,5 +30,3 @@ useridm_innerkits_path = "${useridm_interfaces_path}/innerkits"
 useridm_kits_path = "${useridm_interfaces_path}/kits"
 
 aafwk_path = "//foundation/aafwk/standard"
-
-appexecfwk_path = "//foundation/appexecfwk/standard"
